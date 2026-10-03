@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Moldova Fashion Marketplace</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+
+        <div class="logo">
+            CLOSET
+        </div>
+
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Browse</a>
+            <a href="#">Sell</a>
+            <a href="#">About</a>
+        </nav>
+
+        <div class="header-buttons">
+            <button id="loginButton">Log in</button>
+            <button id="headerSellButton">Sell an item</button>
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <!-- HOME PAGE -->
+
+        <section class="hero">
+
+            <div class="hero-text">
+
+                <p class="small-title">MADE FOR MOLDOVA</p>
+
+                <h1>
+                    Your clothes.<br>
+                    Their next story.
+                </h1>
+
+                <p class="hero-description">
+                    Buy, sell and discover clothes from people across Moldova.
+                    A simpler way to give fashion a second life.
+                </p>
+
+                <div class="hero-buttons">
+                    <button id="browseButton">Browse clothes</button>
+                    <button id="sellButton">Sell something</button>
+                </div>
+
+            </div>
+
+
+            <div class="hero-image">
+
+                <div class="image-placeholder">
+                    YOUR<br>
+                    FASHION<br>
+                    HERE
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="why-us">
+
+            <p class="small-title">WHY US?</p>
+
+            <h2>
+                Not another classifieds website.
+            </h2>
+
+            <p>
+                A marketplace built specifically around clothing,
+                fashion and the people who wear it.
+            </p>
+
+        </section>
+
+        <!-- SIGN IN PAGE -->
+
+<section id="loginPage" class="account-page">
+
+    <div class="account-container">
+
+        <button id="closeLoginButton" class="close-account">
+            ← Back
+        </button>
+
+        <div class="account-card">
+
+            <p class="small-title">
+                WELCOME BACK
+            </p>
+
+            <h2>
+                Sign in to<br>
+                CLOSET.
+            </h2>
+
+            <p class="account-intro">
+                Sign in to sell your clothes and manage your listings.
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="loginEmail">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="you@example.com"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="Your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="account-button"
+                >
+                    Sign in
+                </button>
+
+            </form>
+
+
+            <p class="account-switch">
+                Don't have an account?
+                <button id="goToSignupButton">
+                    Create an account
+                </button>
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- CREATE ACCOUNT PAGE -->
+
+<section id="signupPage" class="account-page">
+
+    <div class="account-container">
+
+        <button id="closeSignupButton" class="close-account">
+            ← Back
+        </button>
+
+        <div class="account-card">
+
+            <p class="small-title">
+                JOIN CLOSET
+            </p>
+
+            <h2>
+                Create your<br>
+                account.
+            </h2>
+
+            <p class="account-intro">
+                Create an account to buy and sell clothes across Moldova.
+            </p>
+
+
+            <form id="signupForm">
+
+                <div class="form-group">
+
+                    <label for="signupName">
+                        Your name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="signupName"
+                        placeholder="Your name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="signupEmail">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="signupEmail"
+                        placeholder="you@example.com"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="signupPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="signupPassword"
+                        placeholder="Create a password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="signupPasswordConfirm">
+                        Confirm password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="signupPasswordConfirm"
+                        placeholder="Repeat your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="account-button"
+                >
+                    Create account
+                </button>
+
+            </form>
+
+
+            <p class="account-switch">
+                Already have an account?
+                <button id="goToLoginButton">
+                    Sign in
+                </button>
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+        <!-- SELL PAGE -->
+
+        <section id="sellPage" class="sell-page">
+
+            <div class="sell-container">
+
+                <button id="closeSellButton" class="close-sell">
+                    ← Back
+                </button>
+
+                <p class="small-title">
+                    SELL YOUR CLOTHES
+                </p>
+
+                <h2>
+                    Give your clothes<br>
+                    a new home.
+                </h2>
+
+                <p class="sell-intro">
+                    Add the details of your item and make it available
+                    to buyers across Moldova.
+                </p>
+
+
+                <form id="listingForm">
+
+                    <div class="form-group">
+
+                        <label for="itemName">
+                            Item name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="itemName"
+                            placeholder="e.g. Vintage denim jacket"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="itemPrice">
+                            Price (MDL)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="itemPrice"
+                            placeholder="e.g. 450"
+                            min="1"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="itemSize">
+                            Size
+                        </label>
+
+                        <select id="itemSize" required>
+
+                            <option value="">
+                                Choose a size
+                            </option>
+
+                            <option>XS</option>
+                            <option>S</option>
+                            <option>M</option>
+                            <option>L</option>
+                            <option>XL</option>
+                            <option>XXL</option>
+                            <option>Other</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="itemCondition">
+                            Condition
+                        </label>
+
+                        <select id="itemCondition" required>
+
+                            <option value="">
+                                Choose condition
+                            </option>
+
+                            <option>New</option>
+                            <option>Like new</option>
+                            <option>Good</option>
+                            <option>Fair</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="itemDescription">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="itemDescription"
+                            placeholder="Tell buyers about your item..."
+                            rows="5"
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="itemImage">
+                            Photo
+                        </label>
+
+                        <input
+                            type="file"
+                            id="itemImage"
+                            accept="image/*"
+                            required
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="publish-button"
+                    >
+                        Publish item
+                    </button>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            © 2026 CLOSET · Moldova
+        </p>
+
+    </footer>
+
+
+    <script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,559 @@
+/* ============================= */
+/*        GENERAL STYLES         */
+/* ============================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f7f5f0;
+    color: #171717;
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+
+/* ============================= */
+/*           HEADER              */
+/* ============================= */
+
+header {
+    width: 100%;
+    height: 80px;
+    padding: 0 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #f7f5f0;
+    border-bottom: 1px solid #dedbd3;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+nav {
+    display: flex;
+    gap: 35px;
+}
+
+nav a {
+    font-size: 15px;
+    color: #444;
+    transition: color 0.2s ease;
+}
+
+nav a:hover {
+    color: #000;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.header-buttons button {
+    padding: 11px 18px;
+    border: 1px solid #222;
+    border-radius: 25px;
+    background: transparent;
+    font-size: 14px;
+}
+
+.header-buttons button:last-child {
+    background: #171717;
+    color: white;
+}
+
+
+/* ============================= */
+/*             HERO              */
+/* ============================= */
+
+.hero {
+    min-height: 650px;
+    padding: 80px 6%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+}
+
+.hero-text {
+    max-width: 600px;
+}
+
+.small-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #777;
+    margin-bottom: 18px;
+}
+
+.hero h1 {
+    font-size: clamp(50px, 6vw, 88px);
+    line-height: 0.95;
+    letter-spacing: -4px;
+    margin-bottom: 30px;
+}
+
+.hero-description {
+    max-width: 480px;
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 35px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 14px;
+}
+
+.hero-buttons button {
+    padding: 15px 25px;
+    border-radius: 30px;
+    border: 1px solid #171717;
+    font-size: 15px;
+    transition: 0.2s ease;
+}
+
+.hero-buttons button:first-child {
+    background: #171717;
+    color: white;
+}
+
+.hero-buttons button:last-child {
+    background: transparent;
+}
+
+.hero-buttons button:hover {
+    transform: translateY(-2px);
+}
+
+
+/* ============================= */
+/*         HERO IMAGE            */
+/* ============================= */
+
+.hero-image {
+    width: 45%;
+    max-width: 600px;
+}
+
+.image-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ddd8cd;
+    color: #777;
+
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-align: center;
+
+    border-radius: 4px;
+}
+
+
+
+/* ============================= */
+/*           WHY US              */
+/* ============================= */
+
+.why-us {
+    padding: 130px 6%;
+    text-align: center;
+    background: #ebe7dd;
+}
+
+.why-us h2 {
+    max-width: 700px;
+    margin: 0 auto 20px;
+
+    font-size: 55px;
+    line-height: 1;
+    letter-spacing: -3px;
+}
+
+.why-us p:last-child {
+    max-width: 500px;
+    margin: auto;
+
+    color: #666;
+    font-size: 17px;
+}
+
+
+/* ============================= */
+/*            FOOTER             */
+/* ============================= */
+
+footer {
+    padding: 30px 6%;
+    background: #171717;
+    color: #aaa;
+
+    text-align: center;
+    font-size: 13px;
+}
+
+
+/* ============================= */
+/*         MOBILE VIEW           */
+/* ============================= */
+
+@media (max-width: 900px) {
+
+    header {
+        padding: 0 4%;
+    }
+
+    nav {
+        display: none;
+    }
+
+    .hero {
+        padding: 60px 6%;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .clothing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .why-us h2 {
+        font-size: 42px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .header-buttons button:first-child {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 52px;
+    }
+
+    .hero-description {
+        font-size: 16px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .clothing-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .featured {
+        padding: 70px 5%;
+    }
+
+    .section-title h2 {
+        font-size: 38px;
+    }
+
+    .why-us {
+        padding: 90px 6%;
+    }
+
+    .why-us h2 {
+        font-size: 38px;
+    }
+}
+
+/* ============================= */
+/*          SELL PAGE            */
+/* ============================= */
+
+.sell-page {
+    display: none;
+    min-height: 100vh;
+    padding: 70px 6%;
+    background: #f7f5f0;
+}
+
+.sell-container {
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+.close-sell {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    color: #555;
+    padding: 8px 0;
+    margin-bottom: 45px;
+}
+
+.close-sell:hover {
+    color: #000;
+}
+
+.sell-container h2 {
+    font-size: 64px;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    margin-bottom: 20px;
+}
+
+.sell-intro {
+    color: #666;
+    font-size: 17px;
+    max-width: 500px;
+    margin-bottom: 50px;
+}
+
+
+/* ============================= */
+/*          SELL LAYOUT           */
+/* ============================= */
+
+#listingForm {
+    max-width: 720px;
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    border: 1px solid #e3dfd6;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+}
+
+
+/* ============================= */
+/*           FORM                */
+/* ============================= */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 9px;
+    letter-spacing: 0.3px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+
+    border: 1px solid #d8d4ca;
+    border-radius: 10px;
+
+    background: #faf9f6;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+
+    transition: border-color 0.2s ease,
+                background 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #171717;
+    background: white;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+
+/* ============================= */
+/*          PHOTO INPUT           */
+/* ============================= */
+
+#itemImage {
+    padding: 25px;
+    border: 2px dashed #d3cfc5;
+    background: #faf9f6;
+    cursor: pointer;
+}
+
+#itemImage:hover {
+    border-color: #171717;
+}
+
+
+/* ============================= */
+/*        PUBLISH BUTTON          */
+/* ============================= */
+
+.publish-button {
+    width: 100%;
+
+    padding: 17px;
+
+    border: none;
+    border-radius: 30px;
+
+    background: #171717;
+    color: white;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease,
+                background 0.2s ease;
+}
+
+.publish-button:hover {
+    transform: translateY(-2px);
+    background: #2a2a2a;
+}
+
+
+/* ============================= */
+/*          MOBILE               */
+/* ============================= */
+
+@media (max-width: 700px) {
+
+    .sell-page {
+        padding: 45px 5%;
+    }
+
+    .sell-container h2 {
+        font-size: 48px;
+    }
+
+    #listingForm {
+        padding: 25px;
+        border-radius: 14px;
+    }
+}
+
+/* ============================= */
+/*         ACCOUNT PAGE          */
+/* ============================= */
+
+.account-page {
+    display: none;
+    min-height: 100vh;
+    padding: 70px 6%;
+    background: #f7f5f0;
+}
+
+.account-container {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.close-account {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    color: #555;
+    padding: 8px 0;
+    margin-bottom: 35px;
+}
+
+.close-account:hover {
+    color: #000;
+}
+
+.account-card {
+    background: white;
+    border: 1px solid #e3dfd6;
+    border-radius: 18px;
+    padding: 45px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.05);
+}
+
+.account-card h2 {
+    font-size: 58px;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    margin-bottom: 20px;
+}
+
+.account-intro {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 35px;
+}
+
+.account-button {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 30px;
+    background: #171717;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.account-button:hover {
+    transform: translateY(-2px);
+}
+
+.account-switch {
+    margin-top: 25px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.account-switch button {
+    border: none;
+    background: none;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+#signupPage {
+    display: none;
+}
