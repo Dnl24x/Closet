@@ -1,7 +1,7 @@
 (() => {
     const STORAGE_KEY = "closet-language";
     const SUPPORTED = ["en", "ro", "ru"];
-    const BRAND = { en: "CLOSET", ro: "A doua șansă", ru: "CLOSET" };
+    const BRAND = { en: "A doua șansă", ro: "A doua șansă", ru: "A doua șansă" };
 
     const translations = {
         en: {
@@ -21,7 +21,7 @@
             "Choose condition":"Choose condition","Location":"Location","Description":"Description","Photos":"Photos","Add photos":"Add photos","Choose files or drag them here":"Choose files or drag them here","Up to 20 photos · JPG, PNG or WebP":"Up to 20 photos · JPG, PNG or WebP","Publish listing":"Publish listing",
             "Back":"Back","Loading listing…":"Loading listing…","Please wait while we load the item.":"Please wait while we load the item.",
             "Listing unavailable":"Listing unavailable","Profile":"Profile","Your profile":"Your profile","Edit profile":"Edit profile","Settings":"Settings","Sign out":"Sign out",
-            "CLOSET PROFILE":"CLOSET PROFILE","YOUR CLOSET":"YOUR CLOSET","My listings":"My listings","Sell an item →":"Sell an item →",
+            "A doua șansă PROFILE":"A doua șansă PROFILE","YOUR CLOSET":"YOUR CLOSET","My listings":"My listings","Sell an item →":"Sell an item →",
             "ACCOUNT":"ACCOUNT","Settings.":"Settings.","Manage your CLOSET account and preferences.":"Manage your CLOSET account and preferences.","Account email":"Account email","Loading...":"Loading...",
             "Buying Protection":"Buying Protection","A future CLOSET feature. We'll announce when it becomes available.":"A future CLOSET feature. We'll announce when it becomes available.","Coming soon":"Coming soon","Sign out of this CLOSET account on this device.":"Sign out of this CLOSET account on this device.",
             "WElCOME BACK":"WELCOME BACK","WELCOME BACK":"WELCOME BACK","Sign in to":"Sign in to","Sign in":"Sign in","Create an account":"Create an account","Don't have an account?":"Don't have an account?",
@@ -29,8 +29,8 @@
             "We've sent a verification link to your email address. Open it and verify your account before signing in.":"We've sent a verification link to your email address. Open it and verify your account before signing in.",
             "JOIN CLOSET":"JOIN CLOSET","Create your account.":"Create your account.","Create an account to buy and sell things across Moldova.":"Create an account to buy and sell things across Moldova.",
             "Your name":"Your name","Create a password":"Create a password","Confirm password":"Confirm password","Repeat your password":"Repeat your password","Already have an account?":"Already have an account?",
-            "ABOUT CLOSET":"ABOUT CLOSET","Everything deserves another story.":"Everything deserves another story.","CLOSET is a Moldova-focused marketplace for buying, selling and discovering useful things locally.":"CLOSET is a Moldova-focused marketplace for buying, selling and discovering useful things locally.",
-            "Built for second lives.":"Built for second lives.","CLOSET keeps useful things moving instead of letting them sit unused.":"CLOSET keeps useful things moving instead of letting them sit unused.",
+            "ABOUT CLOSET":"ABOUT CLOSET","Everything deserves another story.":"Everything deserves another story.","A doua șansă is a Moldova-focused marketplace for buying, selling and discovering useful things locally.":"A doua șansă is a Moldova-focused marketplace for buying, selling and discovering useful things locally.",
+            "Built for second lives.":"Built for second lives.","A doua șansă keeps useful things moving instead of letting them sit unused.":"A doua șansă keeps useful things moving instead of letting them sit unused.",
             "Built for Moldova.":"Built for Moldova.","The marketplace is designed around people buying and selling locally across Moldova.":"The marketplace is designed around people buying and selling locally across Moldova.",
             "Built to grow.":"Built to grow.","Profiles, listings, reviews and future marketplace features can all grow with CLOSET.":"Profiles, listings, reviews and future marketplace features can all grow with CLOSET.",
             "Moldova marketplace":"Moldova marketplace","© 2026 CLOSET · Moldova":"© 2026 CLOSET · Moldova",
@@ -54,7 +54,7 @@
             "Choose condition":"Alege starea","Location":"Locație","Description":"Descriere","Photos":"Fotografii","Add photos":"Adaugă fotografii","Choose files or drag them here":"Alege fișiere sau trage-le aici","Up to 20 photos · JPG, PNG or WebP":"Până la 20 de fotografii · JPG, PNG sau WebP","Publish listing":"Publică anunțul",
             "Back":"Înapoi","Loading listing…":"Se încarcă anunțul…","Please wait while we load the item.":"Așteaptă cât încărcăm articolul.",
             "Listing unavailable":"Anunț indisponibil","Your profile":"Profilul tău","Edit profile":"Editează profilul","Settings":"Setări","Sign out":"Deconectare",
-            "CLOSET PROFILE":"PROFIL","YOUR CLOSET":"ANUNȚURILE TALE","My listings":"Anunțurile mele","Sell an item →":"Vinde un articol →",
+            "A doua șansă PROFILE":"PROFIL","YOUR CLOSET":"ANUNȚURILE TALE","My listings":"Anunțurile mele","Sell an item →":"Vinde un articol →",
             "ACCOUNT":"CONT","Settings.":"Setări.","Manage your CLOSET account and preferences.":"Gestionează-ți contul și preferințele.","Account email":"Emailul contului","Loading...":"Se încarcă...",
             "Buying Protection":"Protecția cumpărătorului","A future CLOSET feature. We'll announce when it becomes available.":"O funcție CLOSET viitoare. Te vom anunța când va fi disponibilă.","Coming soon":"În curând","Sign out of this CLOSET account on this device.":"Deconectează acest cont CLOSET de pe acest dispozitiv.",
             "WELCOME BACK":"BINE AI REVENIT","Sign in to":"Conectează-te la","Sign in":"Conectare","Create an account":"Creează un cont","Don't have an account?":"Nu ai un cont?",
@@ -62,8 +62,8 @@
             "We've sent a verification link to your email address. Open it and verify your account before signing in.":"Ți-am trimis un link de verificare. Deschide-l și verifică-ți contul înainte de conectare.",
             "JOIN CLOSET":"ALĂTURĂ-TE","Create your account.":"Creează-ți contul.","Create an account to buy and sell things across Moldova.":"Creează un cont pentru a cumpăra și vinde lucruri în Moldova.",
             "Your name":"Numele tău","Create a password":"Creează o parolă","Confirm password":"Confirmă parola","Repeat your password":"Repetă parola","Already have an account?":"Ai deja un cont?",
-            "ABOUT CLOSET":"DESPRE CLOSET","Everything deserves another story.":"Totul merită o nouă poveste.","CLOSET is a Moldova-focused marketplace for buying, selling and discovering useful things locally.":"Un marketplace din Moldova pentru a cumpăra, vinde și descoperi lucruri utile, local.",
-            "Built for second lives.":"Creat pentru a doua șansă.","CLOSET keeps useful things moving instead of letting them sit unused.":"Păstrăm lucrurile utile în circulație, în loc să rămână nefolosite.",
+            "ABOUT CLOSET":"DESPRE CLOSET","Everything deserves another story.":"Totul merită o nouă poveste.","A doua șansă is a Moldova-focused marketplace for buying, selling and discovering useful things locally.":"Un marketplace din Moldova pentru a cumpăra, vinde și descoperi lucruri utile, local.",
+            "Built for second lives.":"Creat pentru a doua șansă.","A doua șansă keeps useful things moving instead of letting them sit unused.":"Păstrăm lucrurile utile în circulație, în loc să rămână nefolosite.",
             "Built for Moldova.":"Creat pentru Moldova.","The marketplace is designed around people buying and selling locally across Moldova.":"Marketplace-ul este creat pentru oameni care cumpără și vând local în Moldova.",
             "Built to grow.":"Creat pentru a crește.","Profiles, listings, reviews and future marketplace features can all grow with CLOSET.":"Profilurile, anunțurile, recenziile și funcțiile viitoare pot crește împreună cu marketplace-ul.",
             "Moldova marketplace":"Marketplace din Moldova","© 2026 CLOSET · Moldova":"© 2026 A doua șansă · Moldova",
@@ -87,7 +87,7 @@
             "Choose condition":"Выбери состояние","Location":"Местоположение","Description":"Описание","Photos":"Фотографии","Add photos":"Добавить фото","Choose files or drag them here":"Выбери файлы или перетащи их сюда","Up to 20 photos · JPG, PNG or WebP":"До 20 фото · JPG, PNG или WebP","Publish listing":"Опубликовать объявление",
             "Back":"Назад","Loading listing…":"Загрузка объявления…","Please wait while we load the item.":"Подожди, пока мы загрузим товар.",
             "Listing unavailable":"Объявление недоступно","Your profile":"Твой профиль","Edit profile":"Изменить профиль","Settings":"Настройки","Sign out":"Выйти",
-            "CLOSET PROFILE":"ПРОФИЛЬ","YOUR CLOSET":"ТВОИ ОБЪЯВЛЕНИЯ","My listings":"Мои объявления","Sell an item →":"Продать товар →",
+            "A doua șansă PROFILE":"ПРОФИЛЬ","YOUR CLOSET":"ТВОИ ОБЪЯВЛЕНИЯ","My listings":"Мои объявления","Sell an item →":"Продать товар →",
             "ACCOUNT":"АККАУНТ","Settings.":"Настройки.","Manage your CLOSET account and preferences.":"Управляй аккаунтом и настройками.","Account email":"Email аккаунта","Loading...":"Загрузка...",
             "Buying Protection":"Защита покупателя","A future CLOSET feature. We'll announce when it becomes available.":"Будущая функция CLOSET. Мы сообщим, когда она станет доступна.","Coming soon":"Скоро","Sign out of this CLOSET account on this device.":"Выйти из этого аккаунта CLOSET на этом устройстве.",
             "WELCOME BACK":"С ВОЗВРАЩЕНИЕМ","Sign in to":"Войди в","Sign in":"Войти","Create an account":"Создать аккаунт","Don't have an account?":"Нет аккаунта?",
@@ -95,8 +95,8 @@
             "We've sent a verification link to your email address. Open it and verify your account before signing in.":"Мы отправили ссылку для подтверждения на твою почту. Открой её и подтверди аккаунт перед входом.",
             "JOIN CLOSET":"ПРИСОЕДИНЯЙСЯ","Create your account.":"Создай аккаунт.","Create an account to buy and sell things across Moldova.":"Создай аккаунт, чтобы покупать и продавать товары по Молдове.",
             "Your name":"Твоё имя","Create a password":"Создай пароль","Confirm password":"Подтверди пароль","Repeat your password":"Повтори пароль","Already have an account?":"Уже есть аккаунт?",
-            "ABOUT CLOSET":"О CLOSET","Everything deserves another story.":"Каждая вещь заслуживает новой истории.","CLOSET is a Moldova-focused marketplace for buying, selling and discovering useful things locally.":"Маркетплейс для покупки, продажи и поиска полезных вещей по всей Молдове.",
-            "Built for second lives.":"Создан для второй жизни вещей.","CLOSET keeps useful things moving instead of letting them sit unused.":"Полезные вещи продолжают жить, а не лежат без дела.",
+            "ABOUT CLOSET":"О CLOSET","Everything deserves another story.":"Каждая вещь заслуживает новой истории.","A doua șansă is a Moldova-focused marketplace for buying, selling and discovering useful things locally.":"Маркетплейс для покупки, продажи и поиска полезных вещей по всей Молдове.",
+            "Built for second lives.":"Создан для второй жизни вещей.","A doua șansă keeps useful things moving instead of letting them sit unused.":"Полезные вещи продолжают жить, а не лежат без дела.",
             "Built for Moldova.":"Создан для Молдовы.","The marketplace is designed around people buying and selling locally across Moldova.":"Маркетплейс создан для людей, которые покупают и продают товары по всей Молдове.",
             "Built to grow.":"Создан, чтобы расти.","Profiles, listings, reviews and future marketplace features can all grow with CLOSET.":"Профили, объявления, отзывы и будущие функции будут развиваться вместе с CLOSET.",
             "Moldova marketplace":"Маркетплейс Молдовы","© 2026 CLOSET · Moldova":"© 2026 CLOSET · Молдова",
@@ -143,7 +143,7 @@
     function apply() {
         const lang = getLanguage();
         document.documentElement.lang = lang;
-        document.title = lang === "ro" ? "A doua șansă — Moldova Marketplace" : "CLOSET — Moldova Marketplace";
+        document.title = "A doua șansă — Moldova Marketplace";
         document.querySelectorAll(".logo, .site-footer strong").forEach(el => {
             el.textContent = brand();
         });
