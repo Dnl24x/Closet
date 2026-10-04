@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         homeCategoryStrip: document.getElementById("homeCategoryStrip"),
 
         browseSearch: document.getElementById("browseSearch"),
+        browseFilterButton: document.getElementById("browseFilterButton"),
+        browseFilterPanel: document.getElementById("browseFilterPanel"),
+        clearBrowseFilters: document.getElementById("clearBrowseFilters"),
         browseCategoryButton: document.getElementById("browseCategoryButton"),
         browseLocation: document.getElementById("browseLocation"),
         browseCondition: document.getElementById("browseCondition"),
@@ -1275,6 +1278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 state.selectedCategory = button.dataset.categoryId || null;
                 menu.hidden = true;
                 elements.browseCategoryButton?.setAttribute("aria-expanded", "false");
+                elements.browseCategoryButton.textContent = button.textContent.trim();
                 loadBrowseListings();
             });
         });
@@ -1378,6 +1382,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function setupBrowseControls() {
         const refresh = debounce(loadBrowseListings, 250);
+
         elements.browseSearch?.addEventListener("input", refresh);
         elements.browseLocation?.addEventListener("change", refresh);
         elements.browseCondition?.addEventListener("change", refresh);
@@ -1385,6 +1390,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         elements.browseMaxPrice?.addEventListener("input", refresh);
         elements.browseSort?.addEventListener("change", refresh);
         elements.browseCategoryButton?.addEventListener("click", openBrowseCategoryMenu);
+
+        elements.browseFilterButton?.addEventListener("click", () => {
+            const panel = elements.browseFilterPanel;
+            if (!panel) return;
+
+            const opening = panel.hidden;
+            panel.hidden = !opening;
+            elements.browseFilterButton.setAttribute("aria-expanded", String(opening));
+
+            if (!opening && elements.browseCategoryMenu) {
+                elements.browseCategoryMenu.hidden = true;
+                elements.browseCategoryButton?.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        elements.clearBrowseFilters?.addEventListener("click", () => {
+            state.selectedCategory = null;
+
+            if (elements.browseLocation) elements.browseLocation.value = "";
+            if (elements.browseCondition) elements.browseCondition.value = "";
+            if (elements.browseMinPrice) elements.browseMinPrice.value = "";
+            if (elements.browseMaxPrice) elements.browseMaxPrice.value = "";
+            if (elements.browseSort) elements.browseSort.value = "newest";
+
+            if (elements.browseCategoryButton) {
+                elements.browseCategoryButton.textContent = "Category";
+                elements.browseCategoryButton.setAttribute("aria-expanded", "false");
+            }
+
+            if (elements.browseCategoryMenu) {
+                elements.browseCategoryMenu.hidden = true;
+            }
+
+            loadBrowseListings();
+        });
     }
 
     function debounce(callback, delay) {
