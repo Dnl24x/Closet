@@ -99,6 +99,10 @@
     }
 
     async function initialize() {
+        if (typeof ClosetI18n !== "undefined") {
+            ClosetI18n.initialize();
+        }
+
         if (
             typeof ClosetAuth === "undefined" ||
             !window.supabaseClient
