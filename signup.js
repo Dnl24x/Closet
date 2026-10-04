@@ -42,6 +42,9 @@
     const verificationDone =
         document.getElementById("signupVerificationDone");
 
+    const verificationEmail =
+        document.getElementById("signupVerificationEmail");
+
 
     function showMessage(text, type = "error") {
         if (!message) {
@@ -91,8 +94,15 @@
         window.location.href = "login.html";
     }
 
-    function showVerificationModal() {
+    function showVerificationModal(email = "") {
         if (!verificationModal) return;
+
+        if (verificationEmail) {
+            verificationEmail.textContent = email
+                ? email
+                : "";
+            verificationEmail.hidden = !email;
+        }
 
         verificationModal.hidden = false;
         document.body.classList.add("auth-verification-open");
@@ -225,13 +235,23 @@
             }
 
             if (result.needsVerification) {
+                try {
+                    localStorage.setItem(
+                        "closet-pending-verification",
+                        JSON.stringify({
+                            email,
+                            createdAt: Date.now()
+                        })
+                    );
+                } catch {}
+
                 showMessage(
                     "Please verify your email. Open your Gmail and click the verification link from A doua șansă.",
                     "success"
                 );
 
                 form.reset();
-                showVerificationModal();
+                showVerificationModal(email);
 
                 return;
             }
