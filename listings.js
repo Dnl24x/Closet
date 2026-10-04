@@ -124,15 +124,25 @@ const ClosetListings = (() => {
         minPrice = null,
         maxPrice = null,
         sort = "newest",
-        limit = 30
+        limit = 30,
+        lightweight = false
     } = {}) {
         try {
-            let query = client.from("listings").select(`
-                id, seller_id, category_id, title, description, price_mdl, condition, status, location, attributes, created_at, updated_at,
-                profiles (id, display_name, username, avatar_url),
-                categories (id, name, slug, parent_id),
-                listing_images (id, image_url, sort_order)
-            `).eq("status", "active");
+            const select = lightweight
+                ? `
+                    id, category_id, title, price_mdl, condition, status, location, created_at,
+                    profiles (id, display_name, username, avatar_url),
+                    categories (id, name, slug, parent_id),
+                    listing_images (id, image_url, sort_order)
+                `
+                : `
+                    id, seller_id, category_id, title, description, price_mdl, condition, status, location, attributes, created_at, updated_at,
+                    profiles (id, display_name, username, avatar_url),
+                    categories (id, name, slug, parent_id),
+                    listing_images (id, image_url, sort_order)
+                `;
+
+            let query = client.from("listings").select(select).eq("status", "active");
 
             if (categoryId) {
                 const children = typeof ClosetCategories !== "undefined"
