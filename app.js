@@ -1576,7 +1576,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupProfileActions();
         setupImagePreview();
         setupNavigationEvents();
-        setupAuthStateListener();\n        setupLanguageSettings();
+        setupAuthStateListener();
+        setupLanguageSettings();
 
         const session =
             await ClosetAuth.initialize();
