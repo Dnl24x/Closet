@@ -5,7 +5,7 @@ const ClosetCategories = (() => {
     let categoriesRequest = null;
 
     const CACHE_KEY = "closet-categories-cache";
-    const CACHE_TTL = 10 * 60 * 1000;
+    const CACHE_TTL = 60 * 60 * 1000;
 
     function readCachedCategories() {
         try {
