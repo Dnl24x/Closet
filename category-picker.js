@@ -378,7 +378,7 @@ const ClosetCategoryPicker = (() => {
         }
 
         try {
-            allCategories = await ClosetCategories.getFreshCategories();
+            allCategories = await ClosetCategories.getCategories();
 
             topLevelCategories = allCategories.filter(
                 (category) => category.parent_id === null
@@ -402,51 +402,6 @@ const ClosetCategoryPicker = (() => {
         }
     }
 
-    async function refresh() {
-        if (typeof ClosetCategories === "undefined") return;
-
-        const previousCategoryName = selectedCategory?.name || "";
-        const previousSubcategoryName = selectedSubcategory?.name || "";
-
-        allCategories = await ClosetCategories.getFreshCategories();
-        topLevelCategories = allCategories.filter(
-            (category) => category.parent_id === null
-        );
-
-        // If the database IDs were regenerated, recover the user's selection
-        // by its stable category name instead of submitting a dead UUID.
-        if (previousCategoryName) {
-            const freshCategory = allCategories.find(
-                category => !category.parent_id && category.name === previousCategoryName
-            );
-
-            if (freshCategory) {
-                selectedCategory = freshCategory;
-                if (elements.categoryInput) elements.categoryInput.value = freshCategory.id;
-                if (elements.categoryValue) elements.categoryValue.textContent = freshCategory.name;
-
-                const freshSubcategory = previousSubcategoryName
-                    ? allCategories.find(
-                        category =>
-                            category.parent_id === freshCategory.id &&
-                            category.name === previousSubcategoryName
-                    )
-                    : null;
-
-                selectedSubcategory = freshSubcategory || null;
-                if (elements.subcategoryInput) elements.subcategoryInput.value = freshSubcategory?.id || "";
-                if (elements.subcategoryValue) {
-                    elements.subcategoryValue.textContent = freshSubcategory?.name || "Choose a subcategory";
-                }
-                if (elements.subcategoryField) {
-                    elements.subcategoryField.hidden = !getSubcategories(freshCategory.id).length;
-                }
-            }
-        }
-
-        renderCategoryResults(elements.categorySearch?.value || "");
-    }
-
     function getSelection() {
         return {
             category: selectedCategory,
@@ -456,7 +411,6 @@ const ClosetCategoryPicker = (() => {
 
     return {
         initialize,
-        refresh,
         getSelection
     };
 })();
