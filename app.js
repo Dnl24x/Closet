@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         editingListingId: null,
         listingBackView: "browse",
         publicProfileUserId: null,
-        publicProfileBackView: "browse"
+        publicProfileBackView: "browse",
+        editReturnView: "browse"
     };
 
     const elements = {
@@ -627,11 +628,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderVisibleListingHearts();
     }
 
-    async function openListing(id) {
+    async function openListing(id, options = {}) {
         if (!id || !elements.listingDetailsContent) return;
 
         const currentView = ClosetNavigation.getCurrentView();
-        if (currentView && currentView !== "listing") state.listingBackView = currentView;
+        if (!options.preserveBack && currentView && currentView !== "listing") {
+            state.listingBackView = currentView;
+        }
 
         state.currentListingId = id;
         ClosetNavigation.show("listing");
@@ -1429,6 +1432,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const editedId = state.editingListingId;
+        if (editedId) {
+            state.listingBackView = state.editReturnView || state.listingBackView || "browse";
+            state.editReturnView = "browse";
+        }
         state.editingListingId = null;
 
         state.selectedImages.forEach(
@@ -1461,7 +1468,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (result.listing?.id) {
             await openListing(result.listing.id);
         } else if (editedId) {
-            await openListing(editedId);
+            await openListing(editedId, { preserveBack: true });
         }
     }
 
@@ -1475,6 +1482,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         state.editingListingId = listing.id;
         state.currentListingId = listing.id;
+
+        const currentView = ClosetNavigation.getCurrentView();
+        state.editReturnView =
+            currentView === "listing"
+                ? (state.listingBackView || "browse")
+                : (currentView || "browse");
 
         const setValue = (id, value) => {
             const element = document.getElementById(id);
