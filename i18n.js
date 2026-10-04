@@ -228,5 +228,14 @@
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
-    return { getLanguage, setLanguage, apply, openPicker, closePicker, translateValue, brand, initialize };
+    window.ClosetI18n = {
+        getLanguage,
+        setLanguage,
+        apply,
+        openPicker,
+        closePicker,
+        translateValue,
+        brand,
+        initialize
+    };
 })();
