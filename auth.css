@@ -425,3 +425,91 @@
         transition: none;
     }
 }
+
+/* ---------------------------------------------------------
+   Signup email verification modal
+   --------------------------------------------------------- */
+
+.auth-verification-modal[hidden] {
+    display: none !important;
+}
+
+.auth-verification-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px;
+
+    background: rgba(17, 17, 17, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.auth-verification-card {
+    width: min(100%, 440px);
+    padding: 34px;
+
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 22px;
+
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.15);
+
+    text-align: center;
+}
+
+.auth-verification-icon {
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+
+    background: #f1f1ef;
+    color: #111111;
+
+    font-size: 24px;
+}
+
+.auth-verification-card h2 {
+    margin: 0;
+
+    color: #111111;
+    font-size: 32px;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+}
+
+.auth-verification-card p:not(.eyebrow) {
+    margin: 14px auto 24px;
+    max-width: 350px;
+
+    color: #666666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+body.auth-verification-open {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .auth-verification-card {
+        padding: 28px 20px;
+        border-radius: 18px;
+    }
+
+    .auth-verification-card h2 {
+        font-size: 27px;
+    }
+}
