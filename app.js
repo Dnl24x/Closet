@@ -1435,8 +1435,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (elements.headerSellButton) {
-            elements.headerSellButton.textContent =
-                "Sell";
+            elements.headerSellButton.textContent = "Sell an item";
         }
 
         if (
@@ -1468,7 +1467,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupForms();
         setupProfileActions();
         setupImagePreview();
-        setupRemoveImage();
         setupNavigationEvents();
         setupAuthStateListener();
 
