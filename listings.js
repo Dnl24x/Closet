@@ -159,32 +159,6 @@ const ClosetListings = (() => {
         return null;
     }
 
-    async function ensureSellerProfile(user) {
-        const { data: existingProfile, error: profileLookupError } = await client
-            .from("profiles")
-            .select("id")
-            .eq("id", user.id)
-            .maybeSingle();
-
-        if (profileLookupError) throw profileLookupError;
-        if (existingProfile) return;
-
-        const displayName = String(
-            user.user_metadata?.name ||
-            user.email?.split("@")[0] ||
-            "A doua șansă user"
-        ).trim().slice(0, 80);
-
-        const { error: profileInsertError } = await client
-            .from("profiles")
-            .insert({
-                id: user.id,
-                display_name: displayName
-            });
-
-        if (profileInsertError) throw profileInsertError;
-    }
-
     async function createListing({
         title,
         description,
@@ -208,8 +182,6 @@ const ClosetListings = (() => {
         let listing = null;
 
         try {
-            await ensureSellerProfile(user);
-
             const requestedCategoryId = subcategoryId || categoryId;
 
             let finalCategoryId = requestedCategoryId;
@@ -473,12 +445,6 @@ const ClosetListings = (() => {
         const message = String(error?.message || "").toLowerCase();
         if (message.includes("row-level security")) return "You don't have permission to perform that action.";
         if (message.includes("bucket") || message.includes("storage")) return "The image could not be uploaded. Check that the listing image storage bucket and its policies are configured, then try again.";
-        if (
-            message.includes("seller_id") ||
-            message.includes("profiles_id")
-        ) {
-            return "Your seller profile could not be created. Please try again.";
-        }
         if (
             message.includes("category_id") ||
             message.includes("categories_id")
