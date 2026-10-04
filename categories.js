@@ -4,7 +4,8 @@ const ClosetCategories = (() => {
     let categories = null;
     let categoriesRequest = null;
 
-    const CACHE_KEY = "closet-categories-cache";
+    // Versioned cache key so old category IDs cannot survive a category-data reset.
+    const CACHE_KEY = "closet-categories-cache-v2";
     const CACHE_TTL = 60 * 60 * 1000;
 
     function readCachedCategories() {
