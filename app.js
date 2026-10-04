@@ -106,7 +106,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("saveProfileButton"),
 
         settingsEmail:
-            document.getElementById("settingsEmail")
+            document.getElementById("settingsEmail"),
+
+        settingsLanguage:
+            document.getElementById("settingsLanguage")
     };
 
     function showStatus(message, type = "success") {
@@ -1565,6 +1568,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function initialize() {
+        if (typeof ClosetI18n !== "undefined") {
+            ClosetI18n.initialize();
+        }
+
         ClosetNavigation.initialize("home");
         if (elements.homeHeaderSearch) elements.homeHeaderSearch.hidden = false;
 
@@ -1581,6 +1588,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const session =
             await ClosetAuth.initialize();
+
+        const accountLanguage =
+            session?.user?.user_metadata?.language;
+
+        if (
+            accountLanguage &&
+            ["en", "ro", "ru"].includes(accountLanguage) &&
+            typeof ClosetI18n !== "undefined"
+        ) {
+            ClosetI18n.setLanguage(accountLanguage, false);
+        }
 
         await updateAuthenticatedUI();
 
