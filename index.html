@@ -575,6 +575,83 @@
     </section>
 
 
+    <section
+        id="publicProfileView"
+        class="app-view"
+        data-view-section="public-profile"
+        hidden
+    >
+        <div class="profile-page">
+            <button
+                type="button"
+                id="publicProfileBackButton"
+                class="back-button"
+            >
+                ← Back
+            </button>
+
+            <div class="profile-header public-profile-header">
+                <div class="profile-avatar-wrapper">
+                    <div id="publicProfileAvatar" class="profile-avatar">
+                        <span>A</span>
+                    </div>
+                </div>
+
+                <div class="profile-information">
+                    <p id="publicProfileEyebrow" class="eyebrow">Seller Profile</p>
+                    <h1 id="publicProfileDisplayName">Profile</h1>
+                    <p id="publicProfileUsername" class="profile-username"></p>
+                    <p id="publicProfileBio" class="profile-bio"></p>
+                    <div id="publicProfileLocation" class="profile-location"></div>
+                </div>
+
+                <div class="profile-actions">
+                    <button
+                        id="publicProfileEditButton"
+                        type="button"
+                        class="secondary-button"
+                        hidden
+                    >
+                        Edit profile
+                    </button>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">LISTINGS</p>
+                        <h2>Active listings</h2>
+                    </div>
+                </div>
+
+                <div id="publicProfileListingsGrid" class="listing-grid">
+                    <div class="empty-state">
+                        <h3>Loading profile…</h3>
+                        <p>Please wait while we load this profile.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">SELLER REVIEWS</p>
+                        <h2>Reviews</h2>
+                    </div>
+                </div>
+
+                <div id="publicProfileReviews" class="reviews-list">
+                    <div class="empty-state">
+                        <h3>No reviews yet</h3>
+                        <p>Reviews from other members will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
     <!-- =====================================
          EDIT PROFILE
          ===================================== -->
@@ -1318,6 +1395,15 @@
 
             </div>
 
+            <div class="about-contact-callout">
+                <div>
+                    <p class="eyebrow">NEED SOMETHING?</p>
+                    <h2>Have a question or need help?</h2>
+                    <p>Reach the A doua șansă team through the support and contact pages.</p>
+                </div>
+                <a class="text-button" href="contact.html">Contact A doua șansă →</a>
+            </div>
+
         </div>
 
     </section>
@@ -1330,23 +1416,23 @@
      ========================================= -->
 
 <footer class="site-footer">
+    <div class="site-footer-main">
+        <div class="site-footer-brand">
+            <strong>A doua șansă</strong>
+            <span>DoaSanse · Moldova marketplace</span>
+        </div>
 
-    <div>
-
-        <strong>
-            A doua șansă
-        </strong>
-
-        <span>
-            Moldova marketplace
-        </span>
-
+        <nav class="site-footer-links" aria-label="Footer">
+            <a href="terms.html">Terms of Service</a>
+            <a href="help.html">Need Help</a>
+            <a href="contact.html">Contact</a>
+        </nav>
     </div>
 
-    <p>
-        © 2026 A doua șansă · Moldova
-    </p>
-
+    <div class="site-footer-bottom">
+        <span>© 2026 DoaSanse · A doua șansă · Moldova</span>
+        <a href="terms.html">Terms of Service</a>
+    </div>
 </footer>
 
 
