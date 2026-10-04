@@ -357,8 +357,11 @@ const ClosetListings = (() => {
         try {
             const allowedFields = ["category_id", "title", "description", "price_mdl", "condition", "status", "location", "attributes"];
             const allowedUpdates = {};
+
             allowedFields.forEach(field => {
-                if (Object.prototype.hasOwnProperty.call(updates, field)) allowedUpdates[field] = updates[field];
+                if (Object.prototype.hasOwnProperty.call(updates, field)) {
+                    allowedUpdates[field] = updates[field];
+                }
             });
 
             if ("title" in allowedUpdates) allowedUpdates.title = String(allowedUpdates.title || "").trim();
@@ -366,10 +369,28 @@ const ClosetListings = (() => {
             if ("location" in allowedUpdates) allowedUpdates.location = String(allowedUpdates.location || "").trim();
             if ("price_mdl" in allowedUpdates) allowedUpdates.price_mdl = Number(allowedUpdates.price_mdl);
 
-            const { data, error } = await client.from("listings").update(allowedUpdates)
-                .eq("id", id).eq("seller_id", user.id).select().single();
+            if (allowedUpdates.category_id) {
+                const { data: category, error: categoryError } = await client
+                    .from("categories")
+                    .select("id")
+                    .eq("id", allowedUpdates.category_id)
+                    .eq("is_active", true)
+                    .maybeSingle();
+
+                if (categoryError) throw categoryError;
+                if (!category) throw new Error("Selected category no longer exists. Please choose another category.");
+            }
+
+            const { data, error } = await client
+                .from("listings")
+                .update(allowedUpdates)
+                .eq("id", id)
+                .eq("seller_id", user.id)
+                .select()
+                .single();
 
             if (error) throw error;
+
             return { success: true, listing: data };
         } catch (error) {
             console.error("CLOSET listing update error:", error);
