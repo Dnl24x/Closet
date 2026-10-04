@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create account — CLOSET</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="auth.css">
+</head>
+
+<body class="auth-page">
+
+    <header class="site-header">
+        <button
+            class="logo"
+            id="logoButton"
+            type="button"
+            aria-label="Return to CLOSET home"
+        >
+            CLOSET
+        </button>
+    </header>
+
+    <main class="auth-main">
+        <section class="auth-card">
+
+            <button
+                class="auth-back-button"
+                id="backButton"
+                type="button"
+            >
+                ← Back
+            </button>
+
+            <div class="auth-heading">
+                <p class="eyebrow">JOIN CLOSET</p>
+
+                <h1>Create account.</h1>
+
+                <p>
+                    Create your CLOSET account and start
+                    giving your clothes a new home.
+                </p>
+            </div>
+
+            <form
+                id="signupForm"
+                class="auth-form"
+                novalidate
+            >
+
+                <div
+                    id="signupFormMessage"
+                    class="auth-form-message"
+                    role="alert"
+                    hidden
+                ></div>
+
+                <div class="auth-field">
+                    <label for="signupName">
+                        Your name
+                    </label>
+
+                    <input
+                        id="signupName"
+                        name="name"
+                        type="text"
+                        autocomplete="name"
+                        placeholder="Your name"
+                        required
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="signupEmail">
+                        Email address
+                    </label>
+
+                    <input
+                        id="signupEmail"
+                        name="email"
+                        type="email"
+                        autocomplete="email"
+                        placeholder="you@example.com"
+                        required
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label for="signupPassword">
+                        Password
+                    </label>
+
+                    <div class="auth-password">
+                        <input
+                            id="signupPassword"
+                            name="password"
+                            type="password"
+                            autocomplete="new-password"
+                            placeholder="At least 6 characters"
+                            required
+                        >
+
+                        <button
+                            id="toggleSignupPassword"
+                            class="auth-password-toggle"
+                            type="button"
+                            aria-label="Show password"
+                        >
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-field">
+                    <label for="signupPasswordConfirm">
+                        Confirm password
+                    </label>
+
+                    <div class="auth-password">
+                        <input
+                            id="signupPasswordConfirm"
+                            name="password-confirm"
+                            type="password"
+                            autocomplete="new-password"
+                            placeholder="Enter your password again"
+                            required
+                        >
+
+                        <button
+                            id="toggleSignupPasswordConfirm"
+                            class="auth-password-toggle"
+                            type="button"
+                            aria-label="Show password"
+                        >
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    id="signupSubmitButton"
+                    class="auth-submit"
+                    type="submit"
+                >
+                    Create account
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                <span>or</span>
+            </div>
+
+            <p class="auth-switch">
+                Already have an account?
+
+                <button
+                    id="goToLoginButton"
+                    type="button"
+                >
+                    Sign in
+                </button>
+            </p>
+
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="auth.js"></script>
+    <script src="signup.js"></script>
+
+</body>
+</html>

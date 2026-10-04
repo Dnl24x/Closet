@@ -1,369 +1,1603 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async () => {
+    const client = window.supabaseClient;
 
-    // =====================================
-    // SUPABASE
-    // =====================================
-
-    const SUPABASE_URL = "https://wdnpncgramzkvqcqeyur.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_e5gQ9HHadZ0V7bByXfSMUg_LuZHK--M";
-
-    const supabaseClient = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
-
-
-    // =====================================
-    // PAGES
-    // =====================================
-
-    const homePage = document.querySelector(".hero");
-    const whyUs = document.querySelector(".why-us");
-
-    const sellPage = document.getElementById("sellPage");
-    const loginPage = document.getElementById("loginPage");
-    const signupPage = document.getElementById("signupPage");
-
-
-    // =====================================
-    // BUTTONS
-    // =====================================
-
-    const sellButton = document.getElementById("sellButton");
-    const headerSellButton = document.getElementById("headerSellButton");
-    const loginButton = document.getElementById("loginButton");
-
-    const closeSellButton = document.getElementById("closeSellButton");
-    const closeLoginButton = document.getElementById("closeLoginButton");
-    const closeSignupButton = document.getElementById("closeSignupButton");
-
-    const goToSignupButton = document.getElementById("goToSignupButton");
-    const goToLoginButton = document.getElementById("goToLoginButton");
-
-
-    // =====================================
-    // SHOW HOME
-    // =====================================
-
-    function showHome() {
-
-        if (homePage) {
-            homePage.style.display = "flex";
-        }
-
-        if (whyUs) {
-            whyUs.style.display = "block";
-        }
-
-        if (sellPage) {
-            sellPage.style.display = "none";
-        }
-
-        if (loginPage) {
-            loginPage.style.display = "none";
-        }
-
-        if (signupPage) {
-            signupPage.style.display = "none";
-        }
-
-        window.scrollTo(0, 0);
+    if (!client) {
+        console.error("CLOSET: Supabase client is unavailable.");
+        return;
     }
 
+    const state = {
+        selectedCategory: null,
+        selectedSubcategory: null,
+        currentListingId: null
+    };
 
-    // =====================================
-    // SHOW LOGIN
-    // =====================================
+    const elements = {
+        statusMessage: document.getElementById("statusMessage"),
 
-    function showLogin() {
+        logoButton: document.getElementById("logoButton"),
+        headerProfileButton:
+            document.getElementById("headerProfileButton"),
+        headerSellButton:
+            document.getElementById("headerSellButton"),
 
-        if (homePage) {
-            homePage.style.display = "none";
+        homeListingsGrid:
+            document.getElementById("homeListingsGrid"),
+
+        browseListingsGrid:
+            document.getElementById("browseListingsGrid"),
+
+        browseSearch:
+            document.getElementById("browseSearch"),
+
+        categoryFilters:
+            document.querySelectorAll(".category-filter"),
+
+        listingForm:
+            document.getElementById("listingForm"),
+
+        itemImage:
+            document.getElementById("itemImage"),
+
+        imagePreview:
+            document.getElementById("imagePreview"),
+
+        imagePreviewImage:
+            document.querySelector("#imagePreview img"),
+
+        removeImageButton:
+            document.getElementById("removeImageButton"),
+
+        publishListingButton:
+            document.getElementById("publishListingButton"),
+
+        listingDetailsContent:
+            document.getElementById("listingDetailsContent"),
+
+        profileAvatar:
+            document.getElementById("profileAvatar"),
+
+        profileDisplayName:
+            document.getElementById("profileDisplayName"),
+
+        profileUsername:
+            document.getElementById("profileUsername"),
+
+        profileBio:
+            document.getElementById("profileBio"),
+
+        profileLocation:
+            document.getElementById("profileLocation"),
+
+        profileEditButton:
+            document.getElementById("editProfileButton"),
+
+        profileSettingsButton:
+            document.getElementById("settingsButton"),
+
+        myListingsGrid:
+            document.getElementById("myListingsGrid"),
+
+        profileReviews:
+            document.getElementById("profileReviews"),
+
+        profileForm:
+            document.getElementById("profileForm"),
+
+        profileImage:
+            document.getElementById("profileImage"),
+
+        profileImagePreview:
+            document.getElementById("profileImagePreview"),
+
+        saveProfileButton:
+            document.getElementById("saveProfileButton"),
+
+        settingsEmail:
+            document.getElementById("settingsEmail")
+    };
+
+    function showStatus(message, type = "success") {
+        if (!elements.statusMessage) {
+            return;
         }
 
-        if (whyUs) {
-            whyUs.style.display = "none";
-        }
+        elements.statusMessage.textContent = message;
+        elements.statusMessage.className =
+            `status-message ${type}`;
 
-        if (sellPage) {
-            sellPage.style.display = "none";
-        }
+        elements.statusMessage.hidden = false;
 
-        if (signupPage) {
-            signupPage.style.display = "none";
-        }
+        window.clearTimeout(showStatus.timeout);
 
-        if (loginPage) {
-            loginPage.style.display = "block";
-        }
-
-        window.scrollTo(0, 0);
+        showStatus.timeout = window.setTimeout(() => {
+            elements.statusMessage.hidden = true;
+        }, 4500);
     }
 
-
-    // =====================================
-    // SHOW SIGNUP
-    // =====================================
-
-    function showSignup() {
-
-        if (homePage) {
-            homePage.style.display = "none";
+    function showFormMessage(element, message, type = "error") {
+        if (!element) {
+            return;
         }
 
-        if (whyUs) {
-            whyUs.style.display = "none";
+        element.textContent = message;
+        element.className = `form-message ${type}`;
+        element.hidden = false;
+    }
+
+    function clearFormMessage(element) {
+        if (!element) {
+            return;
         }
 
-        if (sellPage) {
-            sellPage.style.display = "none";
+        element.textContent = "";
+        element.hidden = true;
+    }
+
+    function setButtonLoading(
+        button,
+        loading,
+        loadingText = "Please wait…"
+    ) {
+        if (!button) {
+            return;
         }
 
-        if (loginPage) {
-            loginPage.style.display = "none";
+        if (loading) {
+            button.dataset.originalText =
+                button.textContent;
+
+            button.textContent = loadingText;
+            button.disabled = true;
+        } else {
+            button.textContent =
+                button.dataset.originalText ||
+                button.textContent;
+
+            delete button.dataset.originalText;
+            button.disabled = false;
+        }
+    }
+
+    function formatPrice(price) {
+        const amount = Number(price);
+
+        if (!Number.isFinite(amount)) {
+            return "Price unavailable";
         }
 
-        if (signupPage) {
-            signupPage.style.display = "block";
+        return `${amount.toLocaleString("en-US")} MDL`;
+    }
+
+    function formatDate(date) {
+        if (!date) {
+            return "";
         }
 
-        window.scrollTo(0, 0);
-    }
+        const parsed = new Date(date);
 
-
-    // =====================================
-    // SHOW SELL PAGE
-    // =====================================
-
-    function showSell() {
-
-        if (homePage) {
-            homePage.style.display = "none";
+        if (Number.isNaN(parsed.getTime())) {
+            return "";
         }
 
-        if (whyUs) {
-            whyUs.style.display = "none";
-        }
-
-        if (loginPage) {
-            loginPage.style.display = "none";
-        }
-
-        if (signupPage) {
-            signupPage.style.display = "none";
-        }
-
-        if (sellPage) {
-            sellPage.style.display = "block";
-        }
-
-        window.scrollTo(0, 0);
-    }
-
-
-    // =====================================
-    // HOME → LOGIN
-    // =====================================
-
-    if (sellButton) {
-        sellButton.addEventListener("click", showLogin);
-    }
-
-    if (headerSellButton) {
-        headerSellButton.addEventListener("click", showLogin);
-    }
-
-    if (loginButton) {
-        loginButton.addEventListener("click", showLogin);
-    }
-
-
-    // =====================================
-    // BACK BUTTONS
-    // =====================================
-
-    if (closeLoginButton) {
-        closeLoginButton.addEventListener("click", showHome);
-    }
-
-    if (closeSignupButton) {
-        closeSignupButton.addEventListener("click", showHome);
-    }
-
-    if (closeSellButton) {
-        closeSellButton.addEventListener("click", showHome);
-    }
-
-
-    // =====================================
-    // LOGIN ↔ SIGNUP
-    // =====================================
-
-    if (goToSignupButton) {
-        goToSignupButton.addEventListener("click", showSignup);
-    }
-
-    if (goToLoginButton) {
-        goToLoginButton.addEventListener("click", showLogin);
-    }
-
-
-    // =====================================
-    // LOGIN FORM
-    // =====================================
-
-    const loginForm = document.getElementById("loginForm");
-
-    if (loginForm) {
-
-        loginForm.addEventListener("submit", async function (event) {
-
-            event.preventDefault();
-
-            const email = document
-                .getElementById("loginEmail")
-                .value
-                .trim();
-
-            const password = document.getElementById("loginPassword").value;
-
-            try {
-
-                const { data, error } =
-                    await supabaseClient.auth.signInWithPassword({
-                        email: email,
-                        password: password
-                    });
-
-                if (error) {
-                    alert(error.message);
-                    return;
-                }
-
-                alert("Welcome back to CLOSET!");
-
-                loginForm.reset();
-
-                showSell();
-
-            } catch (error) {
-
-                console.error(error);
-                alert("Something went wrong. Please try again.");
-
-            }
-
+        return parsed.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
         });
-
     }
 
-
-    // =====================================
-    // SIGNUP FORM
-    // =====================================
-
-    const signupForm = document.getElementById("signupForm");
-
-    if (signupForm) {
-
-        signupForm.addEventListener("submit", async function (event) {
-
-            event.preventDefault();
-
-            const name = document
-                .getElementById("signupName")
-                .value
-                .trim();
-
-            const email = document
-                .getElementById("signupEmail")
-                .value
-                .trim();
-
-            const password =
-                document.getElementById("signupPassword").value;
-
-            const confirmPassword =
-                document.getElementById("signupPasswordConfirm").value;
-
-
-            // Check passwords match
-
-            if (password !== confirmPassword) {
-                alert("Passwords do not match.");
-                return;
-            }
-
-
-            try {
-
-                const { data, error } =
-                    await supabaseClient.auth.signUp({
-                        email: email,
-                        password: password,
-
-                        options: {
-                            data: {
-                                name: name
-                            }
-                        }
-                    });
-
-
-                if (error) {
-                    alert(error.message);
-                    return;
-                }
-
-
-                alert(
-                    "Account created! Check your email to verify your CLOSET account."
-                );
-
-                signupForm.reset();
-
-                showLogin();
-
-            } catch (error) {
-
-                console.error(error);
-                alert("Something went wrong. Please try again.");
-
-            }
-
-        });
-
+    function escapeHTML(value) {
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
     }
 
+    function getListingImage(listing) {
+        const images =
+            Array.isArray(listing?.listing_images)
+                ? listing.listing_images
+                : [];
 
-    // =====================================
-    // CHECK EXISTING SESSION
-    // =====================================
+        if (!images.length) {
+            return null;
+        }
 
-    async function checkSession() {
+        const sorted = [...images].sort(
+            (a, b) =>
+                Number(a.sort_order || 0) -
+                Number(b.sort_order || 0)
+        );
 
-        const {
-            data: { session }
-        } = await supabaseClient.auth.getSession();
+        return sorted[0]?.image_url || null;
+    }
 
+    function getProfileName(profile) {
+        return (
+            profile?.display_name ||
+            profile?.username ||
+            "CLOSET member"
+        );
+    }
 
-        if (session) {
+    function getListingCategoryLabel(listing) {
+        if (listing?.category?.name) {
+            return listing.category.name;
+        }
 
-            console.log(
-                "User is already logged in:",
-                session.user.email
+        if (listing?.category_name) {
+            return listing.category_name;
+        }
+
+        if (listing?.subcategory?.name) {
+            return listing.subcategory.name;
+        }
+
+        if (listing?.subcategory_name) {
+            return listing.subcategory_name;
+        }
+
+        return "Marketplace";
+    }
+
+    function getListingSubcategoryLabel(listing) {
+        if (listing?.subcategory?.name) {
+            return listing.subcategory.name;
+        }
+
+        if (listing?.subcategory_name) {
+            return listing.subcategory_name;
+        }
+
+        return "";
+    }
+
+    function createListingCard(listing) {
+        const image = getListingImage(listing);
+
+        const title =
+            escapeHTML(listing?.title || "Untitled item");
+
+        const category =
+            escapeHTML(
+                getListingCategoryLabel(listing)
             );
 
-        }
+        const subcategory =
+            escapeHTML(
+                getListingSubcategoryLabel(listing)
+            );
 
-        showHome();
+        const sellerName =
+            escapeHTML(
+                getProfileName(listing?.profiles)
+            );
+
+        const card =
+            document.createElement("article");
+
+        card.className = "listing-card";
+
+        card.innerHTML = `
+            <button
+                type="button"
+                class="listing-card-button"
+                data-listing-id="${escapeHTML(listing.id)}"
+                aria-label="View ${title}"
+            >
+                ${
+                    image
+                        ? `
+                            <img
+                                class="listing-image"
+                                src="${escapeHTML(image)}"
+                                alt="${title}"
+                                loading="lazy"
+                            >
+                        `
+                        : `
+                            <div
+                                class="listing-image"
+                                aria-hidden="true"
+                            ></div>
+                        `
+                }
+
+                <div class="listing-card-body">
+
+                    <h3 class="listing-card-title">
+                        ${title}
+                    </h3>
+
+                    <div class="listing-card-meta">
+                        <span>
+                            ${category}
+                            ${
+                                subcategory
+                                    ? ` · ${subcategory}`
+                                    : ""
+                            }
+                        </span>
+
+                        <span>
+                            ${sellerName}
+                        </span>
+                    </div>
+
+                    <div class="listing-card-price">
+                        ${formatPrice(listing.price_mdl)}
+                    </div>
+
+                </div>
+            </button>
+        `;
+
+        return card;
     }
 
+    function renderListings(
+        container,
+        listings,
+        emptyTitle,
+        emptyText
+    ) {
+        if (!container) {
+            return;
+        }
 
-    // =====================================
-    // INITIAL PAGE
-    // =====================================
+        container.innerHTML = "";
 
-    checkSession();
+        if (!listings.length) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>
+                        ${escapeHTML(emptyTitle)}
+                    </h3>
 
+                    <p>
+                        ${escapeHTML(emptyText)}
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        listings.forEach((listing) => {
+            container.appendChild(
+                createListingCard(listing)
+            );
+        });
+    }
+
+    async function loadHomeListings() {
+        if (!elements.homeListingsGrid) {
+            return;
+        }
+
+        const result =
+            await ClosetListings.getListings({
+                limit: 8
+            });
+
+        if (!result.success) {
+            renderListings(
+                elements.homeListingsGrid,
+                [],
+                "Listings are unavailable",
+                result.message
+            );
+
+            return;
+        }
+
+        renderListings(
+            elements.homeListingsGrid,
+            result.listings,
+            "Nothing is listed yet",
+            "Be the first person to give an item a new home."
+        );
+    }
+
+    async function loadBrowseListings() {
+        if (!elements.browseListingsGrid) {
+            return;
+        }
+
+        const search =
+            elements.browseSearch?.value || "";
+
+        const result =
+            await ClosetListings.getListings({
+                categoryId: state.selectedCategory,
+                search,
+                limit: 30
+            });
+
+        if (!result.success) {
+            renderListings(
+                elements.browseListingsGrid,
+                [],
+                "Listings are unavailable",
+                result.message
+            );
+
+            return;
+        }
+
+        renderListings(
+            elements.browseListingsGrid,
+            result.listings,
+            "No listings found",
+            "Try another search or category."
+        );
+    }
+
+    async function loadMyListings() {
+        if (!elements.myListingsGrid) {
+            return;
+        }
+
+        const user = ClosetAuth.getUser();
+
+        if (!user) {
+            renderListings(
+                elements.myListingsGrid,
+                [],
+                "Sign in to see your listings",
+                "Your published items will appear here."
+            );
+
+            return;
+        }
+
+        const result =
+            await ClosetListings.getMyListings();
+
+        if (!result.success) {
+            renderListings(
+                elements.myListingsGrid,
+                [],
+                "Your listings couldn't be loaded",
+                result.message
+            );
+
+            return;
+        }
+
+        renderListings(
+            elements.myListingsGrid,
+            result.listings,
+            "You haven't listed anything yet",
+            "When you publish an item, it will appear here."
+        );
+    }
+
+    async function openListing(id) {
+        if (
+            !id ||
+            !elements.listingDetailsContent
+        ) {
+            return;
+        }
+
+        state.currentListingId = id;
+
+        ClosetNavigation.show("listing");
+
+        elements.listingDetailsContent.innerHTML = `
+            <div class="empty-state">
+                <h3>Loading listing…</h3>
+                <p>
+                    Please wait while we load the item.
+                </p>
+            </div>
+        `;
+
+        const result =
+            await ClosetListings.getListing(id);
+
+        if (!result.success) {
+            elements.listingDetailsContent.innerHTML = `
+                <div class="empty-state">
+                    <h3>Listing unavailable</h3>
+                    <p>
+                        ${escapeHTML(result.message)}
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        renderListingDetails(result.listing);
+    }
+
+    function renderListingDetails(listing) {
+        const image =
+            getListingImage(listing);
+
+        const seller =
+            listing?.profiles || {};
+
+        const title =
+            escapeHTML(listing?.title || "Untitled item");
+
+        const description =
+            escapeHTML(
+                listing?.description ||
+                "No description provided."
+            );
+
+        const sellerName =
+            escapeHTML(
+                getProfileName(seller)
+            );
+
+        const username =
+            seller.username
+                ? `@${escapeHTML(seller.username)}`
+                : "";
+
+        const category =
+            escapeHTML(
+                getListingCategoryLabel(listing)
+            );
+
+        const subcategory =
+            getListingSubcategoryLabel(listing);
+
+        const imageHTML = image
+            ? `
+                <img
+                    class="listing-detail-image"
+                    src="${escapeHTML(image)}"
+                    alt="${title}"
+                >
+            `
+            : `
+                <div
+                    class="listing-detail-image"
+                    aria-hidden="true"
+                ></div>
+            `;
+
+        const attributes =
+            listing?.attributes &&
+            typeof listing.attributes === "object"
+                ? listing.attributes
+                : {};
+
+        const attributeEntries =
+            Object.entries(attributes)
+                .filter(
+                    ([, value]) =>
+                        value !== null &&
+                        value !== undefined &&
+                        String(value).trim() !== ""
+                );
+
+        const attributesHTML =
+            attributeEntries.length
+                ? `
+                    <div class="detail-attributes">
+                        ${attributeEntries
+                            .map(
+                                ([key, value]) => `
+                                    <div class="detail-attribute">
+                                        <span>
+                                            ${escapeHTML(key)}
+                                        </span>
+
+                                        <strong>
+                                            ${escapeHTML(
+                                                value
+                                            )}
+                                        </strong>
+                                    </div>
+                                `
+                            )
+                            .join("")}
+                    </div>
+                `
+                : "";
+
+        elements.listingDetailsContent.innerHTML = `
+            <div class="listing-detail">
+
+                <div>
+                    ${imageHTML}
+                </div>
+
+                <div class="listing-detail-info">
+
+                    <p class="eyebrow">
+                        ${category}
+                        ${
+                            subcategory
+                                ? ` · ${escapeHTML(subcategory)}`
+                                : ""
+                        }
+                    </p>
+
+                    <h1>
+                        ${title}
+                    </h1>
+
+                    <div class="detail-price">
+                        ${formatPrice(listing.price_mdl)}
+                    </div>
+
+                    <div class="detail-meta">
+
+                        ${
+                            listing.condition
+                                ? `
+                                    <span class="detail-pill">
+                                        ${escapeHTML(
+                                            formatCondition(
+                                                listing.condition
+                                            )
+                                        )}
+                                    </span>
+                                `
+                                : ""
+                        }
+
+                        <span class="detail-pill">
+                            Listed
+                            ${formatDate(
+                                listing.created_at
+                            )}
+                        </span>
+
+                    </div>
+
+                    ${attributesHTML}
+
+                    <p class="detail-description">
+                        ${description}
+                    </p>
+
+                    <div class="seller-card">
+
+                        ${
+                            seller.avatar_url
+                                ? `
+                                    <img
+                                        class="avatar"
+                                        src="${escapeHTML(
+                                            seller.avatar_url
+                                        )}"
+                                        alt=""
+                                    >
+                                `
+                                : `
+                                    <div
+                                        class="avatar"
+                                        aria-hidden="true"
+                                    ></div>
+                                `
+                        }
+
+                        <div>
+                            <strong>
+                                ${sellerName}
+                            </strong>
+
+                            <span>
+                                ${username}
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="protection-card">
+
+                        <strong>
+                            Buying Protection
+                        </strong>
+
+                        <p>
+                            CLOSET is working on a
+                            secure buying experience.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+    function formatCondition(condition) {
+        const labels = {
+            new: "New",
+            like_new: "Like new",
+            good: "Good",
+            fair: "Fair",
+            for_parts: "For parts"
+        };
+
+        return labels[condition] || condition;
+    }
+
+    async function loadProfile() {
+        const user =
+            ClosetAuth.getUser();
+
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const result =
+            await ClosetProfile.getMyProfile();
+
+        if (!result.success) {
+            showStatus(
+                result.message,
+                "error"
+            );
+
+            return;
+        }
+
+        const profile =
+            result.profile || {};
+
+        if (elements.profileDisplayName) {
+            elements.profileDisplayName.textContent =
+                profile.display_name ||
+                user.user_metadata?.name ||
+                "CLOSET member";
+        }
+
+        if (elements.profileUsername) {
+            elements.profileUsername.textContent =
+                profile.username
+                    ? `@${profile.username}`
+                    : "";
+        }
+
+        if (elements.profileBio) {
+            elements.profileBio.textContent =
+                profile.bio || "";
+        }
+
+        if (elements.profileLocation) {
+            elements.profileLocation.textContent =
+                profile.location || "";
+        }
+
+        if (elements.profileAvatar) {
+            if (profile.avatar_url) {
+                elements.profileAvatar.innerHTML = `
+                    <img
+                        src="${escapeHTML(
+                            profile.avatar_url
+                        )}"
+                        alt=""
+                    >
+                `;
+            } else {
+                elements.profileAvatar.innerHTML = `
+                    <span>
+                        ${escapeHTML(
+                            (
+                                profile.display_name ||
+                                user.user_metadata?.name ||
+                                "C"
+                            )
+                                .charAt(0)
+                                .toUpperCase()
+                        )}
+                    </span>
+                `;
+            }
+        }
+
+        if (elements.settingsEmail) {
+            elements.settingsEmail.textContent =
+                user.email || "";
+        }
+
+        await Promise.all([
+            loadMyListings(),
+            loadReviews(user.id)
+        ]);
+    }
+
+    async function loadReviews(userId) {
+        if (!elements.profileReviews) {
+            return;
+        }
+
+        const result =
+            await ClosetProfile.getReviews(userId);
+
+        elements.profileReviews.innerHTML = "";
+
+        if (
+            !result.success ||
+            !result.reviews.length
+        ) {
+            elements.profileReviews.innerHTML = `
+                <div class="empty-state">
+                    <h3>No reviews yet</h3>
+                    <p>
+                        Reviews from other members
+                        will appear here.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        result.reviews.forEach((review) => {
+            const reviewer =
+                review.profiles || {};
+
+            const card =
+                document.createElement("article");
+
+            card.className = "review-card";
+
+            const rating =
+                Math.max(
+                    0,
+                    Math.min(
+                        5,
+                        Number(review.rating) || 0
+                    )
+                );
+
+            const stars =
+                "★".repeat(rating);
+
+            card.innerHTML = `
+                <div class="review-top">
+
+                    <span class="review-author">
+                        ${escapeHTML(
+                            getProfileName(reviewer)
+                        )}
+                    </span>
+
+                    <span class="review-date">
+                        ${formatDate(
+                            review.created_at
+                        )}
+                    </span>
+
+                </div>
+
+                <div class="review-stars">
+                    ${stars}
+                </div>
+
+                ${
+                    review.comment
+                        ? `
+                            <p class="review-comment">
+                                ${escapeHTML(
+                                    review.comment
+                                )}
+                            </p>
+                        `
+                        : ""
+                }
+            `;
+
+            elements.profileReviews.appendChild(card);
+        });
+    }
+
+    async function loadEditProfile() {
+        const user =
+            ClosetAuth.getUser();
+
+        if (!user) {
+            window.location.href =
+                "login.html";
+            return;
+        }
+
+        const result =
+            await ClosetProfile.getMyProfile();
+
+        if (!result.success) {
+            showStatus(
+                result.message,
+                "error"
+            );
+
+            return;
+        }
+
+        const profile =
+            result.profile || {};
+
+        const nameInput =
+            document.getElementById(
+                "profileName"
+            );
+
+        const usernameInput =
+            document.getElementById(
+                "profileUsername"
+            );
+
+        const bioInput =
+            document.getElementById(
+                "profileBio"
+            );
+
+        const locationInput =
+            document.getElementById(
+                "profileLocation"
+            );
+
+        if (nameInput) {
+            nameInput.value =
+                profile.display_name ||
+                user.user_metadata?.name ||
+                "";
+        }
+
+        if (usernameInput) {
+            usernameInput.value =
+                profile.username || "";
+        }
+
+        if (bioInput) {
+            bioInput.value =
+                profile.bio || "";
+        }
+
+        if (locationInput) {
+            locationInput.value =
+                profile.location || "";
+        }
+
+        if (elements.profileImagePreview) {
+            if (profile.avatar_url) {
+                elements.profileImagePreview.src =
+                    profile.avatar_url;
+
+                elements.profileImagePreview.hidden =
+                    false;
+            } else {
+                elements.profileImagePreview.hidden =
+                    true;
+            }
+        }
+    }
+
+    async function saveProfile(event) {
+        event.preventDefault();
+
+        const user =
+            ClosetAuth.getUser();
+
+        if (!user) {
+            window.location.href =
+                "login.html";
+            return;
+        }
+
+        const displayName =
+            document.getElementById(
+                "profileName"
+            )?.value || "";
+
+        const username =
+            document.getElementById(
+                "profileUsername"
+            )?.value || "";
+
+        const bio =
+            document.getElementById(
+                "profileBio"
+            )?.value || "";
+
+        const location =
+            document.getElementById(
+                "profileLocation"
+            )?.value || "";
+
+        setButtonLoading(
+            elements.saveProfileButton,
+            true,
+            "Saving…"
+        );
+
+        const result =
+            await ClosetProfile.updateProfile({
+                displayName,
+                username,
+                bio,
+                location
+            });
+
+        if (!result.success) {
+            setButtonLoading(
+                elements.saveProfileButton,
+                false
+            );
+
+            showStatus(
+                result.message,
+                "error"
+            );
+
+            return;
+        }
+
+        const image =
+            elements.profileImage?.files?.[0];
+
+        if (image) {
+            const imageResult =
+                await ClosetProfile.uploadAvatar(
+                    image
+                );
+
+            if (!imageResult.success) {
+                setButtonLoading(
+                    elements.saveProfileButton,
+                    false
+                );
+
+                showStatus(
+                    `Profile saved, but the profile photo could not be uploaded: ${imageResult.message}`,
+                    "error"
+                );
+
+                await loadProfile();
+
+                ClosetNavigation.show(
+                    "profile"
+                );
+
+                return;
+            }
+        }
+
+        setButtonLoading(
+            elements.saveProfileButton,
+            false
+        );
+
+        showStatus(
+            "Your profile has been updated.",
+            "success"
+        );
+
+        await loadProfile();
+
+        ClosetNavigation.show(
+            "profile"
+        );
+    }
+
+    async function publishListing(event) {
+        event.preventDefault();
+
+        const messageElement =
+            document.getElementById(
+                "listingFormMessage"
+            );
+
+        clearFormMessage(
+            messageElement
+        );
+
+        const title =
+            document.getElementById(
+                "itemName"
+            )?.value.trim() || "";
+
+        const price =
+            document.getElementById(
+                "itemPrice"
+            )?.value || "";
+
+        const categoryId =
+            document.getElementById(
+                "itemCategory"
+            )?.value || "";
+
+        const subcategoryId =
+            document.getElementById(
+                "itemSubcategory"
+            )?.value || "";
+
+        const condition =
+            document.getElementById(
+                "itemCondition"
+            )?.value || "";
+
+        const description =
+            document.getElementById(
+                "itemDescription"
+            )?.value.trim() || "";
+
+        const image =
+            elements.itemImage?.files?.[0];
+
+        if (!title) {
+            showFormMessage(
+                messageElement,
+                "Please add a title for your item."
+            );
+
+            return;
+        }
+
+        if (
+            !price ||
+            Number(price) <= 0
+        ) {
+            showFormMessage(
+                messageElement,
+                "Please enter a valid price."
+            );
+
+            return;
+        }
+
+        if (!categoryId) {
+            showFormMessage(
+                messageElement,
+                "Please choose a category."
+            );
+
+            return;
+        }
+
+        if (!condition) {
+            showFormMessage(
+                messageElement,
+                "Please choose the item's condition."
+            );
+
+            return;
+        }
+
+        if (!image) {
+            showFormMessage(
+                messageElement,
+                "Please add a photo of your item."
+            );
+
+            return;
+        }
+
+        setButtonLoading(
+            elements.publishListingButton,
+            true,
+            "Publishing…"
+        );
+
+        const result =
+            await ClosetListings.createListing({
+                title,
+                description,
+                price,
+                categoryId,
+                subcategoryId,
+                condition,
+                image
+            });
+
+        setButtonLoading(
+            elements.publishListingButton,
+            false
+        );
+
+        if (!result.success) {
+            showFormMessage(
+                messageElement,
+                result.message
+            );
+
+            return;
+        }
+
+        elements.listingForm.reset();
+
+        if (elements.imagePreview) {
+            elements.imagePreview.hidden = true;
+        }
+
+        if (elements.removeImageButton) {
+            elements.removeImageButton.hidden = true;
+        }
+
+        state.selectedCategory = null;
+        state.selectedSubcategory = null;
+
+        const categoryValue =
+            document.getElementById(
+                "categoryPickerValue"
+            );
+
+        const subcategoryValue =
+            document.getElementById(
+                "subcategoryPickerValue"
+            );
+
+        if (categoryValue) {
+            categoryValue.textContent =
+                "Choose a category";
+        }
+
+        if (subcategoryValue) {
+            subcategoryValue.textContent =
+                "Choose a subcategory";
+        }
+
+        const subcategoryField =
+            document.getElementById(
+                "subcategoryField"
+            );
+
+        if (subcategoryField) {
+            subcategoryField.hidden = true;
+        }
+
+        showStatus(
+            "Your item has been published.",
+            "success"
+        );
+
+        await Promise.all([
+            loadHomeListings(),
+            loadBrowseListings(),
+            loadMyListings()
+        ]);
+
+        if (result.listing?.id) {
+            await openListing(
+                result.listing.id
+            );
+        }
+    }
+
+    function setupImagePreview() {
+        if (!elements.itemImage) {
+            return;
+        }
+
+        elements.itemImage.addEventListener(
+            "change",
+            () => {
+                const file =
+                    elements.itemImage.files?.[0];
+
+                if (!file) {
+                    if (elements.imagePreview) {
+                        elements.imagePreview.hidden =
+                            true;
+                    }
+
+                    if (
+                        elements.removeImageButton
+                    ) {
+                        elements.removeImageButton.hidden =
+                            true;
+                    }
+
+                    return;
+                }
+
+                if (!file.type.startsWith("image/")) {
+                    elements.itemImage.value = "";
+
+                    showStatus(
+                        "Please choose an image file.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                const objectURL =
+                    URL.createObjectURL(file);
+
+                if (elements.imagePreviewImage) {
+                    elements.imagePreviewImage.src =
+                        objectURL;
+                }
+
+                if (elements.imagePreview) {
+                    elements.imagePreview.hidden =
+                        false;
+                }
+
+                if (elements.removeImageButton) {
+                    elements.removeImageButton.hidden =
+                        false;
+                }
+            }
+        );
+    }
+
+    function setupRemoveImage() {
+        elements.removeImageButton?.addEventListener(
+            "click",
+            () => {
+                if (elements.itemImage) {
+                    elements.itemImage.value = "";
+                }
+
+                if (elements.imagePreviewImage) {
+                    elements.imagePreviewImage.removeAttribute(
+                        "src"
+                    );
+                }
+
+                if (elements.imagePreview) {
+                    elements.imagePreview.hidden =
+                        true;
+                }
+
+                if (elements.removeImageButton) {
+                    elements.removeImageButton.hidden =
+                        true;
+                }
+            }
+        );
+    }
+
+    function setupHeaderActions() {
+        elements.logoButton?.addEventListener(
+            "click",
+            () => {
+                ClosetNavigation.show("home");
+            }
+        );
+
+        elements.headerProfileButton?.addEventListener(
+            "click",
+            () => {
+                if (ClosetAuth.isSignedIn()) {
+                    ClosetNavigation.show("profile");
+                } else {
+                    window.location.href =
+                        "login.html";
+                }
+            }
+        );
+
+        elements.headerSellButton?.addEventListener(
+            "click",
+            () => {
+                if (ClosetAuth.isSignedIn()) {
+                    ClosetNavigation.show("sell");
+                } else {
+                    window.location.href =
+                        "login.html";
+                }
+            }
+        );
+    }
+
+    function setupListingClicks() {
+        document.addEventListener(
+            "click",
+            (event) => {
+                const button =
+                    event.target.closest(
+                        "[data-listing-id]"
+                    );
+
+                if (!button) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                openListing(
+                    button.dataset.listingId
+                );
+            }
+        );
+    }
+
+    function setupBrowseControls() {
+        elements.browseSearch?.addEventListener(
+            "input",
+            debounce(
+                loadBrowseListings,
+                300
+            )
+        );
+
+        elements.categoryFilters.forEach(
+            (button) => {
+                button.addEventListener(
+                    "click",
+                    async () => {
+                        elements.categoryFilters.forEach(
+                            (item) => {
+                                item.classList.remove(
+                                    "active"
+                                );
+                            }
+                        );
+
+                        button.classList.add(
+                            "active"
+                        );
+
+                        state.selectedCategory =
+                            button.dataset.category ||
+                            null;
+
+                        await loadBrowseListings();
+                    }
+                );
+            }
+        );
+    }
+
+    function debounce(callback, delay) {
+        let timeout;
+
+        return (...args) => {
+            window.clearTimeout(timeout);
+
+            timeout = window.setTimeout(
+                () => callback(...args),
+                delay
+            );
+        };
+    }
+
+    function setupNavigationEvents() {
+        window.addEventListener(
+            "closet:navigate",
+            async (event) => {
+                const view =
+                    event.detail?.view;
+
+                if (view === "home") {
+                    await loadHomeListings();
+                }
+
+                if (view === "browse") {
+                    await loadBrowseListings();
+                }
+
+                if (view === "profile") {
+                    await loadProfile();
+                }
+
+                if (view === "edit-profile") {
+                    await loadEditProfile();
+                }
+            }
+        );
+    }
+
+    function setupForms() {
+        elements.listingForm?.addEventListener(
+            "submit",
+            publishListing
+        );
+
+        elements.profileForm?.addEventListener(
+            "submit",
+            saveProfile
+        );
+    }
+
+    function setupProfileActions() {
+        elements.profileEditButton?.addEventListener(
+            "click",
+            () => {
+                if (!ClosetAuth.isSignedIn()) {
+                    window.location.href =
+                        "login.html";
+
+                    return;
+                }
+
+                ClosetNavigation.show(
+                    "edit-profile"
+                );
+            }
+        );
+
+        elements.profileSettingsButton?.addEventListener(
+            "click",
+            () => {
+                if (!ClosetAuth.isSignedIn()) {
+                    window.location.href =
+                        "login.html";
+
+                    return;
+                }
+
+                ClosetNavigation.show(
+                    "settings"
+                );
+            }
+        );
+    }
+
+    async function updateAuthenticatedUI() {
+        const signedIn =
+            ClosetAuth.isSignedIn();
+
+        if (elements.headerProfileButton) {
+            elements.headerProfileButton.textContent =
+                signedIn
+                    ? "Profile"
+                    : "Sign in";
+        }
+
+        if (elements.headerSellButton) {
+            elements.headerSellButton.textContent =
+                "Sell";
+        }
+
+        if (
+            elements.settingsEmail &&
+            signedIn
+        ) {
+            elements.settingsEmail.textContent =
+                ClosetAuth.getUser()?.email || "";
+        }
+    }
+
+    function setupAuthStateListener() {
+        window.addEventListener(
+            "closet:auth",
+            async () => {
+                await updateAuthenticatedUI();
+            }
+        );
+    }
+
+    async function initialize() {
+        ClosetNavigation.initialize("home");
+
+        setupHeaderActions();
+        setupListingClicks();
+        setupBrowseControls();
+        setupForms();
+        setupProfileActions();
+        setupImagePreview();
+        setupRemoveImage();
+        setupNavigationEvents();
+        setupAuthStateListener();
+
+        const session =
+            await ClosetAuth.initialize();
+
+        await updateAuthenticatedUI();
+
+        await loadHomeListings();
+
+        if (session) {
+            console.log(
+                "CLOSET: Signed-in session restored."
+            );
+        }
+
+        console.log(
+            "CLOSET initialized."
+        );
+    }
+
+    await initialize();
 });
+

@@ -1,46 +1,134 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Moldova Fashion Marketplace</title>
+<title>CLOSET — Moldova Fashion Marketplace</title>
+<meta
+    name="description"
+    content="CLOSET is a fashion marketplace for buying and selling clothes across Moldova."
+>
 
-    <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
+
+
 </head>
 
 <body>
 
-    <header>
+<!-- =========================================
+     SITE HEADER
+     ========================================= -->
 
-        <div class="logo">
-            CLOSET
-        </div>
+<header class="site-header">
 
-        <nav>
-            <a href="#">Home</a>
-            <a href="#">Browse</a>
-            <a href="#">Sell</a>
-            <a href="#">About</a>
-        </nav>
+    <button
+        class="logo"
+        id="logoButton"
+        type="button"
+        aria-label="Go to CLOSET home"
+    >
+        CLOSET
+    </button>
 
-        <div class="header-buttons">
-            <button id="loginButton">Log in</button>
-            <button id="headerSellButton">Sell an item</button>
-        </div>
+    <nav class="main-navigation" aria-label="Main navigation">
 
-    </header>
+        <button
+            type="button"
+            class="nav-link active"
+            data-view="home"
+        >
+            Home
+        </button>
+
+        <button
+            type="button"
+            class="nav-link"
+            data-view="browse"
+        >
+            Browse
+        </button>
+
+        <button
+            type="button"
+            class="nav-link"
+            data-view="sell"
+        >
+            Sell
+        </button>
+
+        <button
+            type="button"
+            class="nav-link"
+            data-view="about"
+        >
+            About
+        </button>
+
+    </nav>
+
+    <div class="header-actions">
+
+        <button
+            id="headerProfileButton"
+            class="header-profile-button"
+            type="button"
+        >
+            Profile
+        </button>
+
+        <button
+            id="headerSellButton"
+            class="header-sell-button"
+            type="button"
+        >
+            Sell an item
+        </button>
+
+    </div>
+
+</header>
 
 
-    <main>
+<!-- =========================================
+     GLOBAL STATUS / TOAST
+     ========================================= -->
 
-        <!-- HOME PAGE -->
+<div
+    id="statusMessage"
+    class="status-message"
+    role="status"
+    aria-live="polite"
+    hidden
+></div>
 
-        <section class="hero">
 
-            <div class="hero-text">
+<!-- =========================================
+     MAIN APPLICATION
+     ========================================= -->
 
-                <p class="small-title">MADE FOR MOLDOVA</p>
+<main id="app">
+
+
+    <!-- =====================================
+         HOME
+         ===================================== -->
+
+    <section
+        id="homeView"
+        class="app-view"
+        data-view-section="home"
+    >
+
+        <div class="hero">
+
+            <div class="hero-content">
+
+                <p class="eyebrow">
+                    MADE FOR MOLDOVA
+                </p>
 
                 <h1>
                     Your clothes.<br>
@@ -48,273 +136,366 @@
                 </h1>
 
                 <p class="hero-description">
-                    Buy, sell and discover clothes from people across Moldova.
-                    A simpler way to give fashion a second life.
+                    Buy, sell and discover clothes from people
+                    across Moldova. A simpler way to give fashion
+                    a second life.
                 </p>
 
-                <div class="hero-buttons">
-                    <button id="browseButton">Browse clothes</button>
-                    <button id="sellButton">Sell something</button>
+                <div class="hero-actions">
+
+                    <button
+                        id="browseButton"
+                        class="primary-button"
+                        type="button"
+                        data-view="browse"
+                    >
+                        Browse clothes
+                    </button>
+
+                    <button
+                        id="heroSellButton"
+                        class="secondary-button"
+                        type="button"
+                        data-view="sell"
+                    >
+                        Sell something
+                    </button>
+
                 </div>
 
             </div>
 
+            <div class="hero-visual">
 
-            <div class="hero-image">
+                <div class="hero-visual-content">
 
-                <div class="image-placeholder">
-                    YOUR<br>
-                    FASHION<br>
-                    HERE
+                    <span>SECOND</span>
+                    <strong>LIFE</strong>
+                    <span>FOR FASHION</span>
+
                 </div>
 
             </div>
 
-        </section>
+        </div>
 
 
-        <section class="why-us">
+        <section class="home-introduction">
 
-            <p class="small-title">WHY US?</p>
+            <p class="eyebrow">
+                WHY CLOSET?
+            </p>
 
             <h2>
-                Not another classifieds website.
+                A marketplace built around clothes,
+                not clutter.
             </h2>
 
             <p>
-                A marketplace built specifically around clothing,
-                fashion and the people who wear it.
+                CLOSET brings clothing buyers and sellers
+                together in one place, with profiles,
+                real listings and a simpler way to discover
+                fashion across Moldova.
             </p>
 
         </section>
 
-        <!-- SIGN IN PAGE -->
 
-<section id="loginPage" class="account-page">
+        <section class="home-features">
 
-    <div class="account-container">
+            <article class="feature-card">
 
-        <button id="closeLoginButton" class="close-account">
-            ← Back
-        </button>
+                <span class="feature-number">01</span>
 
-        <div class="account-card">
+                <h3>
+                    Discover
+                </h3>
 
-            <p class="small-title">
-                WELCOME BACK
-            </p>
+                <p>
+                    Find clothing listed by people across
+                    Moldova.
+                </p>
 
-            <h2>
-                Sign in to<br>
-                CLOSET.
-            </h2>
+            </article>
 
-            <p class="account-intro">
-                Sign in to sell your clothes and manage your listings.
-            </p>
 
-            <form id="loginForm">
+            <article class="feature-card">
 
-                <div class="form-group">
+                <span class="feature-number">02</span>
 
-                    <label for="loginEmail">
-                        Email
-                    </label>
+                <h3>
+                    Sell
+                </h3>
 
-                    <input
-                        type="email"
-                        id="loginEmail"
-                        placeholder="you@example.com"
-                        required
-                    >
+                <p>
+                    Create a listing, add your photos and
+                    put your clothes up for sale.
+                </p>
+
+            </article>
+
+
+            <article class="feature-card">
+
+                <span class="feature-number">03</span>
+
+                <h3>
+                    Connect
+                </h3>
+
+                <p>
+                    View seller profiles and build trust
+                    through reviews.
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <section class="home-latest">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        JUST LISTED
+                    </p>
+
+                    <h2>
+                        Fresh finds.
+                    </h2>
 
                 </div>
-
-
-                <div class="form-group">
-
-                    <label for="loginPassword">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="loginPassword"
-                        placeholder="Your password"
-                        required
-                    >
-
-                </div>
-
 
                 <button
-                    type="submit"
-                    class="account-button"
+                    type="button"
+                    class="text-button"
+                    data-view="browse"
                 >
-                    Sign in
+                    Browse everything →
                 </button>
 
-            </form>
+            </div>
+
+            <div
+                id="homeListingsGrid"
+                class="listing-grid"
+            >
+                <div class="listing-empty">
+                    <p>No listings yet.</p>
+                </div>
+            </div>
+
+        </section>
+
+    </section>
 
 
-            <p class="account-switch">
-                Don't have an account?
-                <button id="goToSignupButton">
-                    Create an account
-                </button>
+    <!-- =====================================
+         BROWSE
+         ===================================== -->
+
+    <section
+        id="browseView"
+        class="app-view"
+        data-view-section="browse"
+        hidden
+    >
+
+        <div class="page-header">
+
+            <p class="eyebrow">
+                EXPLORE CLOSET
+            </p>
+
+            <h1>
+                Find something<br>
+                worth wearing.
+            </h1>
+
+            <p>
+                Discover clothing listed by people
+                across Moldova.
             </p>
 
         </div>
 
-    </div>
 
-</section>
+        <div class="browse-controls">
 
+            <label
+                class="search-field"
+                for="browseSearch"
+            >
 
-<!-- CREATE ACCOUNT PAGE -->
+                <span class="sr-only">
+                    Search listings
+                </span>
 
-<section id="signupPage" class="account-page">
+                <input
+                    type="search"
+                    id="browseSearch"
+                    placeholder="Search clothes..."
+                    autocomplete="off"
+                >
 
-    <div class="account-container">
-
-        <button id="closeSignupButton" class="close-account">
-            ← Back
-        </button>
-
-        <div class="account-card">
-
-            <p class="small-title">
-                JOIN CLOSET
-            </p>
-
-            <h2>
-                Create your<br>
-                account.
-            </h2>
-
-            <p class="account-intro">
-                Create an account to buy and sell clothes across Moldova.
-            </p>
+            </label>
 
 
-            <form id="signupForm">
-
-                <div class="form-group">
-
-                    <label for="signupName">
-                        Your name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="signupName"
-                        placeholder="Your name"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="signupEmail">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="signupEmail"
-                        placeholder="you@example.com"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="signupPassword">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="signupPassword"
-                        placeholder="Create a password"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="signupPasswordConfirm">
-                        Confirm password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="signupPasswordConfirm"
-                        placeholder="Repeat your password"
-                        required
-                    >
-
-                </div>
-
+            <div
+                id="categoryFilters"
+                class="category-filters"
+                aria-label="Listing categories"
+            >
 
                 <button
-                    type="submit"
-                    class="account-button"
+                    type="button"
+                    class="category-filter active"
+                    data-category=""
                 >
-                    Create account
+                    All
                 </button>
 
-            </form>
-
-
-            <p class="account-switch">
-                Already have an account?
-                <button id="goToLoginButton">
-                    Sign in
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Tops"
+                >
+                    Tops
                 </button>
-            </p>
+
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Bottoms"
+                >
+                    Bottoms
+                </button>
+
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Dresses"
+                >
+                    Dresses
+                </button>
+
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Outerwear"
+                >
+                    Outerwear
+                </button>
+
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Shoes"
+                >
+                    Shoes
+                </button>
+
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Accessories"
+                >
+                    Accessories
+                </button>
+
+                <button
+                    type="button"
+                    class="category-filter"
+                    data-category="Other"
+                >
+                    Other
+                </button>
+
+            </div>
 
         </div>
 
-    </div>
 
-</section>
+        <div
+            id="browseListingsGrid"
+            class="listing-grid"
+        >
+            <div class="listing-loading">
+                Loading listings...
+            </div>
+        </div>
+
+    </section>
 
 
+    <!-- =====================================
+         SELL
+         ===================================== -->
 
+    <section
+        id="sellView"
+        class="app-view"
+        data-view-section="sell"
+        hidden
+    >
 
-        <!-- SELL PAGE -->
+        <div class="sell-layout">
 
-        <section id="sellPage" class="sell-page">
+            <div class="sell-introduction">
 
-            <div class="sell-container">
-
-                <button id="closeSellButton" class="close-sell">
+                <button
+                    type="button"
+                    class="back-button"
+                    data-view="home"
+                >
                     ← Back
                 </button>
 
-                <p class="small-title">
-                    SELL YOUR CLOTHES
+                <p class="eyebrow">
+                    SELL ON CLOSET
                 </p>
 
-                <h2>
+                <h1>
                     Give your clothes<br>
                     a new home.
-                </h2>
+                </h1>
 
-                <p class="sell-intro">
-                    Add the details of your item and make it available
-                    to buyers across Moldova.
+                <p>
+                    Add the details of your item, upload
+                    a photo and publish your listing for
+                    buyers across Moldova.
                 </p>
 
+                <div class="sell-note">
 
-                <form id="listingForm">
+                    <strong>
+                        Your listing
+                    </strong>
+
+                    <span>
+                        Your item will be saved to your
+                        CLOSET account and shown in Browse
+                        once published.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <form id="listingForm" novalidate>
+
+                    <div
+                        id="listingFormMessage"
+                        class="form-message"
+                        hidden
+                    ></div>
+
 
                     <div class="form-group">
 
@@ -325,73 +506,248 @@
                         <input
                             type="text"
                             id="itemName"
+                            name="title"
                             placeholder="e.g. Vintage denim jacket"
+                            maxlength="100"
                             required
                         >
 
                     </div>
 
 
-                    <div class="form-group">
+                    <div class="form-row">
 
-                        <label for="itemPrice">
-                            Price (MDL)
-                        </label>
+                        <div class="form-group">
 
-                        <input
-                            type="number"
-                            id="itemPrice"
-                            placeholder="e.g. 450"
-                            min="1"
-                            required
-                        >
+                            <label for="itemPrice">
+                                Price
+                            </label>
 
-                    </div>
+                            <div class="input-with-suffix">
 
+                                <input
+                                    type="number"
+                                    id="itemPrice"
+                                    name="price"
+                                    placeholder="450"
+                                    min="1"
+                                    max="9999999"
+                                    step="0.01"
+                                    required
+                                >
 
-                    <div class="form-group">
+                                <span>
+                                    MDL
+                                </span>
 
-                        <label for="itemSize">
-                            Size
-                        </label>
+                            </div>
 
-                        <select id="itemSize" required>
-
-                            <option value="">
-                                Choose a size
-                            </option>
-
-                            <option>XS</option>
-                            <option>S</option>
-                            <option>M</option>
-                            <option>L</option>
-                            <option>XL</option>
-                            <option>XXL</option>
-                            <option>Other</option>
-
-                        </select>
-
-                    </div>
+                        </div>
 
 
-                    <div class="form-group">
+                        <div class="form-group category-picker-field">
 
-                        <label for="itemCondition">
-                            Condition
-                        </label>
+    <label for="categorySearch">
+        Category
+    </label>
 
-                        <select id="itemCondition" required>
+    <div
+        class="category-picker"
+        id="categoryPicker"
+    >
 
-                            <option value="">
-                                Choose condition
-                            </option>
+        <button
+            type="button"
+            id="categoryPickerTrigger"
+            class="category-picker-trigger"
+            aria-expanded="false"
+            aria-controls="categoryPickerPanel"
+        >
+            <span id="categoryPickerValue">
+                Choose a category
+            </span>
 
-                            <option>New</option>
-                            <option>Like new</option>
-                            <option>Good</option>
-                            <option>Fair</option>
+            <span class="category-picker-arrow">
+                ⌄
+            </span>
+        </button>
 
-                        </select>
+
+        <div
+            id="categoryPickerPanel"
+            class="category-picker-panel"
+            hidden
+        >
+
+            <div class="category-search">
+
+                <input
+                    type="search"
+                    id="categorySearch"
+                    placeholder="Search categories..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div
+                id="categoryResults"
+                class="category-results"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <input
+        type="hidden"
+        id="itemCategory"
+        name="category"
+        value=""
+    >
+
+</div>
+
+
+<div
+    class="form-group category-picker-field"
+    id="subcategoryField"
+    hidden
+>
+
+    <label for="subcategorySearch">
+        Subcategory
+    </label>
+
+
+    <div
+        class="category-picker"
+        id="subcategoryPicker"
+    >
+
+        <button
+            type="button"
+            id="subcategoryPickerTrigger"
+            class="category-picker-trigger"
+            aria-expanded="false"
+            aria-controls="subcategoryPickerPanel"
+        >
+            <span id="subcategoryPickerValue">
+                Choose a subcategory
+            </span>
+
+            <span class="category-picker-arrow">
+                ⌄
+            </span>
+        </button>
+
+
+        <div
+            id="subcategoryPickerPanel"
+            class="category-picker-panel"
+            hidden
+        >
+
+            <div class="category-search">
+
+                <input
+                    type="search"
+                    id="subcategorySearch"
+                    placeholder="Search subcategories..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div
+                id="subcategoryResults"
+                class="category-results"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <input
+        type="hidden"
+        id="itemSubcategory"
+        name="subcategory"
+        value=""
+    >
+
+</div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="itemSize">
+                                Size
+                            </label>
+
+                            <select
+                                id="itemSize"
+                                name="size"
+                                required
+                            >
+
+                                <option value="">
+                                    Choose a size
+                                </option>
+
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="Other">Other</option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="itemCondition">
+                                Condition
+                            </label>
+
+                            <select
+                                id="itemCondition"
+                                name="condition"
+                                required
+                            >
+
+                                <option value="">
+                                    Choose condition
+                                </option>
+
+                                <option value="New">
+                                    New
+                                </option>
+
+                                <option value="Like new">
+                                    Like new
+                                </option>
+
+                                <option value="Good">
+                                    Good
+                                </option>
+
+                                <option value="Fair">
+                                    Fair
+                                </option>
+
+                            </select>
+
+                        </div>
 
                     </div>
 
@@ -404,8 +760,10 @@
 
                         <textarea
                             id="itemDescription"
-                            placeholder="Tell buyers about your item..."
-                            rows="5"
+                            name="description"
+                            placeholder="Tell buyers about the item, its condition and anything they should know..."
+                            maxlength="2000"
+                            rows="7"
                             required
                         ></textarea>
 
@@ -415,22 +773,72 @@
                     <div class="form-group">
 
                         <label for="itemImage">
-                            Photo
+                            Photos
                         </label>
 
-                        <input
-                            type="file"
-                            id="itemImage"
-                            accept="image/*"
-                            required
+                        <div
+                            id="imageUploadArea"
+                            class="image-upload-area"
                         >
+
+                            <input
+                                type="file"
+                                id="itemImage"
+                                name="image"
+                                accept="image/jpeg,image/png,image/webp"
+                                required
+                            >
+
+                            <label
+                                for="itemImage"
+                                class="image-upload-label"
+                            >
+
+                                <span class="upload-icon">
+                                    +
+                                </span>
+
+                                <strong>
+                                    Add a photo
+                                </strong>
+
+                                <span>
+                                    JPG, PNG or WebP
+                                </span>
+
+                            </label>
+
+                            <div
+                                id="imagePreview"
+                                class="image-preview"
+                                hidden
+                            >
+
+                                <img
+                                    id="imagePreviewImage"
+                                    src=""
+                                    alt="Selected item preview"
+                                >
+
+                                <button
+                                    type="button"
+                                    id="removeImageButton"
+                                    class="remove-image-button"
+                                >
+                                    Remove
+                                </button>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
 
                     <button
                         type="submit"
-                        class="publish-button"
+                        id="publishListingButton"
+                        class="primary-button full-width"
                     >
                         Publish item
                     </button>
@@ -439,22 +847,985 @@
 
             </div>
 
-        </section>
+        </div>
 
-    </main>
-
-
-    <footer>
-
-        <p>
-            © 2026 CLOSET · Moldova
-        </p>
-
-    </footer>
+    </section>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js"></script>
+    <!-- =====================================
+         LISTING DETAILS
+         ===================================== -->
+
+    <section
+        id="listingView"
+        class="app-view"
+        data-view-section="listing"
+        hidden
+    >
+
+        <div class="listing-details">
+
+            <button
+                type="button"
+                id="listingBackButton"
+                class="back-button"
+            >
+                ← Back
+            </button>
+
+            <div
+                id="listingDetailsContent"
+                class="listing-details-content"
+            >
+                <div class="listing-loading">
+                    Loading listing...
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         PROFILE
+         ===================================== -->
+
+    <section
+        id="profileView"
+        class="app-view"
+        data-view-section="profile"
+        hidden
+    >
+
+        <div class="profile-page">
+
+            <div
+                id="profileHeader"
+                class="profile-header"
+            >
+
+                <div class="profile-avatar-wrapper">
+
+                    <div
+                        id="profileAvatar"
+                        class="profile-avatar"
+                    >
+                        <span>
+                            C
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="profile-information">
+
+                    <p class="eyebrow">
+                        CLOSET PROFILE
+                    </p>
+
+                    <h1 id="profileDisplayName">
+                        Your profile
+                    </h1>
+
+                    <p
+                        id="profileUsername"
+                        class="profile-username"
+                    ></p>
+
+                    <p
+                        id="profileBio"
+                        class="profile-bio"
+                    ></p>
+
+                    <div
+                        id="profileLocation"
+                        class="profile-location"
+                    ></div>
+
+                </div>
+                
+                <div class="profile-actions">
+
+                    <button
+                        id="editProfileButton"
+                        type="button"
+                        class="secondary-button"
+                    >
+                        Edit profile
+                    </button>
+
+                    <button
+                        id="settingsButton"
+                        type="button"
+                        class="secondary-button"
+                    >
+                        Settings
+                    </button>
+
+                    <button
+                        id="signOutButton"
+                        type="button"
+                        class="secondary-button"
+                    >
+                        Sign out
+                    </button>
+
+                </div>
+
+            </div>
+            
+            <div class="profile-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            YOUR CLOSET
+                        </p>
+
+                        <h2>
+                            My listings
+                        </h2>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="text-button"
+                        data-view="sell"
+                    >
+                        Sell an item →
+                    </button>
+
+                </div>
+
+                <div
+                    id="myListingsGrid"
+                    class="listing-grid"
+                >
+                    <div class="listing-empty">
+                        <p>
+                            You haven't listed anything yet.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="profile-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            SELLER REVIEWS
+                        </p>
+
+                        <h2>
+                            Reviews
+                        </h2>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="profileReviews"
+                    class="reviews-list"
+                >
+                    <div class="reviews-empty">
+                        No reviews yet.
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         EDIT PROFILE
+         ===================================== -->
+
+    <section
+        id="editProfileView"
+        class="app-view"
+        data-view-section="edit-profile"
+        hidden
+    >
+
+        <div class="settings-layout">
+
+            <div class="settings-introduction">
+
+                <button
+                    type="button"
+                    class="back-button"
+                    data-view="profile"
+                >
+                    ← Back to profile
+                </button>
+
+                <p class="eyebrow">
+                    PROFILE
+                </p>
+
+                <h1>
+                    Edit your<br>
+                    profile.
+                </h1>
+
+                <p>
+                    Keep your CLOSET profile up to date so
+                    buyers know who they're dealing with.
+                </p>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <form
+                    id="profileForm"
+                    novalidate
+                >
+
+                    <div
+                        id="profileFormMessage"
+                        class="form-message"
+                        hidden
+                    ></div>
+
+
+                    <div class="profile-photo-editor">
+
+                        <div
+                            id="editProfileAvatar"
+                            class="profile-avatar large"
+                        >
+                            <span>
+                                C
+                            </span>
+                        </div>
+
+                        <div>
+
+                            <label
+                                for="profileImage"
+                                class="secondary-button"
+                            >
+                                Change photo
+                            </label>
+
+                            <input
+                                type="file"
+                                id="profileImage"
+                                accept="image/jpeg,image/png,image/webp"
+                                hidden
+                            >
+
+                            <p>
+                                JPG, PNG or WebP.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="profileName">
+                            Display name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profileName"
+                            maxlength="80"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="profileUsername">
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profileUsername"
+                            maxlength="30"
+                            placeholder="yourusername"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="profileBio">
+                            Bio
+                        </label>
+
+                        <textarea
+                            id="profileBio"
+                            maxlength="300"
+                            rows="5"
+                            placeholder="Tell people a little about yourself..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="profileLocation">
+                            Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profileLocation"
+                            maxlength="100"
+                            placeholder="e.g. Chișinău"
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="saveProfileButton"
+                        class="primary-button full-width"
+                    >
+                        Save changes
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         SETTINGS
+         ===================================== -->
+
+    <section
+        id="settingsView"
+        class="app-view"
+        data-view-section="settings"
+        hidden
+    >
+
+        <div class="settings-layout">
+
+            <div class="settings-introduction">
+
+                <button
+                    type="button"
+                    class="back-button"
+                    data-view="profile"
+                >
+                    ← Back to profile
+                </button>
+
+                <p class="eyebrow">
+                    ACCOUNT
+                </p>
+
+                <h1>
+                    Settings.
+                </h1>
+
+                <p>
+                    Manage your CLOSET account and
+                    preferences.
+                </p>
+
+            </div>
+
+
+            <div class="settings-card">
+
+                <div class="settings-item">
+
+                    <div>
+
+                        <strong>
+                            Account email
+                        </strong>
+
+                        <span id="settingsEmail">
+                            Loading...
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="settings-item">
+
+                    <div>
+
+                        <strong>
+                            Buying Protection
+                        </strong>
+
+                        <span>
+                            A future CLOSET feature.
+                            We'll announce when it becomes
+                            available.
+                        </span>
+
+                    </div>
+
+                    <span class="coming-soon-badge">
+                        Coming soon
+                    </span>
+
+                </div>
+
+
+                <div class="settings-item danger-zone">
+
+                    <div>
+
+                        <strong>
+                            Sign out
+                        </strong>
+
+                        <span>
+                            Sign out of this CLOSET account
+                            on this device.
+                        </span>
+
+                    </div>
+
+                    <button
+                        id="logoutButton"
+                        type="button"
+                        class="danger-button"
+                    >
+                        Sign out
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         LOGIN
+         ===================================== -->
+
+    <section
+        id="loginView"
+        class="app-view"
+        data-view-section="login"
+        hidden
+    >
+
+        <div class="account-layout">
+
+            <div class="account-card">
+
+                <button
+                    type="button"
+                    class="back-button"
+                    data-view="home"
+                >
+                    ← Back
+                </button>
+
+                <p class="eyebrow">
+                    WELCOME BACK
+                </p>
+
+                <h1>
+                    Sign in to<br>
+                    CLOSET.
+                </h1>
+
+                <p class="account-intro">
+                    Sign in to manage your profile,
+                    listings and CLOSET activity.
+                </p>
+
+
+                <form
+                    id="loginForm"
+                    novalidate
+                >
+
+                    <div
+                        id="loginFormMessage"
+                        class="form-message"
+                        hidden
+                    ></div>
+
+
+                    <div class="form-group">
+
+                        <label for="loginEmail">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="loginPassword">
+                            Password
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="loginPassword"
+                                autocomplete="current-password"
+                                placeholder="Your password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="toggleLoginPassword"
+                                class="password-toggle"
+                                aria-label="Show password"
+                            >
+                                👁
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="loginSubmitButton"
+                        class="primary-button full-width"
+                    >
+                        Sign in
+                    </button>
+
+                </form>
+
+
+                <p class="account-switch">
+
+                    Don't have an account?
+
+                    <button
+                        id="goToSignupButton"
+                        type="button"
+                    >
+                        Create an account
+                    </button>
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         SIGN UP
+         ===================================== -->
+
+    <section
+        id="signupView"
+        class="app-view"
+        data-view-section="signup"
+        hidden
+    >
+
+        <div class="account-layout">
+
+            <div class="account-card">
+
+                <button
+                    type="button"
+                    class="back-button"
+                    data-view="home"
+                >
+                    ← Back
+                </button>
+
+                <p class="eyebrow">
+                    JOIN CLOSET
+                </p>
+
+                <h1>
+                    Create your<br>
+                    account.
+                </h1>
+
+                <p class="account-intro">
+                    Create an account to buy and sell
+                    clothes across Moldova.
+                </p>
+
+
+                <form
+                    id="signupForm"
+                    novalidate
+                >
+
+                    <div
+                        id="signupFormMessage"
+                        class="form-message"
+                        hidden
+                    ></div>
+
+
+                    <div class="form-group">
+
+                        <label for="signupName">
+                            Your name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="signupName"
+                            autocomplete="name"
+                            maxlength="80"
+                            placeholder="Your name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="signupEmail">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="signupEmail"
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="signupPassword">
+                            Password
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="signupPassword"
+                                autocomplete="new-password"
+                                placeholder="Create a password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="toggleSignupPassword"
+                                class="password-toggle"
+                                aria-label="Show password"
+                            >
+                                👁
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="signupPasswordConfirm">
+                            Confirm password
+                        </label>
+
+                        <div class="password-wrapper">
+
+                            <input
+                                type="password"
+                                id="signupPasswordConfirm"
+                                autocomplete="new-password"
+                                placeholder="Repeat your password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="toggleSignupPasswordConfirm"
+                                class="password-toggle"
+                                aria-label="Show password"
+                            >
+                                👁
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="signupSubmitButton"
+                        class="primary-button full-width"
+                    >
+                        Create account
+                    </button>
+
+                </form>
+
+
+                <p class="account-switch">
+
+                    Already have an account?
+
+                    <button
+                        id="goToLoginButton"
+                        type="button"
+                    >
+                        Sign in
+                    </button>
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         EMAIL VERIFICATION
+         ===================================== -->
+
+    <section
+        id="verificationView"
+        class="app-view"
+        data-view-section="verification"
+        hidden
+    >
+
+        <div class="account-layout">
+
+            <div class="account-card verification-card">
+
+                <p class="eyebrow">
+                    CHECK YOUR EMAIL
+                </p>
+
+                <h1>
+                    One more<br>
+                    step.
+                </h1>
+
+                <p class="account-intro">
+                    We've sent a verification link to your
+                    email address. Open it and verify your
+                    account before signing in.
+                </p>
+
+                <button
+                    type="button"
+                    class="secondary-button full-width"
+                    data-view="login"
+                >
+                    Back to sign in
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         ABOUT
+         ===================================== -->
+
+    <section
+        id="aboutView"
+        class="app-view"
+        data-view-section="about"
+        hidden
+    >
+
+        <div class="about-page">
+
+            <p class="eyebrow">
+                ABOUT CLOSET
+            </p>
+
+            <h1>
+                Fashion deserves<br>
+                another story.
+            </h1>
+
+            <p class="about-lead">
+                CLOSET is a Moldova-focused marketplace
+                built around buying, selling and discovering
+                clothing.
+            </p>
+
+
+            <div class="about-grid">
+
+                <div>
+
+                    <span>
+                        01
+                    </span>
+
+                    <h2>
+                        Built for clothing.
+                    </h2>
+
+                    <p>
+                        CLOSET focuses on fashion instead of
+                        trying to be everything for everyone.
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        02
+                    </span>
+
+                    <h2>
+                        Built for Moldova.
+                    </h2>
+
+                    <p>
+                        The marketplace is designed around
+                        people buying and selling clothes
+                        locally across Moldova.
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        03
+                    </span>
+
+                    <h2>
+                        Built to grow.
+                    </h2>
+
+                    <p>
+                        Profiles, listings, reviews and
+                        future marketplace features can all
+                        grow with CLOSET.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================
+     FOOTER
+     ========================================= -->
+
+<footer class="site-footer">
+
+    <div>
+
+        <strong>
+            CLOSET
+        </strong>
+
+        <span>
+            Moldova fashion marketplace
+        </span>
+
+    </div>
+
+    <p>
+        © 2026 CLOSET · Moldova
+    </p>
+
+</footer>
+
+
+<!-- =========================================
+     SUPABASE + CLOSET JAVASCRIPT
+     ========================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+<script src="navigation.js"></script>
+
+<script src="auth.js"></script>
+
+<script src="categories.js"></script>
+
+<script src="category-picker.js"></script>
+
+<script src="listings.js"></script>
+
+<script src="profile.js"></script>
+
+<script src="app.js"></script>
+
+
 
 </body>
 </html>
+
