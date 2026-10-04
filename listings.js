@@ -1,120 +1,122 @@
-    const HOME_CACHE_KEY = "closet-home-listings-cache";
-    const HOME_CACHE_TTL = 30 * 1000;
-    let homeRequest = null;
-    let homeMemoryCache = null;
-    let homeMemoryTimestamp = 0;
-
-    function readHomeCache() {
-        if (homeMemoryCache && Date.now() - homeMemoryTimestamp < HOME_CACHE_TTL) {
-            return homeMemoryCache;
-        }
-
-        try {
-            const cached = JSON.parse(localStorage.getItem(HOME_CACHE_KEY) || "null");
-            if (!cached || !Array.isArray(cached.data)) return null;
-            if (Date.now() - Number(cached.timestamp || 0) >= HOME_CACHE_TTL) return null;
-            homeMemoryCache = cached.data;
-            homeMemoryTimestamp = Number(cached.timestamp || Date.now());
-            return homeMemoryCache;
-        } catch {
-            return null;
-        }
-    }
-
-    function writeHomeCache(data) {
-        homeMemoryCache = data;
-        homeMemoryTimestamp = Date.now();
-        try {
-            localStorage.setItem(HOME_CACHE_KEY, JSON.stringify({
-                timestamp: homeMemoryTimestamp,
-                data
-            }));
-        } catch {
-            // In-memory cache still works when storage is unavailable.
-        }
-    }
-
-    async function getHomeListings({ limit = 8 } = {}) {
-        const cached = readHomeCache();
-        if (cached) {
-            return { success: true, listings: cached };
-        }
-
-        if (homeRequest) return homeRequest;
-
-        homeRequest = (async () => {
-            try {
-                // Keep the critical homepage query completely flat. Nested
-                // PostgREST relations can trigger expensive schema/RLS work.
-                const { data, error } = await client
-                    .from("listings")
-                    .select("id, seller_id, category_id, title, price_mdl, condition, status, location, created_at")
-                    .eq("status", "active")
-                    .order("created_at", { ascending: false })
-                    .limit(limit);
-
-                if (error) throw error;
-
-                const listings = data || [];
-                if (!listings.length) {
-                    writeHomeCache(listings);
-                    return { success: true, listings };
-                }
-
-                // Fetch only the cover image for these few listings in one
-                // small second request. No relational join.
-                const ids = listings.map(item => item.id);
-                const { data: images, error: imageError } = await client
-                    .from("listing_images")
-                    .select("listing_id, image_url, sort_order")
-                    .in("listing_id", ids)
-                    .order("sort_order", { ascending: true });
-
-                if (imageError) throw imageError;
-
-                const coverByListing = new Map();
-                (images || []).forEach(image => {
-                    if (!coverByListing.has(image.listing_id)) {
-                        coverByListing.set(image.listing_id, image);
-                    }
-                });
-
-                const hydrated = listings.map(item => ({
-                    ...item,
-                    listing_images: coverByListing.has(item.id)
-                        ? [coverByListing.get(item.id)]
-                        : []
-                }));
-
-                writeHomeCache(hydrated);
-                return { success: true, listings: hydrated };
-            } catch (error) {
-                console.error("CLOSET homepage listing fetch error:", error);
-
-                // If Supabase is temporarily slow, serve the last cached
-                // homepage instead of leaving the page spinning forever.
-                if (homeMemoryCache) {
-                    return { success: true, listings: homeMemoryCache, cached: true };
-                }
-
-                return {
-                    success: false,
-                    message: getListingErrorMessage(error),
-                    listings: []
-                };
-            } finally {
-                homeRequest = null;
-            }
-        })();
-
-        return homeRequest;
-    }
-
 const ClosetListings = (() => {
     const client = window.supabaseClient;
     const STORAGE_BUCKET = "listing-images";
     const MAX_IMAGES = 20;
     const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+    const HOME_CACHE_KEY = "closet-home-listings-cache";
+        const HOME_CACHE_TTL = 30 * 1000;
+        let homeRequest = null;
+        let homeMemoryCache = null;
+        let homeMemoryTimestamp = 0;
+
+        function readHomeCache() {
+            if (homeMemoryCache && Date.now() - homeMemoryTimestamp < HOME_CACHE_TTL) {
+                return homeMemoryCache;
+            }
+
+            try {
+                const cached = JSON.parse(localStorage.getItem(HOME_CACHE_KEY) || "null");
+                if (!cached || !Array.isArray(cached.data)) return null;
+                if (Date.now() - Number(cached.timestamp || 0) >= HOME_CACHE_TTL) return null;
+                homeMemoryCache = cached.data;
+                homeMemoryTimestamp = Number(cached.timestamp || Date.now());
+                return homeMemoryCache;
+            } catch {
+                return null;
+            }
+        }
+
+        function writeHomeCache(data) {
+            homeMemoryCache = data;
+            homeMemoryTimestamp = Date.now();
+            try {
+                localStorage.setItem(HOME_CACHE_KEY, JSON.stringify({
+                    timestamp: homeMemoryTimestamp,
+                    data
+                }));
+            } catch {
+                // In-memory cache still works when storage is unavailable.
+            }
+        }
+
+        async function getHomeListings({ limit = 8 } = {}) {
+            const cached = readHomeCache();
+            if (cached) {
+                return { success: true, listings: cached };
+            }
+
+            if (homeRequest) return homeRequest;
+
+            homeRequest = (async () => {
+                try {
+                    // Keep the critical homepage query completely flat. Nested
+                    // PostgREST relations can trigger expensive schema/RLS work.
+                    const { data, error } = await client
+                        .from("listings")
+                        .select("id, seller_id, category_id, title, price_mdl, condition, status, location, created_at")
+                        .eq("status", "active")
+                        .order("created_at", { ascending: false })
+                        .limit(limit);
+
+                    if (error) throw error;
+
+                    const listings = data || [];
+                    if (!listings.length) {
+                        writeHomeCache(listings);
+                        return { success: true, listings };
+                    }
+
+                    // Fetch only the cover image for these few listings in one
+                    // small second request. No relational join.
+                    const ids = listings.map(item => item.id);
+                    const { data: images, error: imageError } = await client
+                        .from("listing_images")
+                        .select("listing_id, image_url, sort_order")
+                        .in("listing_id", ids)
+                        .order("sort_order", { ascending: true });
+
+                    if (imageError) throw imageError;
+
+                    const coverByListing = new Map();
+                    (images || []).forEach(image => {
+                        if (!coverByListing.has(image.listing_id)) {
+                            coverByListing.set(image.listing_id, image);
+                        }
+                    });
+
+                    const hydrated = listings.map(item => ({
+                        ...item,
+                        listing_images: coverByListing.has(item.id)
+                            ? [coverByListing.get(item.id)]
+                            : []
+                    }));
+
+                    writeHomeCache(hydrated);
+                    return { success: true, listings: hydrated };
+                } catch (error) {
+                    console.error("CLOSET homepage listing fetch error:", error);
+
+                    // If Supabase is temporarily slow, serve the last cached
+                    // homepage instead of leaving the page spinning forever.
+                    if (homeMemoryCache) {
+                        return { success: true, listings: homeMemoryCache, cached: true };
+                    }
+
+                    return {
+                        success: false,
+                        message: getListingErrorMessage(error),
+                        listings: []
+                    };
+                } finally {
+                    homeRequest = null;
+                }
+            })();
+
+            return homeRequest;
+        }
+
+
 
     function getStoragePath(url) {
         if (!url) return null;
