@@ -378,7 +378,7 @@ const ClosetCategoryPicker = (() => {
         }
 
         try {
-            allCategories = await ClosetCategories.getCategories();
+            allCategories = await ClosetCategories.getFreshCategories();
 
             topLevelCategories = allCategories.filter(
                 (category) => category.parent_id === null
@@ -402,6 +402,15 @@ const ClosetCategoryPicker = (() => {
         }
     }
 
+    async function refresh() {
+        if (typeof ClosetCategories === "undefined") return;
+        allCategories = await ClosetCategories.getFreshCategories();
+        topLevelCategories = allCategories.filter(
+            (category) => category.parent_id === null
+        );
+        renderCategoryResults(elements.categorySearch?.value || "");
+    }
+
     function getSelection() {
         return {
             category: selectedCategory,
@@ -411,6 +420,7 @@ const ClosetCategoryPicker = (() => {
 
     return {
         initialize,
+        refresh,
         getSelection
     };
 })();
