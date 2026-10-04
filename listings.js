@@ -159,6 +159,32 @@ const ClosetListings = (() => {
         return null;
     }
 
+    async function ensureSellerProfile(user) {
+        const { data: existingProfile, error: profileLookupError } = await client
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (profileLookupError) throw profileLookupError;
+        if (existingProfile) return;
+
+        const displayName = String(
+            user.user_metadata?.name ||
+            user.email?.split("@")[0] ||
+            "A doua šansă user"
+        ).trim().slice(0, 80);
+
+        const { error: profileInsertError } = await client
+            .from("profiles")
+            .insert({
+                id: user.id,
+                display_name: displayName
+            });
+
+        if (profileInsertError) throw profileInsertError;
+    }
+
     async function createListing({
         title,
         description,
@@ -180,22 +206,9 @@ const ClosetListings = (() => {
         let listing = null;
 
         try {
-            // Never trust a cached category ID when publishing. Verify the
-            // selected category directly against the current database rows.
-            const requestedCategoryId = subcategoryId || categoryId;
-            const { data: currentCategory, error: categoryError } = await client
-                .from("categories")
-                .select("id, parent_id, is_active")
-                .eq("id", requestedCategoryId)
-                .eq("is_active", true)
-                .maybeSingle();
+            await ensureSellerProfile(user);
 
-            if (categoryError) throw categoryError;
-            if (!currentCategory) {
-                throw new Error("Selected category no longer exists. Please refresh the category list and choose another category.");
-            }
-
-            const finalCategoryId = currentCategory.id;
+            const finalCategoryId = subcategoryId || categoryId;
 
             const { data: listingData, error: listingError } = await client
                 .from("listings")
@@ -357,11 +370,8 @@ const ClosetListings = (() => {
         try {
             const allowedFields = ["category_id", "title", "description", "price_mdl", "condition", "status", "location", "attributes"];
             const allowedUpdates = {};
-
             allowedFields.forEach(field => {
-                if (Object.prototype.hasOwnProperty.call(updates, field)) {
-                    allowedUpdates[field] = updates[field];
-                }
+                if (Object.prototype.hasOwnProperty.call(updates, field)) allowedUpdates[field] = updates[field];
             });
 
             if ("title" in allowedUpdates) allowedUpdates.title = String(allowedUpdates.title || "").trim();
@@ -369,28 +379,10 @@ const ClosetListings = (() => {
             if ("location" in allowedUpdates) allowedUpdates.location = String(allowedUpdates.location || "").trim();
             if ("price_mdl" in allowedUpdates) allowedUpdates.price_mdl = Number(allowedUpdates.price_mdl);
 
-            if (allowedUpdates.category_id) {
-                const { data: category, error: categoryError } = await client
-                    .from("categories")
-                    .select("id")
-                    .eq("id", allowedUpdates.category_id)
-                    .eq("is_active", true)
-                    .maybeSingle();
-
-                if (categoryError) throw categoryError;
-                if (!category) throw new Error("Selected category no longer exists. Please choose another category.");
-            }
-
-            const { data, error } = await client
-                .from("listings")
-                .update(allowedUpdates)
-                .eq("id", id)
-                .eq("seller_id", user.id)
-                .select()
-                .single();
+            const { data, error } = await client.from("listings").update(allowedUpdates)
+                .eq("id", id).eq("seller_id", user.id).select().single();
 
             if (error) throw error;
-
             return { success: true, listing: data };
         } catch (error) {
             console.error("CLOSET listing update error:", error);
@@ -424,10 +416,23 @@ const ClosetListings = (() => {
         const message = String(error?.message || "").toLowerCase();
         if (message.includes("row-level security")) return "You don't have permission to perform that action.";
         if (message.includes("bucket") || message.includes("storage")) return "The image could not be uploaded. Check that the listing image storage bucket and its policies are configured, then try again.";
-        if (message.includes("foreign key")) return "The selected category is no longer available. Please choose another category.";
+        if (
+            message.includes("seller_id") ||
+            message.includes("profiles_id")
+        ) {
+            return "Your seller profile could not be created. Please try again.";
+        }
+        if (
+            message.includes("category_id") ||
+            message.includes("categories_id")
+        ) {
+            return "The selected category is no longer available. Please choose another category.";
+        }
+        if (message.includes("foreign key")) {
+            return "The listing could not be linked to a required record. Please try again.";
+        }
         if (message.includes("violates check constraint")) return "One of the listing details is invalid. Please check the information and try again.";
         if (message.includes("network") || message.includes("fetch")) return "Please check your internet connection and try again.";
-
         return error?.message || "We couldn't complete that action. Please try again.";
     }
 
