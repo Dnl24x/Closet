@@ -111,6 +111,16 @@
 
     const extraTranslations = {
         en: {
+            "ABOUT A doua șansă":"ABOUT A doua șansă",
+            "JOIN A doua șansă":"JOIN A doua șansă",
+            "Keep your A doua șansă profile up to date so buyers know who they're dealing with.":"Keep your A doua șansă profile up to date so buyers know who they're dealing with.",
+            "Manage your A doua șansă account and preferences.":"Manage your A doua șansă account and preferences.",
+            "A future A doua șansă feature. We'll announce when it becomes available.":"A future A doua șansă feature. We'll announce when it becomes available.",
+            "Sign out of this A doua șansă account on this device.":"Sign out of this A doua șansă account on this device.",
+            "Sign in to manage your profile, listings and A doua șansă activity.":"Sign in to manage your profile, listings and A doua șansă activity.",
+            "Create your A doua șansă account and start giving your things a new home.":"Create your A doua șansă account and start giving your things a new home.",
+            "Profiles, listings, reviews and future marketplace features can all grow with A doua șansă.":"Profiles, listings, reviews and future marketplace features can all grow with A doua șansă.",
+
             "Search the marketplace":"Search the marketplace",
             "Marketplace categories":"Marketplace categories",
             "Search listings":"Search listings",
@@ -244,6 +254,16 @@
             "Built to grow.":"Built to grow."
         },
         ro: {
+            "ABOUT A doua șansă":"DESPRE A doua șansă",
+            "JOIN A doua șansă":"ALĂTURĂ-TE A doua șansă",
+            "Keep your A doua șansă profile up to date so buyers know who they're dealing with.":"Păstrează-ți profilul A doua șansă actualizat, pentru ca cumpărătorii să știe cu cine discută.",
+            "Manage your A doua șansă account and preferences.":"Gestionează-ți contul A doua șansă și preferințele.",
+            "A future A doua șansă feature. We'll announce when it becomes available.":"O funcție viitoare A doua șansă. Te vom anunța când va fi disponibilă.",
+            "Sign out of this A doua șansă account on this device.":"Deconectează acest cont A doua șansă de pe acest dispozitiv.",
+            "Sign in to manage your profile, listings and A doua șansă activity.":"Conectează-te pentru a-ți gestiona profilul, anunțurile și activitatea A doua șansă.",
+            "Create your A doua șansă account and start giving your things a new home.":"Creează-ți contul A doua șansă și începe să oferi lucrurilor tale o casă nouă.",
+            "Profiles, listings, reviews and future marketplace features can all grow with A doua șansă.":"Profilurile, anunțurile, recenziile și funcțiile viitoare pot crește împreună cu A doua șansă.",
+
             "Search the marketplace":"Caută în marketplace",
             "Marketplace categories":"Categorii marketplace",
             "Search listings":"Caută anunțuri",
@@ -369,6 +389,16 @@
             "Built to grow.":"Creat pentru a crește."
         },
         ru: {
+            "ABOUT A doua șansă":"О A doua șansă",
+            "JOIN A doua șansă":"ПРИСОЕДИНИСЬ К A doua șansă",
+            "Keep your A doua șansă profile up to date so buyers know who they're dealing with.":"Поддерживай свой профиль A doua șansă в актуальном состоянии, чтобы покупатели знали, с кем имеют дело.",
+            "Manage your A doua șansă account and preferences.":"Управляй аккаунтом A doua șansă и настройками.",
+            "A future A doua șansă feature. We'll announce when it becomes available.":"Будущая функция A doua șansă. Мы сообщим, когда она станет доступна.",
+            "Sign out of this A doua șansă account on this device.":"Выйти из этого аккаунта A doua șansă на этом устройстве.",
+            "Sign in to manage your profile, listings and A doua șansă activity.":"Войди, чтобы управлять профилем, объявлениями и активностью A doua șansă.",
+            "Create your A doua șansă account and start giving your things a new home.":"Создай аккаунт A doua șansă и начни давать своим вещам новый дом.",
+            "Profiles, listings, reviews and future marketplace features can all grow with A doua șansă.":"Профили, объявления, отзывы и будущие функции будут развиваться вместе с A doua șansă.",
+
             "Search the marketplace":"Поиск по маркетплейсу",
             "Marketplace categories":"Категории маркетплейса",
             "Search listings":"Поиск объявлений",
