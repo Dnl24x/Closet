@@ -3290,3 +3290,72 @@ body.language-modal-open {
         width: 100%;
     }
 }
+
+
+/* =========================================================
+   LISTING ACTIONS / SAVED ITEMS
+   ========================================================= */
+
+.listing-card-shell {
+    position: relative;
+}
+
+.listing-card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    display: flex;
+    gap: 6px;
+}
+
+.listing-save-button,
+.listing-edit-button {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,.82);
+    border-radius: 999px;
+    background: rgba(255,255,255,.94);
+    color: var(--text);
+    box-shadow: 0 5px 18px rgba(0,0,0,.12);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+}
+
+.listing-save-button {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.listing-save-button.is-saved {
+    color: #b42318;
+}
+
+.listing-save-button:hover,
+.listing-edit-button:hover {
+    transform: translateY(-1px);
+}
+
+.listing-detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 22px 0;
+}
+
+@media (max-width: 560px) {
+    .listing-card-actions {
+        top: 7px;
+        right: 7px;
+    }
+
+    .listing-save-button,
+    .listing-edit-button {
+        min-width: 34px;
+        min-height: 34px;
+        padding: 0 8px;
+    }
+}
