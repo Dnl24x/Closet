@@ -175,7 +175,9 @@ async function signUp(name, email, password) {
                     emailRedirectTo:
                         "https://dnl24x.github.io/Closet/",
                     data: {
-                        name: cleanName
+                        name: cleanName,
+                        language:
+                            window.ClosetI18n?.getLanguage?.() || "en"
                     }
                 }
             });
