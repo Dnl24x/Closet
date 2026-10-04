@@ -2066,6 +2066,45 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
     }
 
+    function setupEmailVerificationSuccess() {
+        const modal = document.getElementById("verificationSuccessModal");
+        const doneButton = document.getElementById("verificationSuccessDone");
+
+        if (!modal) return;
+
+        const hash = new URLSearchParams(
+            window.location.hash.replace(/^#/, "")
+        );
+        const type = hash.get("type");
+
+        const search = new URLSearchParams(window.location.search);
+        const hasCode = search.has("code");
+
+        if (type !== "signup" && !hasCode) return;
+
+        modal.hidden = false;
+        document.body.classList.add("verification-modal-open");
+
+        doneButton?.addEventListener("click", () => {
+            modal.hidden = true;
+            document.body.classList.remove("verification-modal-open");
+
+            if (window.history.replaceState) {
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    window.location.pathname
+                );
+            }
+        });
+
+        modal.addEventListener("click", event => {
+            if (event.target === modal) {
+                doneButton?.click();
+            }
+        });
+    }
+
     async function initialize() {
         if (typeof ClosetI18n !== "undefined") {
             ClosetI18n.initialize();
@@ -2086,6 +2125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupNavigationEvents();
         setupAuthStateListener();
         setupLanguageSettings();
+        setupEmailVerificationSuccess();
 
         // Authentication can take a moment to reach Supabase. Start it in
         // parallel with the public homepage data so a slow auth request
