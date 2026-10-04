@@ -41,6 +41,7 @@ async function getMyProfile() {
                     bio,
                     location,
                     avatar_url,
+                    avatar_color,
                     created_at,
                     updated_at
                 `)
@@ -74,7 +75,9 @@ async function updateProfile({
     displayName,
     username,
     bio,
-    location
+    location,
+    avatarColor = "#E8E0D6",
+    useInitials = false
 }) {
     const user = ClosetAuth.getUser();
 
@@ -99,7 +102,12 @@ async function updateProfile({
                     bio:
                         bio?.trim() || "",
                     location:
-                        location?.trim() || ""
+                        location?.trim() || "",
+                    avatar_color:
+                        /^#[0-9A-Fa-f]{6}$/.test(avatarColor)
+                            ? avatarColor
+                            : "#E8E0D6",
+                    ...(useInitials ? { avatar_url: null } : {})
                 })
                 .eq("id", user.id)
                 .select()
@@ -144,11 +152,33 @@ async function uploadAvatar(file) {
         };
     }
 
-    if (!file.type.startsWith("image/")) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
         return {
             success: false,
-            message: "Please select a valid image file."
+            message: "Please choose a JPG, PNG or WebP image."
         };
+    }
+
+    let imageUrl = null;
+    try {
+        imageUrl = URL.createObjectURL(file);
+        const image = new Image();
+        image.src = imageUrl;
+        await image.decode();
+
+        if (image.naturalWidth !== 512 || image.naturalHeight !== 512) {
+            return {
+                success: false,
+                message: "Profile photos must be exactly 512 × 512 pixels."
+            };
+        }
+    } catch {
+        return {
+            success: false,
+            message: "We couldn't read that image. Please choose another one."
+        };
+    } finally {
+        if (imageUrl) URL.revokeObjectURL(imageUrl);
     }
 
     const extension =
@@ -233,6 +263,7 @@ async function getProfile(userId) {
                     bio,
                     location,
                     avatar_url,
+                    avatar_color,
                     created_at
                 `)
                 .eq("id", userId)
