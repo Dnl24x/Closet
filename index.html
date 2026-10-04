@@ -169,53 +169,68 @@
             <p>Search local listings from people across Moldova.</p>
         </div>
 
-        <div class="browse-controls marketplace-browse-controls">
+        <div class="browse-controls browse-search-row">
             <label class="search-field browse-search-field" for="browseSearch">
                 <span class="sr-only">Search listings</span>
                 <input type="search" id="browseSearch" placeholder="Search anything..." autocomplete="off">
             </label>
 
-            <div class="browse-category-wrap">
-    <button type="button" id="browseCategoryButton" class="secondary-button" aria-expanded="false">Category</button>
-    <div id="browseCategoryMenu" class="browse-category-menu" hidden></div>
-</div>
-
-            <select id="browseLocation" class="filter-select">
-                <option value="">All locations</option>
-                <option value="Chișinău">Chișinău</option>
-                <option value="Bălți">Bălți</option>
-                <option value="Cahul">Cahul</option>
-                <option value="Orhei">Orhei</option>
-                <option value="Ungheni">Ungheni</option>
-                <option value="Soroca">Soroca</option>
-                <option value="Comrat">Comrat</option>
-                <option value="Other">Other</option>
-            </select>
-
-            <select id="browseCondition" class="filter-select">
-                <option value="">Any condition</option>
-                <option value="new">New</option>
-                <option value="like_new">Like new</option>
-                <option value="good">Good</option>
-                <option value="fair">Fair</option>
-                <option value="for_parts">For parts</option>
-            </select>
-
-            <div class="price-filter">
-                <input type="number" id="browseMinPrice" min="0" step="1" placeholder="Min MDL" aria-label="Minimum price">
-                <span>–</span>
-                <input type="number" id="browseMaxPrice" min="0" step="1" placeholder="Max MDL" aria-label="Maximum price">
-            </div>
-
-            <select id="browseSort" class="filter-select">
-                <option value="newest">Newest</option>
-                <option value="oldest">Oldest</option>
-                <option value="price_low">Price: low to high</option>
-                <option value="price_high">Price: high to low</option>
-            </select>
+            <button type="button" id="browseFilterButton" class="browse-filter-button" aria-expanded="false" aria-controls="browseFilterPanel">
+                <span class="browse-filter-icon" aria-hidden="true">☷</span>
+                Filters
+            </button>
         </div>
 
-        <div id="browseActiveFilters" class="browse-active-filters" hidden></div>
+        <div id="browseFilterPanel" class="browse-filter-panel" hidden>
+            <div class="browse-filter-panel-header">
+                <div>
+                    <strong>Filter listings</strong>
+                    <span>Refine your search without changing the search bar.</span>
+                </div>
+                <button type="button" id="clearBrowseFilters" class="browse-clear-filters">Clear all</button>
+            </div>
+
+            <div class="browse-filter-fields">
+                <div class="browse-category-wrap">
+                    <button type="button" id="browseCategoryButton" class="secondary-button" aria-expanded="false">Category</button>
+                    <div id="browseCategoryMenu" class="browse-category-menu" hidden></div>
+                </div>
+
+                <select id="browseLocation" class="filter-select">
+                    <option value="">All locations</option>
+                    <option value="Chișinău">Chișinău</option>
+                    <option value="Bălți">Bălți</option>
+                    <option value="Cahul">Cahul</option>
+                    <option value="Orhei">Orhei</option>
+                    <option value="Ungheni">Ungheni</option>
+                    <option value="Soroca">Soroca</option>
+                    <option value="Comrat">Comrat</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <select id="browseCondition" class="filter-select">
+                    <option value="">Any condition</option>
+                    <option value="new">New</option>
+                    <option value="like_new">Like new</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="for_parts">For parts</option>
+                </select>
+
+                <div class="price-filter">
+                    <input type="number" id="browseMinPrice" min="0" step="1" placeholder="Min MDL" aria-label="Minimum price">
+                    <span>–</span>
+                    <input type="number" id="browseMaxPrice" min="0" step="1" placeholder="Max MDL" aria-label="Maximum price">
+                </div>
+
+                <select id="browseSort" class="filter-select">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="price_low">Price: low to high</option>
+                    <option value="price_high">Price: high to low</option>
+                </select>
+            </div>
+        </div>
 
         <div id="browseListingsGrid" class="listing-grid">
             <div class="listing-loading">Loading listings...</div>
