@@ -395,7 +395,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const result =
             await ClosetListings.getListings({
-                limit: 8
+                limit: 8,
+                lightweight: true
             });
 
         if (!result.success) {
