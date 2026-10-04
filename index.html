@@ -768,6 +768,18 @@
 
             <div class="settings-card">
 
+                <div class="settings-item language-setting">
+                    <div>
+                        <strong>Language</strong>
+                        <span>Choose the language used across the website.</span>
+                    </div>
+                    <select id="settingsLanguage" class="filter-select" aria-label="Language">
+                        <option value="en">English</option>
+                        <option value="ro">Română</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+
                 <div class="settings-item">
 
                     <div>
@@ -1308,7 +1320,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<div id="languageModal" class="language-modal" hidden role="dialog" aria-modal="true" aria-labelledby="languageModalTitle">
+    <div class="language-modal-card">
+        <p class="eyebrow">CLOSET</p>
+        <h2 id="languageModalTitle">Pick any language you want.</h2>
+        <p>Always can be changed in settings.</p>
+        <div class="language-options">
+            <button type="button" data-language="en">English</button>
+            <button type="button" data-language="ro">Română</button>
+            <button type="button" data-language="ru">Русский</button>
+        </div>
+    </div>
+</div>
+
 <script src="supabase.js"></script>
+
+<script src="i18n.js"></script>
 
 <script src="navigation.js"></script>
 
