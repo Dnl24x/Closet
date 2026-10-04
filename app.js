@@ -880,7 +880,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         state.publicProfileUserId = userId;
         ClosetNavigation.show("public-profile");
-        await loadPublicProfile(userId);
     }
 
     async function loadPublicProfile(userId) {
