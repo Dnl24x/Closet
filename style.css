@@ -2003,45 +2003,67 @@ h3 {
    ========================================================= */
 
 .site-footer {
+    margin-top: 60px;
     border-top: 1px solid var(--border);
-
     background: var(--surface);
 }
 
-.site-footer > div {
+.site-footer-main {
     width: min(calc(100% - 40px), var(--content-width));
-
-    min-height: 100px;
-
+    min-height: 112px;
     margin: 0 auto;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    gap: 20px;
+    gap: 30px;
 }
 
-.site-footer > div strong {
+.site-footer-brand strong {
     display: block;
-
     font-size: 15px;
     font-weight: 850;
     letter-spacing: -0.5px;
 }
 
-.site-footer > div span {
+.site-footer-brand span {
     display: block;
-
-    margin-top: 3px;
-
+    margin-top: 4px;
     color: var(--text-soft);
-
     font-size: 12px;
 }
 
-.site-footer > p {
-    display: none;
+.site-footer-links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px 18px;
+}
+
+.site-footer-links a,
+.site-footer-bottom a {
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.site-footer-links a:hover,
+.site-footer-bottom a:hover {
+    color: var(--text);
+}
+
+.site-footer-bottom {
+    width: min(calc(100% - 40px), var(--content-width));
+    margin: 0 auto;
+    padding: 16px 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--text-soft);
+    font-size: 11px;
 }
 
 /* =========================================================
@@ -2397,15 +2419,22 @@ label:focus-visible {
         width: calc(100vw - 28px);
     }
 
-    .site-footer > div {
+    .site-footer-main {
         width: min(calc(100% - 28px), var(--content-width));
-
         min-height: auto;
-
-        padding: 25px 0;
-
+        padding: 28px 0 24px;
         align-items: flex-start;
+        flex-direction: column;
+    }
 
+    .site-footer-links {
+        justify-content: flex-start;
+    }
+
+    .site-footer-bottom {
+        width: min(calc(100% - 28px), var(--content-width));
+        padding: 16px 0 20px;
+        align-items: flex-start;
         flex-direction: column;
     }
 }
@@ -3415,5 +3444,393 @@ body.language-modal-open {
         min-width: 34px;
         min-height: 34px;
         padding: 0 8px;
+    }
+}
+
+
+/* =========================================================
+   SECOND-PASS MARKETPLACE POLISH
+   ========================================================= */
+
+.seller-profile-button {
+    width: 100%;
+    margin-top: 30px;
+    padding: 17px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    border: 0;
+    border-top: 1px solid var(--border);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+}
+
+.seller-profile-button:hover .seller-profile-copy strong {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.seller-profile-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.seller-profile-copy strong {
+    font-size: 14px;
+}
+
+.seller-profile-copy > span {
+    color: var(--text-soft);
+    font-size: 12px;
+}
+
+.seller-profile-button .avatar {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listing-detail-actions {
+    align-items: center;
+    margin: 24px 0 0;
+}
+
+.listing-detail-actions .listing-save-button {
+    min-width: 44px;
+    width: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.listing-buy-button {
+    min-width: 112px;
+}
+
+.related-listings-section {
+    margin-top: 82px;
+    padding-top: 50px;
+    border-top: 1px solid var(--border);
+}
+
+.related-listings-section .section-heading {
+    margin-bottom: 20px;
+}
+
+.public-profile-header {
+    margin-bottom: 5px;
+}
+
+.public-profile-header .profile-actions {
+    align-self: start;
+}
+
+.about-contact-callout {
+    margin-top: 80px;
+    padding: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+    background: var(--surface);
+    box-shadow: var(--shadow-small);
+}
+
+.about-contact-callout h2 {
+    margin: 8px 0 0;
+    font-size: 25px;
+    letter-spacing: -1px;
+}
+
+.about-contact-callout p:last-child {
+    max-width: 620px;
+    margin: 8px 0 0;
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.profile-photo-editor {
+    gap: 15px;
+    margin-bottom: 26px;
+}
+
+.profile-photo-editor-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.profile-photo-editor-actions {
+    gap: 9px;
+}
+
+.profile-photo-editor-controls > label:not(.secondary-button) {
+    margin-top: 3px;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.avatar-color-row {
+    margin-top: 3px;
+}
+
+.avatar-color-row span {
+    line-height: 1.45;
+}
+
+.profile-photo-editor p {
+    margin-top: 2px;
+    line-height: 1.45;
+}
+
+.settings-layout .form-group {
+    margin-bottom: 16px;
+}
+
+.settings-layout .form-group:last-of-type {
+    margin-bottom: 0;
+}
+
+/* =========================================================
+   LEGAL / SUPPORT / CONTACT PAGES
+   ========================================================= */
+
+.legal-page {
+    max-width: 880px;
+    padding-bottom: 50px;
+}
+
+.legal-page h1 {
+    max-width: 820px;
+    margin: 0;
+}
+
+.legal-lead {
+    max-width: 720px;
+    margin: 24px 0 0;
+    color: var(--text-soft);
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.legal-meta {
+    margin-top: 18px;
+    color: var(--text-soft);
+    font-size: 12px;
+}
+
+.legal-sections {
+    margin-top: 70px;
+}
+
+.legal-section {
+    padding: 30px 0;
+    border-top: 1px solid var(--border);
+}
+
+.legal-section:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.legal-section h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    letter-spacing: -0.7px;
+}
+
+.legal-section p,
+.legal-section li {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+.legal-section p {
+    margin: 0 0 13px;
+}
+
+.legal-section p:last-child {
+    margin-bottom: 0;
+}
+
+.legal-section ul {
+    margin: 12px 0 0;
+    padding-left: 20px;
+}
+
+.legal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 22px;
+}
+
+.legal-card,
+.contact-card {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--surface);
+    box-shadow: var(--shadow-small);
+}
+
+.legal-card h3,
+.contact-card h2 {
+    margin: 0 0 9px;
+    font-size: 17px;
+}
+
+.legal-card p,
+.contact-card p {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.faq-search-wrap {
+    max-width: 650px;
+    margin-top: 28px;
+}
+
+.faq-search-wrap input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+}
+
+.faq-search-wrap input:focus {
+    border-color: var(--text);
+    box-shadow: 0 0 0 3px rgba(23,23,23,.06);
+}
+
+.faq-list {
+    margin-top: 35px;
+    border-top: 1px solid var(--border);
+}
+
+.faq-item {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.faq-item[hidden] {
+    display: none;
+}
+
+.faq-item h2 {
+    margin: 0 0 9px;
+    font-size: 17px;
+    letter-spacing: -0.4px;
+}
+
+.faq-item p {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.faq-empty {
+    margin-top: 25px;
+    padding: 20px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 15px;
+    color: var(--text-soft);
+    font-size: 13px;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 36px;
+}
+
+.contact-detail {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+}
+
+.contact-detail-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--accent-soft);
+    font-size: 14px;
+}
+
+.contact-detail strong {
+    display: block;
+    font-size: 13px;
+}
+
+.contact-detail span,
+.contact-detail a {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-soft);
+    font-size: 13px;
+}
+
+.contact-detail a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 650;
+}
+
+.contact-detail a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.temporary-contact-note {
+    margin-top: 28px;
+    padding: 13px 15px;
+    border-radius: 11px;
+    background: var(--accent-soft);
+    color: var(--text-soft);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+    .about-contact-callout {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-top: 55px;
+    }
+
+    .legal-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .listing-detail-actions .listing-buy-button {
+        flex: 1 1 130px;
     }
 }
