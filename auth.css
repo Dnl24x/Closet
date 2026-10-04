@@ -503,6 +503,63 @@ body.auth-verification-open {
     overflow: hidden;
 }
 
+
+.auth-verification-email {
+    display: inline-block;
+    max-width: 100%;
+    margin: -4px auto 20px !important;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: #f4f3ef;
+    color: #222 !important;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.auth-verification-actions {
+    display: grid;
+    gap: 9px;
+}
+
+.auth-verification-gmail,
+.auth-secondary-submit {
+    width: 100%;
+    min-height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    margin: 0;
+    text-decoration: none;
+}
+
+.auth-secondary-submit {
+    padding: 13px 18px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 11px;
+    background: #f4f3ef;
+    color: #111;
+    font: inherit;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.auth-secondary-submit:hover {
+    background: #ecebe7;
+}
+
+@media (max-width: 600px) {
+    .auth-verification-modal {
+        padding: 12px;
+    }
+
+    .auth-verification-card {
+        width: 100%;
+        max-height: calc(100dvh - 24px);
+        overflow-y: auto;
+    }
+}
+
 @media (max-width: 600px) {
     .auth-verification-card {
         padding: 28px 20px;
