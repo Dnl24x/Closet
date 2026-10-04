@@ -1465,10 +1465,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             loadSavedListings()
         ]);
 
-        if (result.listing?.id) {
-            await openListing(result.listing.id);
-        } else if (editedId) {
+        if (editedId) {
             await openListing(editedId, { preserveBack: true });
+        } else if (result.listing?.id) {
+            await openListing(result.listing.id);
         }
     }
 
