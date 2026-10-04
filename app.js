@@ -1231,6 +1231,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    async function loadHomeCategories() {
+        if (!elements.homeCategoryStrip) return;
+        try {
+            const categories = await ClosetCategories.getTopLevelCategories();
+            elements.homeCategoryStrip.innerHTML = categories.map(category => `
+                <button type="button" class="category-filter" data-category="${escapeHTML(category.id)}">${escapeHTML(category.name)}</button>
+            `).join("");
+            elements.homeCategoryStrip.querySelectorAll(".category-filter").forEach(button => {
+                button.addEventListener("click", () => {
+                    state.selectedCategory = button.dataset.category || null;
+                    if (elements.browseSearch) elements.browseSearch.value = "";
+                    ClosetNavigation.show("browse");
+                });
+            });
+        } catch (error) {
+            console.error("CLOSET home categories error:", error);
+            elements.homeCategoryStrip.innerHTML = '<div class="listing-empty"><p>Categories are temporarily unavailable.</p></div>';
+        }
+    }
+
     async function openCategoryMenu() {
         const menu = elements.headerCategoryMenu;
         if (!menu) return;
@@ -1475,7 +1495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         await updateAuthenticatedUI();
 
-        await loadHomeListings();
+        await Promise.all([loadHomeListings(), loadHomeCategories()]);
 
         if (session) {
             console.log(
