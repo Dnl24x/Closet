@@ -35,7 +35,7 @@
             "Built to grow.":"Built to grow.","Profiles, listings, reviews and future marketplace features can all grow with CLOSET.":"Profiles, listings, reviews and future marketplace features can all grow with CLOSET.",
             "Moldova marketplace":"Moldova marketplace","© 2026 CLOSET · Moldova":"© 2026 CLOSET · Moldova",
             "Pick any language you want.":"Pick any language you want.","Always can be changed in settings.":"Always can be changed in settings.",
-            "Language":"Language","English":"English","Romanian":"Romanian","Russian":"Russian","Save language":"Save language"
+            "Language":"Language","Choose the language used across the website.":"Choose the language used across the website.","English":"English","Romanian":"Romanian","Russian":"Russian","Save language":"Save language",\n            "Electronics & Phones":"Electronics & Phones","Computers & PC Hardware":"Computers & PC Hardware","Cars & Auto Parts":"Cars & Auto Parts","Home & Garden":"Home & Garden","Clothing & Shoes":"Clothing & Shoes","Gaming":"Gaming","Books & Education":"Books & Education","Tools & Equipment":"Tools & Equipment","Kids & Baby":"Kids & Baby","Pets & Pet Supplies":"Pets & Pet Supplies","Music & Instruments":"Music & Instruments","Sports & Outdoors":"Sports & Outdoors","Collectibles & Vintage":"Collectibles & Vintage","Jewelry & Accessories":"Jewelry & Accessories","Property":"Property","Jobs & Services":"Jobs & Services","Other":"Other"
         },
         ro: {
             "Home":"Acasă","Browse":"Explorează","About":"Despre","Profile":"Profil","Sell an item":"Vinde un articol",
@@ -68,7 +68,7 @@
             "Built to grow.":"Creat pentru a crește.","Profiles, listings, reviews and future marketplace features can all grow with CLOSET.":"Profilurile, anunțurile, recenziile și funcțiile viitoare pot crește împreună cu marketplace-ul.",
             "Moldova marketplace":"Marketplace din Moldova","© 2026 CLOSET · Moldova":"© 2026 A doua șansă · Moldova",
             "Pick any language you want.":"Alege orice limbă dorești.","Always can be changed in settings.":"Poate fi schimbată oricând din setări.",
-            "Language":"Limbă","English":"Engleză","Romanian":"Română","Russian":"Rusă","Save language":"Salvează limba"
+            "Language":"Limbă","Choose the language used across the website.":"Alege limba folosită pe întregul site.","English":"Engleză","Romanian":"Română","Russian":"Rusă","Save language":"Salvează limba",\n            "Electronics & Phones":"Electronice și telefoane","Computers & PC Hardware":"Calculatoare și componente","Cars & Auto Parts":"Mașini și piese auto","Home & Garden":"Casă și grădină","Clothing & Shoes":"Îmbrăcăminte și încălțăminte","Gaming":"Jocuri","Books & Education":"Cărți și educație","Tools & Equipment":"Unelte și echipamente","Kids & Baby":"Copii și bebeluși","Pets & Pet Supplies":"Animale și accesorii","Music & Instruments":"Muzică și instrumente","Sports & Outdoors":"Sport și activități în aer liber","Collectibles & Vintage":"Colecționabile și vintage","Jewelry & Accessories":"Bijuterii și accesorii","Property":"Imobiliare","Jobs & Services":"Locuri de muncă și servicii","Other":"Altele"
         },
         ru: {
             "Home":"Главная","Browse":"Обзор","About":"О нас","Profile":"Профиль","Sell an item":"Продать товар",
@@ -101,7 +101,7 @@
             "Built to grow.":"Создан, чтобы расти.","Profiles, listings, reviews and future marketplace features can all grow with CLOSET.":"Профили, объявления, отзывы и будущие функции будут развиваться вместе с CLOSET.",
             "Moldova marketplace":"Маркетплейс Молдовы","© 2026 CLOSET · Moldova":"© 2026 CLOSET · Молдова",
             "Pick any language you want.":"Выбери любой язык.","Always can be changed in settings.":"Язык всегда можно изменить в настройках.",
-            "Language":"Язык","English":"Английский","Romanian":"Румынский","Russian":"Русский","Save language":"Сохранить язык"
+            "Language":"Язык","Choose the language used across the website.":"Выбери язык, который будет использоваться на всём сайте.","English":"Английский","Romanian":"Румынский","Russian":"Русский","Save language":"Сохранить язык",\n            "Electronics & Phones":"Электроника и телефоны","Computers & PC Hardware":"Компьютеры и комплектующие","Cars & Auto Parts":"Автомобили и автозапчасти","Home & Garden":"Дом и сад","Clothing & Shoes":"Одежда и обувь","Gaming":"Игры","Books & Education":"Книги и образование","Tools & Equipment":"Инструменты и оборудование","Kids & Baby":"Дети и товары для малышей","Pets & Pet Supplies":"Животные и товары для них","Music & Instruments":"Музыка и инструменты","Sports & Outdoors":"Спорт и отдых","Collectibles & Vintage":"Коллекционные и винтажные вещи","Jewelry & Accessories":"Украшения и аксессуары","Property":"Недвижимость","Jobs & Services":"Работа и услуги","Other":"Другое"
         }
     };
 
