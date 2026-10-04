@@ -556,7 +556,10 @@
                     ? value.replace(trimmed, translated)
                     : value;
 
-            element.nodeValue = replaceBrand(nextValue);
+            const finalValue = replaceBrand(nextValue);
+            if (finalValue !== value) {
+                element.nodeValue = finalValue;
+            }
             return;
         }
 
@@ -565,7 +568,10 @@
             const value = element.getAttribute(attr);
             if (value) {
                 const translated = translateValue(value);
-                element.setAttribute(attr, replaceBrand(translated));
+                const finalValue = replaceBrand(translated);
+                if (finalValue !== value) {
+                    element.setAttribute(attr, finalValue);
+                }
             }
         });
         element.childNodes.forEach(translateElement);
