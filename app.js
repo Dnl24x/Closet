@@ -12,7 +12,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentListingId: null,
         selectedImages: [],
         draggedImageId: null,
-        editingListingId: null
+        editingListingId: null,
+        listingBackView: "browse",
+        publicProfileUserId: null,
+        publicProfileBackView: "browse"
     };
 
     const elements = {
@@ -119,7 +122,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.getElementById("settingsEmail"),
 
         settingsLanguage:
-            document.getElementById("settingsLanguage")
+            document.getElementById("settingsLanguage"),
+
+        publicProfileBackButton:
+            document.getElementById("publicProfileBackButton"),
+        publicProfileAvatar:
+            document.getElementById("publicProfileAvatar"),
+        publicProfileEyebrow:
+            document.getElementById("publicProfileEyebrow"),
+        publicProfileDisplayName:
+            document.getElementById("publicProfileDisplayName"),
+        publicProfileUsername:
+            document.getElementById("publicProfileUsername"),
+        publicProfileBio:
+            document.getElementById("publicProfileBio"),
+        publicProfileLocation:
+            document.getElementById("publicProfileLocation"),
+        publicProfileEditButton:
+            document.getElementById("publicProfileEditButton"),
+        publicProfileListingsGrid:
+            document.getElementById("publicProfileListingsGrid"),
+        publicProfileReviews:
+            document.getElementById("publicProfileReviews")
     };
 
     function showStatus(message, type = "success") {
@@ -604,224 +628,202 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function openListing(id) {
-        if (
-            !id ||
-            !elements.listingDetailsContent
-        ) {
-            return;
-        }
+        if (!id || !elements.listingDetailsContent) return;
+
+        const currentView = ClosetNavigation.getCurrentView();
+        if (currentView && currentView !== "listing") state.listingBackView = currentView;
 
         state.currentListingId = id;
-
         ClosetNavigation.show("listing");
 
         elements.listingDetailsContent.innerHTML = `
             <div class="empty-state">
                 <h3>Loading listing…</h3>
-                <p>
-                    Please wait while we load the item.
-                </p>
+                <p>Please wait while we load the item.</p>
             </div>
         `;
 
-        const result =
-            await ClosetListings.getListing(id);
+        const result = await ClosetListings.getListing(id);
 
         if (!result.success) {
             elements.listingDetailsContent.innerHTML = `
                 <div class="empty-state">
                     <h3>Listing unavailable</h3>
-                    <p>
-                        ${escapeHTML(result.message)}
-                    </p>
+                    <p>${escapeHTML(result.message)}</p>
                 </div>
             `;
-
             return;
         }
 
         renderListingDetails(result.listing);
+        void loadRelatedListings(result.listing);
     }
 
     function renderListingDetails(listing) {
-        const image =
-            getListingImage(listing);
-
-        const seller =
-            listing?.profiles || {};
-
-        const title =
-            escapeHTML(listing?.title || "Untitled item");
-
-        const description =
-            escapeHTML(
-                listing?.description ||
-                "No description provided."
-            );
-
-        const sellerName =
-            escapeHTML(
-                getProfileName(seller)
-            );
-
-        const username =
-            seller.username
-                ? `@${escapeHTML(seller.username)}`
-                : "";
-
-        const category =
-            escapeHTML(
-                getListingCategoryLabel(listing)
-            );
-
-        const subcategory =
-            getListingSubcategoryLabel(listing);
+        const image = getListingImage(listing);
+        const seller = listing?.profiles || {};
+        const title = escapeHTML(listing?.title || "Untitled item");
+        const description = escapeHTML(listing?.description || "No description provided.");
+        const sellerName = escapeHTML(getProfileName(seller));
+        const username = seller.username ? `@${escapeHTML(seller.username)}` : "";
+        const category = escapeHTML(getListingCategoryLabel(listing));
+        const subcategory = getListingSubcategoryLabel(listing);
+        const ownListing = ClosetAuth.getUser()?.id === listing?.seller_id;
+        const saved = isSavedListing(listing.id);
 
         const imageHTML = image
-            ? `
-                <img
-                    class="listing-detail-image"
-                    src="${escapeHTML(image)}"
-                    alt="${title}"
-                >
-            `
-            : `
-                <div
-                    class="listing-detail-image"
-                    aria-hidden="true"
-                ></div>
-            `;
+            ? `<img class="listing-detail-image" src="${escapeHTML(image)}" alt="${title}">`
+            : `<div class="listing-detail-image" aria-hidden="true"></div>`;
 
         const attributes =
-            listing?.attributes &&
-            typeof listing.attributes === "object"
+            listing?.attributes && typeof listing.attributes === "object"
                 ? listing.attributes
                 : {};
 
-        const attributeEntries =
-            Object.entries(attributes)
-                .filter(
-                    ([, value]) =>
-                        value !== null &&
-                        value !== undefined &&
-                        String(value).trim() !== ""
-                );
+        const attributeEntries = Object.entries(attributes).filter(
+            ([, value]) => value !== null && value !== undefined && String(value).trim() !== ""
+        );
 
-        const attributesHTML =
-            attributeEntries.length
-                ? `
-                    <div class="detail-attributes">
-                        ${attributeEntries
-                            .map(
-                                ([key, value]) => `
-                                    <div class="detail-attribute">
-                                        <span>
-                                            ${escapeHTML(key)}
-                                        </span>
+        const attributesHTML = attributeEntries.length
+            ? `
+                <div class="detail-attributes">
+                    ${attributeEntries.map(([key, value]) => `
+                        <div class="detail-attribute">
+                            <span>${escapeHTML(key)}</span>
+                            <strong>${escapeHTML(value)}</strong>
+                        </div>
+                    `).join("")}
+                </div>
+            `
+            : "";
 
-                                        <strong>
-                                            ${escapeHTML(
-                                                value
-                                            )}
-                                        </strong>
-                                    </div>
-                                `
-                            )
-                            .join("")}
-                    </div>
-                `
-                : "";
+        const sellerAvatarHTML = seller.avatar_url
+            ? `<img class="avatar" src="${escapeHTML(seller.avatar_url)}" alt="">`
+            : `<span class="avatar avatar-initials" style="background-color: ${getAvatarColor(seller)}" aria-hidden="true"><span>${escapeHTML(getAvatarInitial(seller, sellerName))}</span></span>`;
 
         elements.listingDetailsContent.innerHTML = `
             <div class="listing-detail">
-
-                <div>
-                    ${imageHTML}
-                </div>
+                <div>${imageHTML}</div>
 
                 <div class="listing-detail-info">
-
                     <p class="eyebrow">
                         ${category}
-                        ${
-                            subcategory
-                                ? ` · ${escapeHTML(subcategory)}`
-                                : ""
-                        }
+                        ${subcategory ? ` · ${escapeHTML(subcategory)}` : ""}
                     </p>
 
-                    <h1>
-                        ${title}
-                    </h1>
-
-                    <div class="detail-price">
-                        ${formatPrice(listing.price_mdl)}
-                    </div>
+                    <h1>${title}</h1>
+                    <div class="detail-price">${formatPrice(listing.price_mdl)}</div>
 
                     <div class="detail-meta">
-
                         ${
                             listing.condition
-                                ? `
-                                    <span class="detail-pill">
-                                        ${escapeHTML(
-                                            formatCondition(
-                                                listing.condition
-                                            )
-                                        )}
-                                    </span>
-                                `
+                                ? `<span class="detail-pill">${escapeHTML(formatCondition(listing.condition))}</span>`
                                 : ""
                         }
-
-                        <span class="detail-pill">
-                            Listed
-                            ${formatDate(
-                                listing.created_at
-                            )}
-                        </span>
-
+                        <span class="detail-pill">Listed ${formatDate(listing.created_at)}</span>
                     </div>
 
                     ${attributesHTML}
 
                     <div class="detail-description-section">
                         <h2 class="detail-section-title">Description</h2>
-                        <p class="detail-description">
-                            ${
-                            seller.avatar_url
-                                ? '<img class="avatar" src="' + escapeHTML(seller.avatar_url) + '" alt="">'
-                                : '<div class="avatar avatar-initials" style="background-color: ' + getAvatarColor(seller) + '" aria-hidden="true"><span>' + escapeHTML(getAvatarInitial(seller, sellerName)) + '</span></div>'
+                        <p class="detail-description">${description}</p>
+                    </div>
+
+                    <button type="button" class="seller-profile-button"
+                        data-detail-profile-id="${escapeHTML(seller.id || listing.seller_id || "")}">
+                        ${sellerAvatarHTML}
+                        <span class="seller-profile-copy">
+                            <strong>${sellerName}</strong>
+                            <span>${username}</span>
+                        </span>
+                    </button>
+
+                    <div class="listing-detail-actions">
+                        <button type="button" class="primary-button listing-buy-button">Buy</button>
+                        <button
+                            type="button"
+                            class="listing-save-button${saved ? " is-saved" : ""}"
+                            data-detail-save-listing-id="${escapeHTML(listing.id)}"
+                            aria-label="${saved ? "Remove from saved" : "Save listing"}"
+                        >${saved ? "♥" : "♡"}</button>
+                        ${
+                            ownListing
+                                ? `<button type="button" class="secondary-button" data-detail-edit-listing-id="${escapeHTML(listing.id)}">Edit</button>`
+                                : ""
                         }
-                        <div>
-                            <strong>
-                                ${sellerName}
-                            </strong>
-
-                            <span>
-                                ${username}
-                            </span>
-                        </div>
-
                     </div>
 
                     <div class="protection-card">
-
-                        <strong>
-                            Buying Protection
-                        </strong>
-
-                        <p>
-                            CLOSET is working on a
-                            secure buying experience.
-                        </p>
-
+                        <strong>Buying Protection</strong>
+                        <p>A future A doua șansă buying feature. We'll announce when it becomes available.</p>
                     </div>
-
                 </div>
-
             </div>
+
+            <section id="relatedListingsSection" class="related-listings-section" hidden>
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">MORE TO EXPLORE</p>
+                        <h2>More like this.</h2>
+                    </div>
+                </div>
+                <div id="relatedListingsGrid" class="listing-grid"></div>
+            </section>
         `;
+
+        const saveButton = elements.listingDetailsContent.querySelector("[data-detail-save-listing-id]");
+        saveButton?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            void toggleSavedListing(listing.id).then(() => {
+                const updated = isSavedListing(listing.id);
+                saveButton.textContent = updated ? "♥" : "♡";
+                saveButton.classList.toggle("is-saved", updated);
+                saveButton.setAttribute("aria-label", updated ? "Remove from saved" : "Save listing");
+            });
+        });
+
+        elements.listingDetailsContent.querySelector("[data-detail-edit-listing-id]")?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            void startEditingListing(listing);
+        });
+
+        elements.listingDetailsContent.querySelector("[data-detail-profile-id]")?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            const profileId = event.currentTarget.dataset.detailProfileId;
+            if (profileId) void openPublicProfile(profileId);
+        });
+    }
+
+    async function loadRelatedListings(listing) {
+        const section = document.getElementById("relatedListingsSection");
+        const grid = document.getElementById("relatedListingsGrid");
+        if (!section || !grid || !listing?.id) return;
+
+        const result = await ClosetListings.getListings({
+            categoryId: listing.category_id || null,
+            limit: 5,
+            lightweight: true
+        });
+
+        if (!result.success) {
+            section.hidden = true;
+            return;
+        }
+
+        const related = result.listings.filter(item => item.id !== listing.id).slice(0, 4);
+
+        if (!related.length) {
+            section.hidden = true;
+            return;
+        }
+
+        renderListings(grid, related, "", "");
+        section.hidden = false;
+        renderVisibleListingHearts();
     }
 
     function formatCondition(condition) {
@@ -870,6 +872,110 @@ document.addEventListener("DOMContentLoaded", async () => {
         container.appendChild(initial);
         container.style.backgroundColor = getAvatarColor(profile);
     }
+    async function openPublicProfile(userId) {
+        if (!userId) return;
+
+        const currentView = ClosetNavigation.getCurrentView();
+        if (currentView && currentView !== "public-profile") state.publicProfileBackView = currentView;
+
+        state.publicProfileUserId = userId;
+        ClosetNavigation.show("public-profile");
+        await loadPublicProfile(userId);
+    }
+
+    async function loadPublicProfile(userId) {
+        if (!userId || !elements.publicProfileListingsGrid) return;
+
+        elements.publicProfileListingsGrid.innerHTML = `
+            <div class="empty-state">
+                <h3>Loading profile…</h3>
+                <p>Please wait while we load this profile.</p>
+            </div>
+        `;
+
+        const [profileResult, listingsResult, reviewsResult] = await Promise.all([
+            ClosetProfile.getProfile(userId),
+            ClosetListings.getSellerListings(userId, { limit: 30 }),
+            ClosetProfile.getReviews(userId)
+        ]);
+
+        if (!profileResult.success || !profileResult.profile) {
+            elements.publicProfileListingsGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>Profile unavailable</h3>
+                    <p>${escapeHTML(profileResult.message || "This profile could not be found.")}</p>
+                </div>
+            `;
+            return;
+        }
+
+        const profile = profileResult.profile;
+        const isSelf = ClosetAuth.getUser()?.id === profile.id;
+
+        if (elements.publicProfileEyebrow) {
+            elements.publicProfileEyebrow.textContent = isSelf ? "Your Profile" : "Seller Profile";
+        }
+        if (elements.publicProfileDisplayName) {
+            elements.publicProfileDisplayName.textContent =
+                profile.display_name || profile.username || "A doua șansă member";
+        }
+        if (elements.publicProfileUsername) {
+            elements.publicProfileUsername.textContent =
+                profile.username ? `@${profile.username}` : "";
+        }
+        if (elements.publicProfileBio) elements.publicProfileBio.textContent = profile.bio || "";
+        if (elements.publicProfileLocation) elements.publicProfileLocation.textContent = profile.location || "";
+
+        if (elements.publicProfileAvatar) {
+            renderAvatar(elements.publicProfileAvatar, profile, profile.display_name || profile.username);
+        }
+
+        if (elements.publicProfileEditButton) {
+            elements.publicProfileEditButton.hidden = !isSelf;
+            elements.publicProfileEditButton.onclick = () => ClosetNavigation.show("edit-profile");
+        }
+
+        renderListings(
+            elements.publicProfileListingsGrid,
+            listingsResult.success ? listingsResult.listings : [],
+            "No active listings",
+            "This seller has no active listings right now."
+        );
+
+        if (elements.publicProfileReviews) {
+            elements.publicProfileReviews.innerHTML = "";
+
+            if (!reviewsResult.success || !reviewsResult.reviews.length) {
+                elements.publicProfileReviews.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No reviews yet</h3>
+                        <p>Reviews from other members will appear here.</p>
+                    </div>
+                `;
+            } else {
+                reviewsResult.reviews.forEach(review => {
+                    const reviewer = review.profiles || {};
+                    const card = document.createElement("article");
+                    card.className = "review-card";
+                    const rating = Math.max(0, Math.min(5, Number(review.rating) || 0));
+
+                    card.innerHTML = `
+                        <div class="review-top">
+                            <span class="review-author">${escapeHTML(getProfileName(reviewer))}</span>
+                            <span class="review-date">${formatDate(review.created_at)}</span>
+                        </div>
+                        <div class="review-stars">${"★".repeat(rating)}</div>
+                        ${review.comment ? `<p class="review-comment">${escapeHTML(review.comment)}</p>` : ""}
+                    `;
+
+                    elements.publicProfileReviews.appendChild(card);
+                });
+            }
+        }
+
+        renderVisibleListingHearts();
+    }
+
     async function loadProfile() {
         const user =
             ClosetAuth.getUser();
@@ -1268,8 +1374,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!condition) return showFormMessage(messageElement, "Please choose the item's condition.");
         if (!location) return showFormMessage(messageElement, "Please add a location.");
         if (!description) return showFormMessage(messageElement, "Please add a description.");
-        if (!state.editingListingId && !state.selectedImages.length) {
-            return showFormMessage(messageElement, "Please add at least one photo.");
+        if (!state.selectedImages.length) {
+            return showFormMessage(messageElement, "Please keep at least one photo on the listing.");
         }
 
         setButtonLoading(
@@ -1290,7 +1396,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         price_mdl: Number(price),
                         category_id: subcategoryId || categoryId,
                         condition,
-                        location
+                        location,
+                        images: state.editingListingId ? state.selectedImages : undefined
                     }
                 );
             } else {
@@ -1381,8 +1488,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         setValue("itemLocation", listing.location);
         setValue("itemDescription", listing.description);
 
-        const category = listing.categories || listing.category;
-        const categoryId = category?.parent_id || listing.category_id;
+        const allCategories = await ClosetCategories.getCategories();
+        const selectedCategory = allCategories.find(item => item.id === listing.category_id);
+        const parentCategory = selectedCategory?.parent_id
+            ? allCategories.find(item => item.id === selectedCategory.parent_id)
+            : selectedCategory;
 
         const categoryValue = document.getElementById("categoryPickerValue");
         const subcategoryValue = document.getElementById("subcategoryPickerValue");
@@ -1390,38 +1500,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         const subcategoryInput = document.getElementById("itemSubcategory");
         const subcategoryField = document.getElementById("subcategoryField");
 
-        if (categoryValue) {
-            categoryValue.textContent = category?.parent_id
-                ? (category.parent?.name || "Choose a category")
-                : (category?.name || "Choose a category");
-        }
+        if (categoryValue) categoryValue.textContent = parentCategory?.name || "Choose a category";
+        if (categoryInput) categoryInput.value = parentCategory?.id || listing.category_id || "";
 
-        if (categoryInput) categoryInput.value = categoryId || "";
-
-        if (category?.parent_id) {
+        if (selectedCategory?.parent_id) {
             if (subcategoryField) subcategoryField.hidden = false;
-            if (subcategoryValue) subcategoryValue.textContent = category.name || "Choose a subcategory";
-            if (subcategoryInput) subcategoryInput.value = listing.category_id || "";
+            if (subcategoryValue) subcategoryValue.textContent = selectedCategory.name || "Choose a subcategory";
+            if (subcategoryInput) subcategoryInput.value = selectedCategory.id;
         } else {
             if (subcategoryField) subcategoryField.hidden = true;
             if (subcategoryValue) subcategoryValue.textContent = "Choose a subcategory";
             if (subcategoryInput) subcategoryInput.value = "";
         }
 
-        state.selectedImages.forEach(
-            item => item.url && URL.revokeObjectURL(item.url)
-        );
-        state.selectedImages = [];
+        state.selectedImages.forEach(item => {
+            if (!item.existing && item.url) URL.revokeObjectURL(item.url);
+        });
+
+        state.selectedImages = [...(listing.listing_images || [])]
+            .sort((x, y) => Number(x.sort_order || 0) - Number(y.sort_order || 0))
+            .map(image => ({
+                id: image.id,
+                imageId: image.id,
+                existing: true,
+                file: null,
+                url: image.image_url
+            }));
+
         renderImagePreviews();
 
-        if (elements.publishListingButton) {
-            elements.publishListingButton.textContent = "Save changes";
-        }
-
-        clearFormMessage(
-            document.getElementById("listingFormMessage")
-        );
-
+        if (elements.publishListingButton) elements.publishListingButton.textContent = "Save changes";
+        clearFormMessage(document.getElementById("listingFormMessage"));
         ClosetNavigation.show("sell");
     }
 
@@ -1470,40 +1579,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function renderImagePreviews() {
         if (!elements.imagePreviewGrid) return;
+
         elements.imagePreviewGrid.innerHTML = "";
-        if (elements.imageCount) elements.imageCount.textContent = `${state.selectedImages.length} / 20`;
+
+        if (elements.imageCount) {
+            elements.imageCount.textContent = state.selectedImages.length + " / 20";
+        }
+
         state.selectedImages.forEach((item, index) => {
             const card = document.createElement("div");
             card.className = `image-preview-card${index === 0 ? " is-main" : ""}`;
             card.draggable = true;
             card.dataset.imageId = item.id;
+
+            const mainLabel = index === 0
+                ? `<span class="main-photo-badge">${item.existing ? "Current main photo" : "Main photo"}</span>`
+                : `<button type="button" class="make-main-button">Make main</button>`;
+
             card.innerHTML = `
                 <img src="${escapeHTML(item.url)}" alt="Photo ${index + 1}">
                 <div class="image-preview-overlay">
-                    ${index === 0 ? '<span class="main-photo-badge">Main photo</span>' : '<button type="button" class="make-main-button">Make main</button>'}
+                    ${mainLabel}
                     <button type="button" class="remove-photo-button" aria-label="Remove photo">×</button>
-                </div>`;
+                </div>
+            `;
+
             card.querySelector(".remove-photo-button").addEventListener("click", () => {
                 const removed = state.selectedImages.splice(index, 1)[0];
-                if (removed?.url) URL.revokeObjectURL(removed.url);
+                if (removed?.url && !removed.existing) URL.revokeObjectURL(removed.url);
                 renderImagePreviews();
             });
+
             card.querySelector(".make-main-button")?.addEventListener("click", () => {
                 const [selected] = state.selectedImages.splice(index, 1);
                 state.selectedImages.unshift(selected);
                 renderImagePreviews();
             });
-            card.addEventListener("dragstart", event => { state.draggedImageId = item.id; event.dataTransfer.effectAllowed = "move"; });
+
+            card.addEventListener("dragstart", event => {
+                state.draggedImageId = item.id;
+                event.dataTransfer.effectAllowed = "move";
+            });
+
             card.addEventListener("dragover", event => event.preventDefault());
+
             card.addEventListener("drop", event => {
                 event.preventDefault();
+
                 const from = state.selectedImages.findIndex(image => image.id === state.draggedImageId);
                 const to = state.selectedImages.findIndex(image => image.id === item.id);
                 if (from < 0 || to < 0 || from === to) return;
+
                 const [moved] = state.selectedImages.splice(from, 1);
                 state.selectedImages.splice(to, 0, moved);
                 renderImagePreviews();
             });
+
             elements.imagePreviewGrid.appendChild(card);
         });
     }
@@ -1631,6 +1762,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
     }
 
+    function setupListingDetailActions() {
+        document.getElementById("listingBackButton")?.addEventListener("click", () => {
+            ClosetNavigation.show(state.listingBackView || "browse");
+        });
+
+        elements.publicProfileBackButton?.addEventListener("click", () => {
+            ClosetNavigation.show(state.publicProfileBackView || "browse");
+        });
+    }
+
     function setupListingClicks() {
         document.addEventListener(
             "click",
@@ -1735,6 +1876,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (view === "edit-profile") {
                     await loadEditProfile();
+                }
+
+                if (view === "public-profile" && state.publicProfileUserId) {
+                    await loadPublicProfile(state.publicProfileUserId);
                 }
             }
         );
@@ -1920,6 +2065,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupHeaderActions();
         setupHomeHeaderSearch();
         setupListingClicks();
+        setupListingDetailActions();
         setupBrowseControls();
         setupForms();
         setupProfileActions();
