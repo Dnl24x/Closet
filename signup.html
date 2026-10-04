@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="auth.css">
 </head>
 
-<body class="auth-page">
+<body class="auth-page">\n\n<div id="languageModal" class="language-modal" hidden role="dialog" aria-modal="true" aria-labelledby="languageModalTitle">\n    <div class="language-modal-card">\n        <p class="eyebrow">CLOSET</p>\n        <h2 id="languageModalTitle">Pick any language you want.</h2>\n        <p>Always can be changed in settings.</p>\n        <div class="language-options">\n            <button type="button" data-language="en">English</button>\n            <button type="button" data-language="ro">Română</button>\n            <button type="button" data-language="ru">Русский</button>\n        </div>\n    </div>\n</div>
 
     <header class="site-header">
         <button
@@ -172,7 +172,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
-    <script src="auth.js"></script>
+    <script src="i18n.js"></script>\n<script src="auth.js"></script>\n<script>document.addEventListener("DOMContentLoaded", () => window.ClosetI18n?.initialize());</script>
     <script src="signup.js"></script>
 
 </body>
