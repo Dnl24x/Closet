@@ -276,12 +276,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function getSavedKey() {
         const user = ClosetAuth.getUser();
-        return user ? \`closet-saved-listings-\${user.id}\` : "closet-saved-listings-guest";
+        return user ? `closet-saved-listings-${user.id}` : "closet-saved-listings-guest";
     }
 
     function getSavedIds() {
         try {
-            const value = JSON.parse(localStorage.getItem(getSavedKey()) || "[]");
+            const value = JSON.parse(
+                localStorage.getItem(getSavedKey()) || "[]"
+            );
             return Array.isArray(value) ? value : [];
         } catch {
             return [];
@@ -304,9 +306,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (index >= 0) ids.splice(index, 1);
         else ids.push(id);
 
-        localStorage.setItem(getSavedKey(), JSON.stringify(ids));
-        await loadSavedListings();
+        try {
+            localStorage.setItem(getSavedKey(), JSON.stringify(ids));
+        } catch {
+            showStatus("Your browser could not save this listing.", "error");
+            return;
+        }
+
         renderVisibleListingHearts();
+        await loadSavedListings();
     }
 
     function renderVisibleListingHearts() {
@@ -314,7 +322,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const saved = isSavedListing(button.dataset.saveListingId);
             button.classList.toggle("is-saved", saved);
             button.textContent = saved ? "♥" : "♡";
-            button.setAttribute("aria-label", saved ? "Remove from saved" : "Save listing");
+            button.setAttribute(
+                "aria-label",
+                saved ? "Remove from saved" : "Save listing"
+            );
         });
     }
 
@@ -324,47 +335,59 @@ document.addEventListener("DOMContentLoaded", async () => {
         const category = escapeHTML(getListingCategoryLabel(listing));
         const subcategory = escapeHTML(getListingSubcategoryLabel(listing));
         const sellerName = escapeHTML(getProfileName(listing?.profiles));
+        const ownListing = ClosetAuth.getUser()?.id === listing?.seller_id;
         const saved = isSavedListing(listing.id);
-        const ownListing = ClosetAuth.getUser()?.id === listing.seller_id;
 
         const card = document.createElement("article");
         card.className = "listing-card";
-        card.innerHTML = \`
+        card.innerHTML = `
             <div class="listing-card-shell">
-                <button type="button" class="listing-card-button" data-listing-id="\${escapeHTML(listing.id)}" aria-label="View \${title}">
-                    \${image ? \`<img class="listing-image" src="\${escapeHTML(image)}" alt="\${title}" loading="lazy">\` : \`<div class="listing-image" aria-hidden="true"></div>\`}
+                <button type="button" class="listing-card-button"
+                    data-listing-id="${escapeHTML(listing.id)}"
+                    aria-label="View ${title}">
+                    ${image
+                        ? `<img class="listing-image" src="${escapeHTML(image)}" alt="${title}" loading="lazy">`
+                        : `<div class="listing-image" aria-hidden="true"></div>`
+                    }
                     <div class="listing-card-body">
-                        <h3 class="listing-card-title">\${title}</h3>
+                        <h3 class="listing-card-title">${title}</h3>
                         <div class="listing-card-meta">
-                            <span>\${category}\${subcategory ? \` · \${subcategory}\` : ""}</span>
-                            <span>\${sellerName}</span>
+                            <span>${category}${subcategory ? ` · ${subcategory}` : ""}</span>
+                            <span>${sellerName}</span>
                         </div>
-                        <div class="listing-card-price">\${formatPrice(listing.price_mdl)}</div>
+                        <div class="listing-card-price">${formatPrice(listing.price_mdl)}</div>
                     </div>
                 </button>
+
                 <div class="listing-card-actions">
-                    <button type="button" class="listing-save-button\${saved ? " is-saved" : ""}" data-save-listing-id="\${escapeHTML(listing.id)}" aria-label="\${saved ? "Remove from saved" : "Save listing"}">\${saved ? "♥" : "♡"}</button>
-                    \${ownListing ? \`<button type="button" class="listing-edit-button" data-edit-listing-id="\${escapeHTML(listing.id)}">Edit</button>\` : ""}
+                    <button type="button"
+                        class="listing-save-button${saved ? " is-saved" : ""}"
+                        data-save-listing-id="${escapeHTML(listing.id)}"
+                        aria-label="${saved ? "Remove from saved" : "Save listing"}">${saved ? "♥" : "♡"}</button>
+                    ${ownListing
+                        ? `<button type="button" class="listing-edit-button"
+                            data-edit-listing-id="${escapeHTML(listing.id)}">Edit</button>`
+                        : ""}
                 </div>
             </div>
-        \`;
+        `;
 
         card.querySelector("[data-save-listing-id]")?.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
-            toggleSavedListing(listing.id);
+            void toggleSavedListing(listing.id);
         });
 
         card.querySelector("[data-edit-listing-id]")?.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
-            startEditingListing(listing);
+            void startEditingListing(listing);
         });
 
         return card;
     }
 
-    function renderListings(
+    function renderListings(    function renderListings(
         container,
         listings,
         emptyTitle,
@@ -530,23 +553,49 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!elements.savedListingsGrid) return;
 
         if (!ClosetAuth.isSignedIn()) {
-            elements.savedListingsGrid.innerHTML = '<div class="empty-state"><h3>Sign in to save items</h3><p>Your saved listings will appear here.</p></div>';
+            elements.savedListingsGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>Sign in to save items</h3>
+                    <p>Your saved listings will appear here.</p>
+                </div>`;
             return;
         }
 
         const ids = getSavedIds();
+
         if (!ids.length) {
-            elements.savedListingsGrid.innerHTML = '<div class="empty-state"><h3>No saved listings yet</h3><p>Tap the heart on any listing to save it here.</p></div>';
+            elements.savedListingsGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>No saved listings yet</h3>
+                    <p>Tap the heart on any listing to save it here.</p>
+                </div>`;
             return;
         }
 
-        const results = await Promise.all(ids.map(id => ClosetListings.getListing(id)));
-        const listings = results.filter(result => result.success).map(result => result.listing);
-        localStorage.setItem(getSavedKey(), JSON.stringify(listings.map(listing => listing.id)));
+        const results = await Promise.all(
+            ids.map(id => ClosetListings.getListing(id))
+        );
 
-        renderListings(elements.savedListingsGrid, listings, "No saved listings yet", "Tap the heart on any listing to save it here.");
+        const listings = results
+            .filter(result => result.success && result.listing)
+            .map(result => result.listing);
+
+        try {
+            localStorage.setItem(
+                getSavedKey(),
+                JSON.stringify(listings.map(listing => listing.id))
+            );
+        } catch {}
+
+        renderListings(
+            elements.savedListingsGrid,
+            listings,
+            "No saved listings yet",
+            "Tap the heart on any listing to save it here."
+        );
+
+        renderVisibleListingHearts();
     }
-
 
     async function openListing(id) {
         if (
@@ -1160,18 +1209,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function publishListing(event) {
         event.preventDefault();
+
         const messageElement = document.getElementById("listingFormMessage");
         clearFormMessage(messageElement);
 
         if (!ClosetAuth.isSignedIn()) {
-            showFormMessage(messageElement, "Please sign in before publishing an item.");
-            return;
-        }
-
-        try {
-            await ClosetCategoryPicker.refresh();
-        } catch {
-            showFormMessage(messageElement, "Categories could not be refreshed. Please try again.");
+            showFormMessage(
+                messageElement,
+                "Please sign in before publishing an item."
+            );
             return;
         }
 
@@ -1184,59 +1230,110 @@ document.addEventListener("DOMContentLoaded", async () => {
         const description = document.getElementById("itemDescription")?.value.trim() || "";
 
         const safety = runListingSafetyCheck({ title, description, location });
-        if (!safety.allowed) return showFormMessage(messageElement, safety.message);
+        if (!safety.allowed) {
+            showFormMessage(messageElement, safety.message);
+            return;
+        }
+
         if (!title) return showFormMessage(messageElement, "Please add a title for your item.");
         if (!price || Number(price) <= 0) return showFormMessage(messageElement, "Please enter a valid price.");
         if (!categoryId) return showFormMessage(messageElement, "Please choose a category.");
         if (!condition) return showFormMessage(messageElement, "Please choose the item's condition.");
         if (!location) return showFormMessage(messageElement, "Please add a location.");
         if (!description) return showFormMessage(messageElement, "Please add a description.");
-        if (!state.editingListingId && !state.selectedImages.length) return showFormMessage(messageElement, "Please add at least one photo.");
+        if (!state.editingListingId && !state.selectedImages.length) {
+            return showFormMessage(messageElement, "Please add at least one photo.");
+        }
 
-        setButtonLoading(elements.publishListingButton, true, state.editingListingId ? "Saving…" : "Publishing…");
+        setButtonLoading(
+            elements.publishListingButton,
+            true,
+            state.editingListingId ? "Saving…" : "Publishing…"
+        );
 
-        const result = state.editingListingId
-            ? await ClosetListings.updateListing(state.editingListingId, {
-                title,
-                description,
-                price_mdl: Number(price),
-                category_id: subcategoryId || categoryId,
-                condition,
-                location
-            })
-            : await ClosetListings.createListing({
-                title,
-                description,
-                price,
-                categoryId,
-                subcategoryId,
-                condition,
-                location,
-                images: state.selectedImages.map(item => item.file)
-            });
+        let result;
 
-        setButtonLoading(elements.publishListingButton, false);
-        if (!result.success) return showFormMessage(messageElement, result.message);
+        try {
+            if (state.editingListingId) {
+                result = await ClosetListings.updateListing(
+                    state.editingListingId,
+                    {
+                        title,
+                        description,
+                        price_mdl: Number(price),
+                        category_id: subcategoryId || categoryId,
+                        condition,
+                        location
+                    }
+                );
+            } else {
+                result = await ClosetListings.createListing({
+                    title,
+                    description,
+                    price,
+                    categoryId,
+                    subcategoryId,
+                    condition,
+                    location,
+                    images: state.selectedImages.map(item => item.file)
+                });
+            }
+        } catch (error) {
+            console.error("CLOSET publish handler error:", error);
+            result = {
+                success: false,
+                message: error?.message || "We couldn't complete that action. Please try again."
+            };
+        } finally {
+            setButtonLoading(elements.publishListingButton, false);
+        }
+
+        if (!result.success) {
+            showFormMessage(messageElement, result.message);
+            return;
+        }
 
         const editedId = state.editingListingId;
         state.editingListingId = null;
-        state.selectedImages.forEach(item => item.url && URL.revokeObjectURL(item.url));
+
+        state.selectedImages.forEach(
+            item => item.url && URL.revokeObjectURL(item.url)
+        );
         state.selectedImages = [];
+
         elements.listingForm?.reset();
         renderImagePreviews();
         resetCategoryPickers();
-        elements.publishListingButton.textContent = "Publish listing";
 
-        showStatus(editedId ? "Your listing has been updated." : "Your item has been published.", "success");
-        await Promise.all([loadHomeListings(), loadBrowseListings(), loadMyListings(), loadSavedListings()]);
+        if (elements.publishListingButton) {
+            elements.publishListingButton.textContent = "Publish listing";
+        }
 
-        if (result.listing?.id) await openListing(result.listing.id);
-        else if (editedId) await openListing(editedId);
+        showStatus(
+            editedId
+                ? "Your listing has been updated."
+                : "Your item has been published.",
+            "success"
+        );
+
+        await Promise.all([
+            loadHomeListings(),
+            loadBrowseListings(),
+            loadMyListings(),
+            loadSavedListings()
+        ]);
+
+        if (result.listing?.id) {
+            await openListing(result.listing.id);
+        } else if (editedId) {
+            await openListing(editedId);
+        }
     }
 
-
     async function startEditingListing(listing) {
-        if (ClosetAuth.getUser()?.id !== listing?.seller_id) {
+        if (!listing?.id) return;
+
+        if (ClosetAuth.getUser()?.id !== listing.seller_id) {
             showStatus("You can only edit your own listings.", "error");
             return;
         }
@@ -1255,31 +1352,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         setValue("itemLocation", listing.location);
         setValue("itemDescription", listing.description);
 
-        try {
-            await ClosetCategoryPicker.refresh();
-            const categories = await ClosetCategories.getFreshCategories();
-            const selected = categories.find(category => category.id === listing.category_id);
+        const category = listing.categories || listing.category;
+        const categoryId = category?.parent_id || listing.category_id;
 
-            if (selected) {
-                const parent = selected.parent_id
-                    ? categories.find(category => category.id === selected.parent_id)
-                    : null;
+        const categoryValue = document.getElementById("categoryPickerValue");
+        const subcategoryValue = document.getElementById("subcategoryPickerValue");
+        const categoryInput = document.getElementById("itemCategory");
+        const subcategoryInput = document.getElementById("itemSubcategory");
+        const subcategoryField = document.getElementById("subcategoryField");
 
-                document.getElementById("categoryPickerValue").textContent = parent?.name || selected.name;
-                document.getElementById("itemCategory").value = parent?.id || selected.id;
+        if (categoryValue) {
+            categoryValue.textContent = category?.parent_id
+                ? (category.parent?.name || "Choose a category")
+                : (category?.name || "Choose a category");
+        }
 
-                if (parent) {
-                    document.getElementById("subcategoryField").hidden = false;
-                    document.getElementById("subcategoryPickerValue").textContent = selected.name;
-                    document.getElementById("itemSubcategory").value = selected.id;
-                }
-            }
-        } catch {}
+        if (categoryInput) categoryInput.value = categoryId || "";
 
+        if (category?.parent_id) {
+            if (subcategoryField) subcategoryField.hidden = false;
+            if (subcategoryValue) subcategoryValue.textContent = category.name || "Choose a subcategory";
+            if (subcategoryInput) subcategoryInput.value = listing.category_id || "";
+        } else {
+            if (subcategoryField) subcategoryField.hidden = true;
+            if (subcategoryValue) subcategoryValue.textContent = "Choose a subcategory";
+            if (subcategoryInput) subcategoryInput.value = "";
+        }
+
+        state.selectedImages.forEach(
+            item => item.url && URL.revokeObjectURL(item.url)
+        );
         state.selectedImages = [];
         renderImagePreviews();
-        elements.publishListingButton.textContent = "Save changes";
-        clearFormMessage(document.getElementById("listingFormMessage"));
+
+        if (elements.publishListingButton) {
+            elements.publishListingButton.textContent = "Save changes";
+        }
+
+        clearFormMessage(
+            document.getElementById("listingFormMessage")
+        );
+
         ClosetNavigation.show("sell");
     }
 
