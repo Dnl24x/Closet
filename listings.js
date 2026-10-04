@@ -180,7 +180,22 @@ const ClosetListings = (() => {
         let listing = null;
 
         try {
-            const finalCategoryId = subcategoryId || categoryId;
+            // Never trust a cached category ID when publishing. Verify the
+            // selected category directly against the current database rows.
+            const requestedCategoryId = subcategoryId || categoryId;
+            const { data: currentCategory, error: categoryError } = await client
+                .from("categories")
+                .select("id, parent_id, is_active")
+                .eq("id", requestedCategoryId)
+                .eq("is_active", true)
+                .maybeSingle();
+
+            if (categoryError) throw categoryError;
+            if (!currentCategory) {
+                throw new Error("Selected category no longer exists. Please refresh the category list and choose another category.");
+            }
+
+            const finalCategoryId = currentCategory.id;
 
             const { data: listingData, error: listingError } = await client
                 .from("listings")
