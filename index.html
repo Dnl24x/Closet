@@ -50,16 +50,7 @@
         >
             Browse
         </button>
-
-        <button
-            type="button"
-            class="nav-link"
-            data-view="sell"
-        >
-            Sell
-        </button>
-
-        <button
+<button
             type="button"
             class="nav-link"
             data-view="about"
@@ -68,6 +59,18 @@
         </button>
 
     </nav>
+
+    <div id="homeHeaderSearch" class="home-header-search" hidden>
+        <form id="headerSearchForm" class="header-search-form" role="search">
+            <label class="sr-only" for="headerSearchInput">Search the marketplace</label>
+            <input id="headerSearchInput" type="search" placeholder="Search the marketplace..." autocomplete="off">
+            <button type="submit" class="header-search-button">Search</button>
+        </form>
+        <div class="header-category-wrap">
+            <button type="button" id="headerCategoryButton" class="header-category-button" aria-expanded="false">Categories <span>⌄</span></button>
+            <div id="headerCategoryMenu" class="header-category-menu" hidden></div>
+        </div>
+    </div>
 
     <div class="header-actions">
 
@@ -124,16 +127,6 @@
                 A simpler way to keep useful things moving. Find something nearby,
                 give unused items a new home, and make a little money while you're at it.
             </p>
-        </section>
-
-        <section class="home-search-section">
-            <div class="home-search-bar">
-                <label class="search-field home-search-field" for="homeSearch">
-                    <span class="sr-only">Search the marketplace</span>
-                    <input type="search" id="homeSearch" placeholder="What are you looking for?" autocomplete="off">
-                </label>
-                <button type="button" id="homeCategoryButton" class="secondary-button home-category-button">Categories</button>
-            </div>
         </section>
 
         <section class="home-category-section">
