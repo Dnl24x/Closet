@@ -130,9 +130,12 @@
             const trimmed = value.trim();
             if (!trimmed) return;
             const translated = translateValue(trimmed);
-            if (translated !== trimmed) {
-                element.nodeValue = replaceBrand(value.replace(trimmed, translated));
-            }
+            const nextValue =
+                translated !== trimmed
+                    ? value.replace(trimmed, translated)
+                    : value;
+
+            element.nodeValue = replaceBrand(nextValue);
             return;
         }
 
@@ -160,6 +163,8 @@
 
     async function setLanguage(lang, saveToAccount = true) {
         if (!SUPPORTED.includes(lang)) return;
+
+        const previous = getLanguage();
         localStorage.setItem(STORAGE_KEY, lang);
         apply();
 
@@ -174,8 +179,12 @@
                     data: { language: lang }
                 });
             } catch (error) {
-                console.error("CLOSET language preference error:", error);
+                console.error("Language preference error:", error);
             }
+        }
+
+        if (previous !== lang) {
+            window.location.reload();
         }
     }
 
