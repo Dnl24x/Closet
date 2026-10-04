@@ -36,6 +36,12 @@
     const logoButton =
         document.getElementById("logoButton");
 
+    const verificationModal =
+        document.getElementById("signupVerificationModal");
+
+    const verificationDone =
+        document.getElementById("signupVerificationDone");
+
 
     function showMessage(text, type = "error") {
         if (!message) {
@@ -83,6 +89,20 @@
 
     function goToLogin() {
         window.location.href = "login.html";
+    }
+
+    function showVerificationModal() {
+        if (!verificationModal) return;
+
+        verificationModal.hidden = false;
+        document.body.classList.add("auth-verification-open");
+    }
+
+    function closeVerificationModal() {
+        if (!verificationModal) return;
+
+        verificationModal.hidden = true;
+        document.body.classList.remove("auth-verification-open");
     }
 
 
@@ -211,6 +231,7 @@
                 );
 
                 form.reset();
+                showVerificationModal();
 
                 return;
             }
@@ -303,6 +324,13 @@
         confirmPasswordInput
     );
 
+    verificationDone?.addEventListener("click", closeVerificationModal);
+
+    verificationModal?.addEventListener("click", event => {
+        if (event.target === verificationModal) {
+            closeVerificationModal();
+        }
+    });
 
     initialize();
 })();
