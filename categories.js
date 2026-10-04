@@ -30,6 +30,23 @@ const ClosetCategories = (() => {
         }
     }
 
+    async function getFreshCategories() {
+        const { data, error } = await client
+            .from("categories")
+            .select("id, name, slug, parent_id, sort_order")
+            .eq("is_active", true)
+            .order("sort_order", { ascending: true });
+
+        if (error) {
+            console.error("CLOSET fresh categories error:", error);
+            throw error;
+        }
+
+        categories = data || [];
+        writeCachedCategories(categories);
+        return categories;
+    }
+
     async function getCategories() {
         if (categories) {
             return categories;
@@ -97,6 +114,7 @@ const ClosetCategories = (() => {
 
     return {
         getCategories,
+        getFreshCategories,
         getTopLevelCategories,
         getSubcategories,
         clearCache
