@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Need Help — A doua șansă</title>
+    <meta name="description" content="Find quick answers about using the marketplace.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="static-page">
+    <header class="site-header">
+        <a class="logo" href="index.html" aria-label="Return to A doua șansă home">A doua șansă</a>
+        <div class="header-actions static-header-actions">
+            <a class="secondary-button" href="index.html">Back to marketplace</a>
+        </div>
+    </header>
+
+    <main class="static-main">
+        
+<section class="app-view legal-page">
+    <p class="eyebrow" data-i18n="Need Help">Need Help</p>
+    <h1 data-i18n="Need Help — A doua șansă">Need Help — A doua șansă</h1>
+    <p class="legal-lead" data-i18n="Find a quick answer before you contact us."></p>
+
+    <div class="faq-search-wrap">
+        <input id="faqSearch" type="search" placeholder="Search questions..." autocomplete="off" aria-label="Search questions">
+    </div>
+
+    <div id="faqList" class="faq-list">
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="What is A doua șansă?">What is A doua șansă?</h2>
+                <p data-i18n="A doua șansă is a Moldova-focused marketplace where people can list useful items and discover things offered by other users."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="How do I publish a listing?">How do I publish a listing?</h2>
+                <p data-i18n="Sign in, choose Sell an item, fill in the item details, add at least one photo, then publish the listing."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="How do I edit my listing?">How do I edit my listing?</h2>
+                <p data-i18n="Open your listing, press Edit, change the details you need, then press Save changes. Only the owner of a listing can edit it."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="Why isn't my listing visible?">Why isn't my listing visible?</h2>
+                <p data-i18n="Check that it was published successfully, the listing is still active, and your internet connection is working. Hidden, sold or deleted listings may not appear in public browsing."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="How do saved listings work?">How do saved listings work?</h2>
+                <p data-i18n="Press the heart on a listing to save it. Your saved listings are shown in your profile on the same device and account."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="How do I change my profile photo?">How do I change my profile photo?</h2>
+                <p data-i18n="Open Profile, choose Edit profile, select Change photo, and save. Profile photos must be exactly 512 × 512 pixels and use JPG, PNG or WebP."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="Why must my profile photo be 512 × 512 pixels?">Why must my profile photo be 512 × 512 pixels?</h2>
+                <p data-i18n="A fixed square size keeps profile images consistent across listing cards and profile pages."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="When will Buy be available?">When will Buy be available?</h2>
+                <p data-i18n="The Buy button is currently a placeholder. The secure purchasing flow will be added later."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="What items are not allowed?">What items are not allowed?</h2>
+                <p data-i18n="Illegal goods, weapons or ammunition, explosives, controlled drugs, stolen or counterfeit goods, and content that facilitates abuse or fraud are not allowed."></p>
+            </article>
+        
+            <article class="faq-item" data-faq>
+                <h2 data-i18n="How can I contact A doua șansă?">How can I contact A doua șansă?</h2>
+                <p data-i18n="Use the Contact page linked in the footer and on the About page."></p>
+            </article>
+        
+    </div>
+
+    <div id="faqEmpty" class="faq-empty" hidden data-i18n="Didn't find what you need?">Didn't find what you need?</div>
+
+    <div class="legal-section">
+        <h2 data-i18n="Didn't find what you need?">Didn't find what you need?</h2>
+        <p data-i18n="Contact us and tell us what went wrong or what you need help with."></p>
+        <a class="text-button" href="contact.html" data-i18n="Contact A doua șansă">Contact A doua șansă</a>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("faqSearch");
+    const items = [...document.querySelectorAll("[data-faq]")];
+    const empty = document.getElementById("faqEmpty");
+
+    input?.addEventListener("input", () => {
+        const query = input.value.trim().toLowerCase();
+        let visible = 0;
+
+        items.forEach(item => {
+            const matches = !query || item.textContent.toLowerCase().includes(query);
+            item.hidden = !matches;
+            if (matches) visible += 1;
+        });
+
+        if (empty) empty.hidden = visible !== 0;
+    });
+});
+</script>
+    </main>
+
+    <footer class="site-footer">
+    <div class="site-footer-main">
+        <div class="site-footer-brand">
+            <strong>A doua șansă</strong>
+            <span>DoaSanse · Moldova marketplace</span>
+        </div>
+        <nav class="site-footer-links" aria-label="Footer">
+            <a href="terms.html">Terms of Service</a>
+            <a href="help.html">Need Help</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </div>
+
+    <div class="site-footer-bottom">
+        <span>© 2026 DoaSanse · A doua șansă · Moldova</span>
+        <a href="terms.html">Terms of Service</a>
+    </div>
+</footer>
+
+    <div id="languageModal" class="language-modal" hidden role="dialog" aria-modal="true" aria-labelledby="languageModalTitle">
+        <div class="language-modal-card">
+            <p class="eyebrow">A doua șansă</p>
+            <h2 id="languageModalTitle">Pick any language you want.</h2>
+            <p>Always can be changed in settings.</p>
+            <div class="language-options">
+                <button type="button" data-language="en">English</button>
+                <button type="button" data-language="ro">Română</button>
+                <button type="button" data-language="ru">Русский</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            window.ClosetI18n?.initialize();
+        });
+    </script>
+</body>
+</html>
