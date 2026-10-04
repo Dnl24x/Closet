@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         headerSearchInput: document.getElementById("headerSearchInput"),
         headerCategoryButton: document.getElementById("headerCategoryButton"),
         headerCategoryMenu: document.getElementById("headerCategoryMenu"),
+        browseCategoryMenu: document.getElementById("browseCategoryMenu"),
         homeCategoryStrip: document.getElementById("homeCategoryStrip"),
 
         browseSearch: document.getElementById("browseSearch"),
@@ -1251,6 +1252,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    async function openBrowseCategoryMenu() {
+        const menu = elements.browseCategoryMenu;
+        if (!menu) return;
+
+        if (!menu.hidden) {
+            menu.hidden = true;
+            elements.browseCategoryButton?.setAttribute("aria-expanded", "false");
+            return;
+        }
+
+        const categories = await ClosetCategories.getTopLevelCategories();
+        menu.innerHTML = categories.map(category => `
+            <button type="button" class="browse-category-option" data-category-id="${escapeHTML(category.id)}">${escapeHTML(category.name)}</button>
+        `).join("");
+
+        menu.hidden = false;
+        elements.browseCategoryButton?.setAttribute("aria-expanded", "true");
+
+        menu.querySelectorAll("[data-category-id]").forEach(button => {
+            button.addEventListener("click", () => {
+                state.selectedCategory = button.dataset.categoryId || null;
+                menu.hidden = true;
+                elements.browseCategoryButton?.setAttribute("aria-expanded", "false");
+                loadBrowseListings();
+            });
+        });
+    }
+
     async function openCategoryMenu() {
         const menu = elements.headerCategoryMenu;
         if (!menu) return;
@@ -1355,7 +1384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         elements.browseMinPrice?.addEventListener("input", refresh);
         elements.browseMaxPrice?.addEventListener("input", refresh);
         elements.browseSort?.addEventListener("change", refresh);
-        elements.browseCategoryButton?.addEventListener("click", () => openCategoryMenu());
+        elements.browseCategoryButton?.addEventListener("click", openBrowseCategoryMenu);
     }
 
     function debounce(callback, delay) {
