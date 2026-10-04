@@ -403,28 +403,38 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Category data is already cached/shared by ClosetCategories.
-        // Attach labels locally so the listing request stays flat.
-        try {
-            const categories = await ClosetCategories.getCategories();
-            const categoryMap = new Map(
-                categories.map(category => [category.id, category])
-            );
-
-            result.listings.forEach(listing => {
-                const category = categoryMap.get(listing.category_id);
-                if (category) listing.category = category;
-            });
-        } catch {
-            // The listings can still render without category labels.
-        }
-
+        // Render immediately. Category labels are enrichment, not a
+        // prerequisite for showing the marketplace.
         renderListings(
             elements.homeListingsGrid,
             result.listings,
             "Nothing is listed yet",
             "Be the first person to give an item a new home."
         );
+
+        // Enrich cards in the background from the shared category cache.
+        // A slow categories request can no longer block Latest Items.
+        ClosetCategories.getCategories()
+            .then(categories => {
+                const categoryMap = new Map(
+                    categories.map(category => [category.id, category])
+                );
+
+                result.listings.forEach(listing => {
+                    const category = categoryMap.get(listing.category_id);
+                    if (category) listing.category = category;
+                });
+
+                renderListings(
+                    elements.homeListingsGrid,
+                    result.listings,
+                    "Nothing is listed yet",
+                    "Be the first person to give an item a new home."
+                );
+            })
+            .catch(() => {
+                // Keep the already-rendered listings visible.
+            });
     }
 
     async function loadBrowseListings() {
