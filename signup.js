@@ -206,7 +206,7 @@
 
             if (result.needsVerification) {
                 showMessage(
-                    "Your account has been created. Check your email to verify your address before signing in.",
+                    "Please verify your email. Open your Gmail and click the verification link from A doua șansă.",
                     "success"
                 );
 
