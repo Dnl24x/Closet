@@ -9,7 +9,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const state = {
         selectedCategory: null,
         selectedSubcategory: null,
-        currentListingId: null
+        currentListingId: null,
+        selectedImages: [],
+        draggedImageId: null
     };
 
     const elements = {
@@ -33,20 +35,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         categoryFilters:
             document.querySelectorAll(".category-filter"),
 
-        listingForm:
-            document.getElementById("listingForm"),
+        homeHeaderSearch: document.getElementById("homeHeaderSearch"),
+        headerSearchForm: document.getElementById("headerSearchForm"),
+        headerSearchInput: document.getElementById("headerSearchInput"),
+        headerCategoryButton: document.getElementById("headerCategoryButton"),
+        headerCategoryMenu: document.getElementById("headerCategoryMenu"),
+        homeCategoryStrip: document.getElementById("homeCategoryStrip"),
 
-        itemImage:
-            document.getElementById("itemImage"),
+        browseSearch: document.getElementById("browseSearch"),
+        browseCategoryButton: document.getElementById("browseCategoryButton"),
+        browseLocation: document.getElementById("browseLocation"),
+        browseCondition: document.getElementById("browseCondition"),
+        browseMinPrice: document.getElementById("browseMinPrice"),
+        browseMaxPrice: document.getElementById("browseMaxPrice"),
+        browseSort: document.getElementById("browseSort"),
 
-        imagePreview:
-            document.getElementById("imagePreview"),
-
-        imagePreviewImage:
-            document.querySelector("#imagePreview img"),
-
-        removeImageButton:
-            document.getElementById("removeImageButton"),
+        listingForm: document.getElementById("listingForm"),
+        itemImages: document.getElementById("itemImages"),
+        imageUploadArea: document.getElementById("imageUploadArea"),
+        imagePreviewGrid: document.getElementById("imagePreviewGrid"),
+        imageCount: document.getElementById("imageCount"),
 
         publishListingButton:
             document.getElementById("publishListingButton"),
@@ -410,12 +418,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         const search =
             elements.browseSearch?.value || "";
 
-        const result =
-            await ClosetListings.getListings({
-                categoryId: state.selectedCategory,
-                search,
-                limit: 30
-            });
+        const result = await ClosetListings.getListings({
+            categoryId: state.selectedCategory,
+            search,
+            location: elements.browseLocation?.value || "",
+            condition: elements.browseCondition?.value || "",
+            minPrice: elements.browseMinPrice?.value || "",
+            maxPrice: elements.browseMaxPrice?.value || "",
+            sort: elements.browseSort?.value || "newest",
+            limit: 30
+        });
 
         if (!result.success) {
             renderListings(
@@ -1088,272 +1100,176 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function publishListing(event) {
         event.preventDefault();
+        const messageElement = document.getElementById("listingFormMessage");
+        clearFormMessage(messageElement);
 
-        const messageElement =
-            document.getElementById(
-                "listingFormMessage"
-            );
-
-        clearFormMessage(
-            messageElement
-        );
-
-        const title =
-            document.getElementById(
-                "itemName"
-            )?.value.trim() || "";
-
-        const price =
-            document.getElementById(
-                "itemPrice"
-            )?.value || "";
-
-        const categoryId =
-            document.getElementById(
-                "itemCategory"
-            )?.value || "";
-
-        const subcategoryId =
-            document.getElementById(
-                "itemSubcategory"
-            )?.value || "";
-
-        const condition =
-            document.getElementById(
-                "itemCondition"
-            )?.value || "";
-
-        const description =
-            document.getElementById(
-                "itemDescription"
-            )?.value.trim() || "";
-
-        const image =
-            elements.itemImage?.files?.[0];
-
-        if (!title) {
-            showFormMessage(
-                messageElement,
-                "Please add a title for your item."
-            );
-
+        if (!ClosetAuth.isSignedIn()) {
+            showFormMessage(messageElement, "Please sign in before publishing an item.");
+            window.setTimeout(() => { window.location.href = "login.html"; }, 500);
             return;
         }
 
-        if (
-            !price ||
-            Number(price) <= 0
-        ) {
-            showFormMessage(
-                messageElement,
-                "Please enter a valid price."
-            );
+        const title = document.getElementById("itemName")?.value.trim() || "";
+        const price = document.getElementById("itemPrice")?.value || "";
+        const categoryId = document.getElementById("itemCategory")?.value || "";
+        const subcategoryId = document.getElementById("itemSubcategory")?.value || "";
+        const condition = document.getElementById("itemCondition")?.value || "";
+        const location = document.getElementById("itemLocation")?.value.trim() || "";
+        const description = document.getElementById("itemDescription")?.value.trim() || "";
+        const images = [...(elements.itemImages?.files || [])];
 
-            return;
+        const safety = runListingSafetyCheck({ title, description, location });
+        if (!safety.allowed) return showFormMessage(messageElement, safety.message);
+        if (!title) return showFormMessage(messageElement, "Please add a title for your item.");
+        if (!price || Number(price) <= 0) return showFormMessage(messageElement, "Please enter a valid price.");
+        if (!categoryId) return showFormMessage(messageElement, "Please choose a category.");
+        if (!condition) return showFormMessage(messageElement, "Please choose the item's condition.");
+        if (!location) return showFormMessage(messageElement, "Please add a location.");
+        if (!description) return showFormMessage(messageElement, "Please add a description.");
+        if (!state.selectedImages.length) return showFormMessage(messageElement, "Please add at least one photo.");
+
+        setButtonLoading(elements.publishListingButton, true, "Publishing…");
+        const result = await ClosetListings.createListing({
+            title, description, price, categoryId, subcategoryId, condition, location,
+            images: state.selectedImages.map(item => item.file)
+        });
+        setButtonLoading(elements.publishListingButton, false);
+
+        if (!result.success) return showFormMessage(messageElement, result.message);
+
+        state.selectedImages.forEach(item => item.url && URL.revokeObjectURL(item.url));
+        state.selectedImages = [];
+        elements.listingForm?.reset();
+        renderImagePreviews();
+        resetCategoryPickers();
+
+        showStatus("Your item has been published.", "success");
+        await Promise.all([loadHomeListings(), loadBrowseListings(), loadMyListings()]);
+        if (result.listing?.id) await openListing(result.listing.id);
+    }
+
+    function runListingSafetyCheck({ title, description, location }) {
+        const text = [title, description, location].join(" ").toLowerCase();
+        const blockedPatterns = [
+            /\bdrugs?\b/, /\bcocaine\b/, /\bheroin\b/, /\bmeth\b/,
+            /\bweapon(s)?\b/, /\bfirearm(s)?\b/, /\bguns?\b/, /\bammunition\b/,
+            /\bexplosive(s)?\b/, /\bgrenade(s)?\b/
+        ];
+        if (blockedPatterns.some(pattern => pattern.test(text))) {
+            return { allowed: false, message: "This listing contains content that CLOSET does not allow. Please only list ordinary items that can be legally sold on the marketplace." };
         }
+        return { allowed: true };
+    }
 
-        if (!categoryId) {
-            showFormMessage(
-                messageElement,
-                "Please choose a category."
-            );
-
-            return;
-        }
-
-        if (!condition) {
-            showFormMessage(
-                messageElement,
-                "Please choose the item's condition."
-            );
-
-            return;
-        }
-
-        if (!image) {
-            showFormMessage(
-                messageElement,
-                "Please add a photo of your item."
-            );
-
-            return;
-        }
-
-        setButtonLoading(
-            elements.publishListingButton,
-            true,
-            "Publishing…"
-        );
-
-        const result =
-            await ClosetListings.createListing({
-                title,
-                description,
-                price,
-                categoryId,
-                subcategoryId,
-                condition,
-                image
-            });
-
-        setButtonLoading(
-            elements.publishListingButton,
-            false
-        );
-
-        if (!result.success) {
-            showFormMessage(
-                messageElement,
-                result.message
-            );
-
-            return;
-        }
-
-        elements.listingForm.reset();
-
-        if (elements.imagePreview) {
-            elements.imagePreview.hidden = true;
-        }
-
-        if (elements.removeImageButton) {
-            elements.removeImageButton.hidden = true;
-        }
-
+    function resetCategoryPickers() {
+        const categoryValue = document.getElementById("categoryPickerValue");
+        const subcategoryValue = document.getElementById("subcategoryPickerValue");
+        const subcategoryField = document.getElementById("subcategoryField");
+        if (categoryValue) categoryValue.textContent = "Choose a category";
+        if (subcategoryValue) subcategoryValue.textContent = "Choose a subcategory";
+        if (subcategoryField) subcategoryField.hidden = true;
         state.selectedCategory = null;
         state.selectedSubcategory = null;
-
-        const categoryValue =
-            document.getElementById(
-                "categoryPickerValue"
-            );
-
-        const subcategoryValue =
-            document.getElementById(
-                "subcategoryPickerValue"
-            );
-
-        if (categoryValue) {
-            categoryValue.textContent =
-                "Choose a category";
-        }
-
-        if (subcategoryValue) {
-            subcategoryValue.textContent =
-                "Choose a subcategory";
-        }
-
-        const subcategoryField =
-            document.getElementById(
-                "subcategoryField"
-            );
-
-        if (subcategoryField) {
-            subcategoryField.hidden = true;
-        }
-
-        showStatus(
-            "Your item has been published.",
-            "success"
-        );
-
-        await Promise.all([
-            loadHomeListings(),
-            loadBrowseListings(),
-            loadMyListings()
-        ]);
-
-        if (result.listing?.id) {
-            await openListing(
-                result.listing.id
-            );
-        }
     }
 
     function setupImagePreview() {
-        if (!elements.itemImage) {
-            return;
-        }
-
-        elements.itemImage.addEventListener(
-            "change",
-            () => {
-                const file =
-                    elements.itemImage.files?.[0];
-
-                if (!file) {
-                    if (elements.imagePreview) {
-                        elements.imagePreview.hidden =
-                            true;
-                    }
-
-                    if (
-                        elements.removeImageButton
-                    ) {
-                        elements.removeImageButton.hidden =
-                            true;
-                    }
-
-                    return;
-                }
-
-                if (!file.type.startsWith("image/")) {
-                    elements.itemImage.value = "";
-
-                    showStatus(
-                        "Please choose an image file.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-                const objectURL =
-                    URL.createObjectURL(file);
-
-                if (elements.imagePreviewImage) {
-                    elements.imagePreviewImage.src =
-                        objectURL;
-                }
-
-                if (elements.imagePreview) {
-                    elements.imagePreview.hidden =
-                        false;
-                }
-
-                if (elements.removeImageButton) {
-                    elements.removeImageButton.hidden =
-                        false;
-                }
-            }
-        );
+        if (!elements.itemImages) return;
+        const addFiles = (fileList) => {
+            const remaining = 20 - state.selectedImages.length;
+            if (remaining <= 0) return showStatus("You can upload up to 20 photos.", "error");
+            [...fileList].slice(0, remaining).forEach(file => {
+                if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return showStatus("Only JPG, PNG and WebP photos are allowed.", "error");
+                if (file.size > 10 * 1024 * 1024) return showStatus("Each photo must be 10 MB or smaller.", "error");
+                state.selectedImages.push({ id: crypto.randomUUID(), file, url: URL.createObjectURL(file) });
+            });
+            renderImagePreviews();
+            elements.itemImages.value = "";
+        };
+        elements.itemImages.addEventListener("change", event => addFiles(event.target.files));
+        elements.imageUploadArea?.addEventListener("dragover", event => { event.preventDefault(); elements.imageUploadArea.classList.add("dragging"); });
+        elements.imageUploadArea?.addEventListener("dragleave", () => elements.imageUploadArea.classList.remove("dragging"));
+        elements.imageUploadArea?.addEventListener("drop", event => { event.preventDefault(); elements.imageUploadArea.classList.remove("dragging"); addFiles(event.dataTransfer.files); });
     }
 
-    function setupRemoveImage() {
-        elements.removeImageButton?.addEventListener(
-            "click",
-            () => {
-                if (elements.itemImage) {
-                    elements.itemImage.value = "";
-                }
+    function renderImagePreviews() {
+        if (!elements.imagePreviewGrid) return;
+        elements.imagePreviewGrid.innerHTML = "";
+        if (elements.imageCount) elements.imageCount.textContent = `${state.selectedImages.length} / 20`;
+        state.selectedImages.forEach((item, index) => {
+            const card = document.createElement("div");
+            card.className = `image-preview-card${index === 0 ? " is-main" : ""}`;
+            card.draggable = true;
+            card.dataset.imageId = item.id;
+            card.innerHTML = `
+                <img src="${escapeHTML(item.url)}" alt="Photo ${index + 1}">
+                <div class="image-preview-overlay">
+                    ${index === 0 ? '<span class="main-photo-badge">Main photo</span>' : '<button type="button" class="make-main-button">Make main</button>'}
+                    <button type="button" class="remove-photo-button" aria-label="Remove photo">×</button>
+                </div>`;
+            card.querySelector(".remove-photo-button").addEventListener("click", () => {
+                const removed = state.selectedImages.splice(index, 1)[0];
+                if (removed?.url) URL.revokeObjectURL(removed.url);
+                renderImagePreviews();
+            });
+            card.querySelector(".make-main-button")?.addEventListener("click", () => {
+                const [selected] = state.selectedImages.splice(index, 1);
+                state.selectedImages.unshift(selected);
+                renderImagePreviews();
+            });
+            card.addEventListener("dragstart", event => { state.draggedImageId = item.id; event.dataTransfer.effectAllowed = "move"; });
+            card.addEventListener("dragover", event => event.preventDefault());
+            card.addEventListener("drop", event => {
+                event.preventDefault();
+                const from = state.selectedImages.findIndex(image => image.id === state.draggedImageId);
+                const to = state.selectedImages.findIndex(image => image.id === item.id);
+                if (from < 0 || to < 0 || from === to) return;
+                const [moved] = state.selectedImages.splice(from, 1);
+                state.selectedImages.splice(to, 0, moved);
+                renderImagePreviews();
+            });
+            elements.imagePreviewGrid.appendChild(card);
+        });
+    }
 
-                if (elements.imagePreviewImage) {
-                    elements.imagePreviewImage.removeAttribute(
-                        "src"
-                    );
-                }
+    async function openCategoryMenu() {
+        const menu = elements.headerCategoryMenu;
+        if (!menu) return;
+        if (!menu.hidden) {
+            menu.hidden = true;
+            elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
+            return;
+        }
+        const categories = await ClosetCategories.getTopLevelCategories();
+        menu.innerHTML = categories.map(category => `
+            <button type="button" class="header-category-option" data-category-id="${escapeHTML(category.id)}">${escapeHTML(category.name)}</button>`).join("");
+        menu.hidden = false;
+        elements.headerCategoryButton?.setAttribute("aria-expanded", "true");
+        menu.querySelectorAll("[data-category-id]").forEach(button => {
+            button.addEventListener("click", () => {
+                state.selectedCategory = button.dataset.categoryId || null;
+                menu.hidden = true;
+                elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
+                ClosetNavigation.show("browse");
+            });
+        });
+    }
 
-                if (elements.imagePreview) {
-                    elements.imagePreview.hidden =
-                        true;
-                }
-
-                if (elements.removeImageButton) {
-                    elements.removeImageButton.hidden =
-                        true;
-                }
+    function setupHomeHeaderSearch() {
+        elements.headerCategoryButton?.addEventListener("click", openCategoryMenu);
+        elements.headerSearchForm?.addEventListener("submit", event => {
+            event.preventDefault();
+            if (elements.browseSearch) elements.browseSearch.value = elements.headerSearchInput?.value.trim() || "";
+            state.selectedCategory = null;
+            ClosetNavigation.show("browse");
+        });
+        window.addEventListener("closet:navigate", event => {
+            const isHome = event.detail?.view === "home";
+            if (elements.homeHeaderSearch) elements.homeHeaderSearch.hidden = !isHome;
+            if (!isHome && elements.headerCategoryMenu) {
+                elements.headerCategoryMenu.hidden = true;
+                elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
             }
-        );
+        });
     }
 
     function setupHeaderActions() {
@@ -1412,40 +1328,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function setupBrowseControls() {
-        elements.browseSearch?.addEventListener(
-            "input",
-            debounce(
-                loadBrowseListings,
-                300
-            )
-        );
-
-        elements.categoryFilters.forEach(
-            (button) => {
-                button.addEventListener(
-                    "click",
-                    async () => {
-                        elements.categoryFilters.forEach(
-                            (item) => {
-                                item.classList.remove(
-                                    "active"
-                                );
-                            }
-                        );
-
-                        button.classList.add(
-                            "active"
-                        );
-
-                        state.selectedCategory =
-                            button.dataset.category ||
-                            null;
-
-                        await loadBrowseListings();
-                    }
-                );
-            }
-        );
+        const refresh = debounce(loadBrowseListings, 250);
+        elements.browseSearch?.addEventListener("input", refresh);
+        elements.browseLocation?.addEventListener("change", refresh);
+        elements.browseCondition?.addEventListener("change", refresh);
+        elements.browseMinPrice?.addEventListener("input", refresh);
+        elements.browseMaxPrice?.addEventListener("input", refresh);
+        elements.browseSort?.addEventListener("change", refresh);
+        elements.browseCategoryButton?.addEventListener("click", () => openCategoryMenu());
     }
 
     function debounce(callback, delay) {
@@ -1569,8 +1459,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function initialize() {
         ClosetNavigation.initialize("home");
+        if (elements.homeHeaderSearch) elements.homeHeaderSearch.hidden = false;
 
         setupHeaderActions();
+        setupHomeHeaderSearch();
         setupListingClicks();
         setupBrowseControls();
         setupForms();
