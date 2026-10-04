@@ -1586,8 +1586,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupAuthStateListener();
         setupLanguageSettings();
 
-        const session =
-            await ClosetAuth.initialize();
+        // Authentication can take a moment to reach Supabase. Start it in
+        // parallel with the public homepage data so a slow auth request
+        // never blocks Categories or Latest Items from loading.
+        const authPromise = ClosetAuth.initialize();
+
+        const homeDataPromise = Promise.all([
+            loadHomeListings(),
+            loadHomeCategories()
+        ]);
+
+        const session = await authPromise;
 
         const accountLanguage =
             session?.user?.user_metadata?.language;
@@ -1601,8 +1610,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         await updateAuthenticatedUI();
-
-        await Promise.all([loadHomeListings(), loadHomeCategories()]);
+        await homeDataPromise;
 
         if (session) {
             console.log(
