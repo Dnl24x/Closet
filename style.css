@@ -4250,3 +4250,203 @@ body.verification-modal-open {
         font-size: 26px;
     }
 }
+
+
+/* =========================================================
+   FINAL RESPONSIVE MOBILE EXPERIENCE
+   CSS media queries automatically switch the layout based
+   on viewport width. No device-detection JavaScript is needed.
+   ========================================================= */
+
+@media (max-width: 720px) {
+    .site-header {
+        gap: 10px;
+    }
+
+    .main-navigation {
+        scrollbar-width: none;
+    }
+
+    .main-navigation::-webkit-scrollbar {
+        display: none;
+    }
+
+    .header-actions {
+        max-width: 100%;
+    }
+
+    .header-profile-button,
+    .header-sell-button {
+        white-space: nowrap;
+    }
+
+    .page-header h1,
+    .about-page h1,
+    .sell-introduction h1,
+    .settings-introduction h1,
+    .account-card h1 {
+        max-width: 100%;
+        font-size: clamp(38px, 11vw, 50px);
+        line-height: .98;
+    }
+
+    .home-introduction.marketplace-introduction h1 {
+        max-width: 100%;
+        font-size: clamp(39px, 11vw, 50px);
+        line-height: .98;
+    }
+
+    .listing-detail-actions {
+        width: 100%;
+    }
+
+    .listing-detail-actions > * {
+        flex: 1 1 120px;
+    }
+
+    .listing-detail-actions .listing-save-button {
+        flex: 0 0 48px;
+    }
+
+    .seller-profile-button {
+        margin-top: 24px;
+    }
+
+    .related-listings-section {
+        margin-top: 55px;
+        padding-top: 34px;
+    }
+
+    .about-contact-callout {
+        padding: 22px;
+    }
+
+    .legal-page {
+        padding-bottom: 30px;
+    }
+
+    .legal-sections {
+        margin-top: 45px;
+    }
+
+    .legal-section {
+        padding: 24px 0;
+    }
+}
+
+@media (max-width: 520px) {
+    .site-header {
+        align-items: flex-start;
+    }
+
+    .header-actions {
+        gap: 5px;
+    }
+
+    .header-profile-button,
+    .header-sell-button {
+        min-height: 36px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+
+    .nav-link {
+        flex: 0 0 auto;
+    }
+
+    .home-category-strip {
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 3px;
+    }
+
+    .home-category-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    .browse-search-row {
+        gap: 7px;
+    }
+
+    .browse-search-row .browse-search-field input {
+        min-height: 48px;
+    }
+
+    .browse-filter-button {
+        min-height: 48px;
+        padding: 0 11px;
+    }
+
+    .listing-grid {
+        gap: 8px;
+    }
+
+    .listing-card-body {
+        padding: 10px;
+    }
+
+    .listing-card-title {
+        line-height: 1.25;
+    }
+
+    .listing-card-price {
+        font-size: 13px;
+    }
+
+    .form-card,
+    .account-card {
+        padding: 17px;
+        border-radius: 17px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .category-picker-panel,
+    .browse-category-menu {
+        max-height: 58dvh;
+    }
+
+    .profile-actions {
+        width: 100%;
+    }
+
+    .profile-actions > * {
+        flex: 1 1 130px;
+    }
+
+    .site-footer-links {
+        width: 100%;
+        gap: 7px 14px;
+    }
+
+    .site-footer-links a {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 380px) {
+    .logo {
+        font-size: 20px;
+        letter-spacing: -1.2px;
+    }
+
+    .header-profile-button,
+    .header-sell-button {
+        padding: 0 8px;
+        font-size: 10px;
+    }
+
+    .listing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-introduction.marketplace-introduction h1 {
+        font-size: 38px;
+    }
+
+    .app-view {
+        width: min(calc(100% - 22px), var(--content-width));
+    }
+}
