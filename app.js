@@ -389,15 +389,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function loadHomeListings() {
-        if (!elements.homeListingsGrid) {
-            return;
-        }
+        if (!elements.homeListingsGrid) return;
 
-        const result =
-            await ClosetListings.getListings({
-                limit: 8,
-                lightweight: true
-            });
+        const result = await ClosetListings.getHomeListings({ limit: 8 });
 
         if (!result.success) {
             renderListings(
@@ -406,8 +400,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "Listings are unavailable",
                 result.message
             );
-
             return;
+        }
+
+        // Category data is already cached/shared by ClosetCategories.
+        // Attach labels locally so the listing request stays flat.
+        try {
+            const categories = await ClosetCategories.getCategories();
+            const categoryMap = new Map(
+                categories.map(category => [category.id, category])
+            );
+
+            result.listings.forEach(listing => {
+                const category = categoryMap.get(listing.category_id);
+                if (category) listing.category = category;
+            });
+        } catch {
+            // The listings can still render without category labels.
         }
 
         renderListings(
