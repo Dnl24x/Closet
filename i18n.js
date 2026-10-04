@@ -565,6 +565,19 @@
 
 
     Object.assign(translations.en, {
+        "Back to marketplace": "Back to marketplace",
+        "Still need help?": "Still need help?"
+    });
+    Object.assign(translations.ro, {
+        "Back to marketplace": "Înapoi la marketplace",
+        "Still need help?": "Încă ai nevoie de ajutor?"
+    });
+    Object.assign(translations.ru, {
+        "Back to marketplace": "Вернуться на маркетплейс",
+        "Still need help?": "Всё ещё нужна помощь?"
+    });
+
+    Object.assign(translations.en, {
     "Seller Profile": "Seller Profile",
     "Your Profile": "Your Profile",
     "Active listings": "Active listings",
