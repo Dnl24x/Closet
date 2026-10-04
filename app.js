@@ -103,8 +103,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         profileImage:
             document.getElementById("profileImage"),
 
-        profileImagePreview:
-            document.getElementById("profileImagePreview"),
+        editProfileAvatar:
+            document.getElementById("editProfileAvatar"),
+
+        profileAvatarColor:
+            document.getElementById("profileAvatarColor"),
+
+        removeProfilePhotoButton:
+            document.getElementById("removeProfilePhotoButton"),
 
         saveProfileButton:
             document.getElementById("saveProfileButton"),
@@ -779,31 +785,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     ${attributesHTML}
 
-                    <p class="detail-description">
-                        ${description}
-                    </p>
-
-                    <div class="seller-card">
-
-                        ${
+                    <div class="detail-description-section">
+                        <h2 class="detail-section-title">Description</h2>
+                        <p class="detail-description">
+                            ${
                             seller.avatar_url
-                                ? `
-                                    <img
-                                        class="avatar"
-                                        src="${escapeHTML(
-                                            seller.avatar_url
-                                        )}"
-                                        alt=""
-                                    >
-                                `
-                                : `
-                                    <div
-                                        class="avatar"
-                                        aria-hidden="true"
-                                    ></div>
-                                `
+                                ? '<img class="avatar" src="' + escapeHTML(seller.avatar_url) + '" alt="">'
+                                : '<div class="avatar avatar-initials" style="background-color: ' + getAvatarColor(seller) + '" aria-hidden="true"><span>' + escapeHTML(getAvatarInitial(seller, sellerName)) + '</span></div>'
                         }
-
                         <div>
                             <strong>
                                 ${sellerName}
@@ -847,6 +836,40 @@ document.addEventListener("DOMContentLoaded", async () => {
         return labels[condition] || condition;
     }
 
+    function getAvatarInitial(profile, fallbackName = "") {
+        return String(
+            profile?.display_name ||
+            profile?.username ||
+            fallbackName ||
+            "A doua șansă"
+        ).trim().charAt(0).toUpperCase() || "A";
+    }
+
+    function getAvatarColor(profile) {
+        const color = String(profile?.avatar_color || "#E8E0D6");
+        return /^#[0-9A-Fa-f]{6}$/.test(color)
+            ? color
+            : "#E8E0D6";
+    }
+
+    function renderAvatar(container, profile, fallbackName = "") {
+        if (!container) return;
+        container.replaceChildren();
+
+        if (profile?.avatar_url) {
+            const image = document.createElement("img");
+            image.src = profile.avatar_url;
+            image.alt = "";
+            container.appendChild(image);
+            container.style.backgroundColor = "";
+            return;
+        }
+
+        const initial = document.createElement("span");
+        initial.textContent = getAvatarInitial(profile, fallbackName);
+        container.appendChild(initial);
+        container.style.backgroundColor = getAvatarColor(profile);
+    }
     async function loadProfile() {
         const user =
             ClosetAuth.getUser();
@@ -896,32 +919,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (elements.profileAvatar) {
-            if (profile.avatar_url) {
-                elements.profileAvatar.innerHTML = `
-                    <img
-                        src="${escapeHTML(
-                            profile.avatar_url
-                        )}"
-                        alt=""
-                    >
-                `;
-            } else {
-                elements.profileAvatar.innerHTML = `
-                    <span>
-                        ${escapeHTML(
-                            (
-                                profile.display_name ||
-                                user.user_metadata?.name ||
-                                "C"
-                            )
-                                .charAt(0)
-                                .toUpperCase()
-                        )}
-                    </span>
-                `;
-            }
+            renderAvatar(
+                elements.profileAvatar,
+                profile,
+                user.user_metadata?.name
+            );
         }
-
         if (elements.settingsEmail) {
             elements.settingsEmail.textContent =
                 user.email || "";
@@ -1044,6 +1047,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const profile =
             result.profile || {};
 
+        if (elements.removeProfilePhotoButton) {
+            elements.removeProfilePhotoButton.dataset.useInitials =
+                profile.avatar_url ? "false" : "true";
+        }
+
         const nameInput =
             document.getElementById(
                 "profileName"
@@ -1086,20 +1094,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                 profile.location || "";
         }
 
-        if (elements.profileImagePreview) {
-            if (profile.avatar_url) {
-                elements.profileImagePreview.src =
-                    profile.avatar_url;
+        if (elements.editProfileAvatar) {
+            renderAvatar(
+                elements.editProfileAvatar,
+                profile,
+                user.user_metadata?.name
+            );
+        }
 
-                elements.profileImagePreview.hidden =
-                    false;
-            } else {
-                elements.profileImagePreview.hidden =
-                    true;
-            }
+        if (elements.profileAvatarColor) {
+            elements.profileAvatarColor.value =
+                getAvatarColor(profile);
+        }
+
+        if (elements.profileImage) {
+            elements.profileImage.value = "";
+        }
+
+        if (elements.removeProfilePhotoButton) {
+            elements.removeProfilePhotoButton.dataset.useInitials =
+                profile.avatar_url ? "false" : "true";
         }
     }
-
     async function saveProfile(event) {
         event.preventDefault();
 
@@ -1138,12 +1154,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Saving…"
         );
 
+        const avatarColor =
+            elements.profileAvatarColor?.value || "#E8E0D6";
+
+        const useInitials =
+            elements.removeProfilePhotoButton?.dataset.useInitials === "true";
+
         const result =
             await ClosetProfile.updateProfile({
                 displayName,
                 username,
                 bio,
-                location
+                location,
+                avatarColor,
+                useInitials
             });
 
         if (!result.success) {
@@ -1163,7 +1187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const image =
             elements.profileImage?.files?.[0];
 
-        if (image) {
+        if (image && !useInitials) {
             const imageResult =
                 await ClosetProfile.uploadAvatar(
                     image
@@ -1728,6 +1752,77 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
     }
 
+    function setupProfileAvatarEditor() {
+        elements.profileAvatarColor?.addEventListener("input", () => {
+            if (
+                elements.editProfileAvatar &&
+                !elements.profileImage?.files?.[0]
+            ) {
+                renderAvatar(
+                    elements.editProfileAvatar,
+                    {
+                        display_name:
+                            document.getElementById("profileName")?.value || "",
+                        avatar_color:
+                            elements.profileAvatarColor.value
+                    }
+                );
+            }
+        });
+
+        elements.profileImage?.addEventListener("change", async event => {
+            const file = event.target.files?.[0];
+            if (!file || !elements.editProfileAvatar) return;
+
+            if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                showStatus("Please choose a JPG, PNG or WebP image.", "error");
+                event.target.value = "";
+                return;
+            }
+
+            let url = null;
+            try {
+                url = URL.createObjectURL(file);
+                const image = new Image();
+                image.src = url;
+                await image.decode();
+
+                if (image.naturalWidth !== 512 || image.naturalHeight !== 512) {
+                    showStatus("Profile photos must be exactly 512 × 512 pixels.", "error");
+                    event.target.value = "";
+                    return;
+                }
+
+                const preview = document.createElement("img");
+                preview.src = url;
+                preview.alt = "";
+                elements.editProfileAvatar.replaceChildren(preview);
+                elements.editProfileAvatar.style.backgroundColor = "";
+
+                if (elements.removeProfilePhotoButton) {
+                    elements.removeProfilePhotoButton.dataset.useInitials = "false";
+                }
+            } catch {
+                showStatus("We couldn't read that image. Please choose another one.", "error");
+                event.target.value = "";
+            }
+        });
+
+        elements.removeProfilePhotoButton?.addEventListener("click", () => {
+            elements.removeProfilePhotoButton.dataset.useInitials = "true";
+            if (elements.profileImage) elements.profileImage.value = "";
+
+            renderAvatar(
+                elements.editProfileAvatar,
+                {
+                    display_name:
+                        document.getElementById("profileName")?.value || "",
+                    avatar_color:
+                        elements.profileAvatarColor?.value || "#E8E0D6"
+                }
+            );
+        });
+    }
     function setupProfileActions() {
         elements.profileEditButton?.addEventListener(
             "click",
@@ -1828,6 +1923,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupBrowseControls();
         setupForms();
         setupProfileActions();
+        setupProfileAvatarEditor();
         setupImagePreview();
         setupNavigationEvents();
         setupAuthStateListener();
