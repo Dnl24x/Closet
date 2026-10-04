@@ -387,7 +387,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return card;
     }
 
-    function renderListings(    function renderListings(
+    function renderListings(
         container,
         listings,
         emptyTitle,
@@ -1225,6 +1225,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const price = document.getElementById("itemPrice")?.value || "";
         const categoryId = document.getElementById("itemCategory")?.value || "";
         const subcategoryId = document.getElementById("itemSubcategory")?.value || "";
+        const categorySelection = ClosetCategoryPicker.getSelection();
+        const categoryName = categorySelection?.category?.name || "";
+        const subcategoryName = categorySelection?.subcategory?.name || "";
         const condition = document.getElementById("itemCondition")?.value || "";
         const location = document.getElementById("itemLocation")?.value.trim() || "";
         const description = document.getElementById("itemDescription")?.value.trim() || "";
@@ -1273,6 +1276,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     price,
                     categoryId,
                     subcategoryId,
+                    categoryName,
+                    subcategoryName,
                     condition,
                     location,
                     images: state.selectedImages.map(item => item.file)
