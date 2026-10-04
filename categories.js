@@ -2,25 +2,70 @@ const ClosetCategories = (() => {
     const client = window.supabaseClient;
 
     let categories = null;
+    let categoriesRequest = null;
+
+    const CACHE_KEY = "closet-categories-cache";
+    const CACHE_TTL = 10 * 60 * 1000;
+
+    function readCachedCategories() {
+        try {
+            const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+            if (!cached || !Array.isArray(cached.data)) return null;
+            if (Date.now() - Number(cached.timestamp || 0) > CACHE_TTL) return null;
+            return cached.data;
+        } catch {
+            return null;
+        }
+    }
+
+    function writeCachedCategories(data) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+                timestamp: Date.now(),
+                data
+            }));
+        } catch {
+            // Storage can be unavailable; the in-memory cache still works.
+        }
+    }
 
     async function getCategories() {
         if (categories) {
             return categories;
         }
 
-        const { data, error } = await client
+        const cached = readCachedCategories();
+        if (cached) {
+            categories = cached;
+            return categories;
+        }
+
+        // Share one request between the homepage, category picker and
+        // any other component that asks for categories at the same time.
+        if (categoriesRequest) {
+            return categoriesRequest;
+        }
+
+        categoriesRequest = client
             .from("categories")
             .select("id, name, slug, parent_id, sort_order")
             .eq("is_active", true)
-            .order("sort_order", { ascending: true });
+            .order("sort_order", { ascending: true })
+            .then(({ data, error }) => {
+                if (error) {
+                    console.error("CLOSET categories error:", error);
+                    throw error;
+                }
 
-        if (error) {
-            console.error("CLOSET categories error:", error);
-            throw error;
-        }
+                categories = data || [];
+                writeCachedCategories(categories);
+                return categories;
+            })
+            .finally(() => {
+                categoriesRequest = null;
+            });
 
-        categories = data || [];
-        return categories;
+        return categoriesRequest;
     }
 
     async function getTopLevelCategories() {
@@ -41,6 +86,12 @@ const ClosetCategories = (() => {
 
     function clearCache() {
         categories = null;
+        categoriesRequest = null;
+        try {
+            localStorage.removeItem(CACHE_KEY);
+        } catch {
+            // Ignore unavailable storage.
+        }
     }
 
     return {
