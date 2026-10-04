@@ -7,7 +7,7 @@
         en: {
             "Home":"Home","Browse":"Browse","About":"About","Profile":"Profile","Sell an item":"Sell an item",
             "Search the marketplace...":"Search the marketplace...","Search":"Search","Categories":"Categories",
-            "Give your life a second life.":"Give your life a second life.","Save the planet. Earn.":"Save the planet. Earn.",
+            "Give your items a second life.":"Give your items a second life.","Save the planet. Earn.":"Save the planet. Earn.",
             "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.":"A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.",
             "EXPLORE":"EXPLORE","Categories.":"Categories.","View all →":"View all →","JUST LISTED":"JUST LISTED","Latest items.":"Latest items.","Browse everything →":"Browse everything →",
             "Loading categories...":"Loading categories...","Loading listings...":"Loading listings...",
@@ -41,7 +41,7 @@
         ro: {
             "Home":"Acasă","Browse":"Explorează","About":"Despre","Profile":"Profil","Sell an item":"Vinde un articol",
             "Search the marketplace...":"Caută în marketplace...","Search":"Caută","Categories":"Categorii",
-            "Give your life a second life.":"Dă-le lucrurilor tale o a doua șansă.","Save the planet. Earn.":"Protejează planeta. Câștigă.",
+            "Give your items a second life.":"Dă-le articolelor tale o a doua viață.","Save the planet. Earn.":"Protejează planeta. Câștigă.",
             "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.":"O modalitate simplă de a păstra lucrurile utile în circulație. Găsește ceva în apropiere, oferă lucrurilor nefolosite o casă nouă și câștigă niște bani.",
             "EXPLORE":"EXPLOREAZĂ","Categories.":"Categorii.","View all →":"Vezi toate →","JUST LISTED":"RECENT ADĂUGATE","Latest items.":"Ultimele articole.","Browse everything →":"Explorează tot →",
             "Loading categories...":"Se încarcă categoriile...","Loading listings...":"Se încarcă anunțurile...",
@@ -75,7 +75,7 @@
         ru: {
             "Home":"Главная","Browse":"Обзор","About":"О нас","Profile":"Профиль","Sell an item":"Продать товар",
             "Search the marketplace...":"Поиск по маркетплейсу...","Search":"Поиск","Categories":"Категории",
-            "Give your life a second life.":"Дай вещам вторую жизнь.","Save the planet. Earn.":"Береги планету. Зарабатывай.",
+            "Give your items a second life.":"Дай своим вещам вторую жизнь.","Save the planet. Earn.":"Береги планету. Зарабатывай.",
             "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.":"Простой способ дать полезным вещам новую жизнь. Найди что-нибудь рядом, передай ненужные вещи новому владельцу и заработай.",
             "EXPLORE":"ИССЛЕДУЙ","Categories.":"Категории.","View all →":"Смотреть все →","JUST LISTED":"ТОЛЬКО ЧТО ДОБАВЛЕНО","Latest items.":"Последние товары.","Browse everything →":"Смотреть всё →",
             "Loading categories...":"Загрузка категорий...","Loading listings...":"Загрузка объявлений...",
