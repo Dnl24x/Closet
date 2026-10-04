@@ -308,7 +308,7 @@ const ClosetListings = (() => {
                 `
                 : `
                     id, seller_id, category_id, title, description, price_mdl, condition, status, location, attributes, created_at, updated_at,
-                    profiles (id, display_name, username, avatar_url),
+                    profiles (id, display_name, username, avatar_url, avatar_color),
                     categories (id, name, slug, parent_id),
                     listing_images (id, image_url, sort_order)
                 `;
@@ -391,28 +391,156 @@ const ClosetListings = (() => {
         }
     }
 
+    async function getSellerListings(userId, { limit = 30 } = {}) {
+        if (!userId) return { success: false, message: "Profile not found.", listings: [] };
+
+        try {
+            const { data, error } = await client.from("listings").select(`
+                id, seller_id, category_id, title, description, price_mdl, condition, status, location, attributes, created_at, updated_at,
+                categories (id, name, slug, parent_id),
+                listing_images (id, image_url, sort_order)
+            `).eq("seller_id", userId).eq("status", "active").order("created_at", { ascending: false }).limit(limit);
+
+            if (error) throw error;
+
+            return { success: true, listings: data || [] };
+        } catch (error) {
+            console.error("CLOSET seller listings error:", error);
+            return { success: false, message: getListingErrorMessage(error), listings: [] };
+        }
+    }
+
     async function updateListing(id, updates = {}) {
         const user = ClosetAuth.getUser();
         if (!user) return { success: false, message: "You need to sign in first." };
         if (!id) return { success: false, message: "Listing not found." };
 
         try {
+            const currentResult = await getListing(id);
+
+            if (!currentResult.success || !currentResult.listing) {
+                return { success: false, message: currentResult.message || "Listing not found." };
+            }
+
+            if (currentResult.listing.seller_id !== user.id) {
+                return { success: false, message: "You can only edit your own listings." };
+            }
+
             const allowedFields = ["category_id", "title", "description", "price_mdl", "condition", "status", "location", "attributes"];
             const allowedUpdates = {};
+
             allowedFields.forEach(field => {
-                if (Object.prototype.hasOwnProperty.call(updates, field)) allowedUpdates[field] = updates[field];
+                if (Object.prototype.hasOwnProperty.call(updates, field)) {
+                    allowedUpdates[field] = updates[field];
+                }
             });
 
-            if ("title" in allowedUpdates) allowedUpdates.title = String(allowedUpdates.title || "").trim();
-            if ("description" in allowedUpdates) allowedUpdates.description = String(allowedUpdates.description || "").trim();
-            if ("location" in allowedUpdates) allowedUpdates.location = String(allowedUpdates.location || "").trim();
-            if ("price_mdl" in allowedUpdates) allowedUpdates.price_mdl = Number(allowedUpdates.price_mdl);
+            if ("title" in allowedUpdates) {
+                allowedUpdates.title = String(allowedUpdates.title || "").trim();
+            }
 
-            const { data, error } = await client.from("listings").update(allowedUpdates)
-                .eq("id", id).eq("seller_id", user.id).select().single();
+            if ("description" in allowedUpdates) {
+                allowedUpdates.description = String(allowedUpdates.description || "").trim();
+            }
 
-            if (error) throw error;
-            return { success: true, listing: data };
+            if ("location" in allowedUpdates) {
+                allowedUpdates.location = String(allowedUpdates.location || "").trim();
+            }
+
+            if ("price_mdl" in allowedUpdates) {
+                allowedUpdates.price_mdl = Number(allowedUpdates.price_mdl);
+            }
+
+            const { error: updateError } = await client
+                .from("listings")
+                .update(allowedUpdates)
+                .eq("id", id)
+                .eq("seller_id", user.id);
+
+            if (updateError) throw updateError;
+
+            if (Array.isArray(updates.images)) {
+                const { data: existingImages, error: imageFetchError } = await client
+                    .from("listing_images")
+                    .select("id, image_url, sort_order")
+                    .eq("listing_id", id)
+                    .order("sort_order", { ascending: true });
+
+                if (imageFetchError) throw imageFetchError;
+
+                const existingById = new Map(
+                    (existingImages || []).map(image => [image.id, image])
+                );
+
+                const keepExistingIds = new Set();
+                const uploaded = [];
+
+                try {
+                    for (let index = 0; index < updates.images.length; index += 1) {
+                        const item = updates.images[index];
+
+                        if (item?.existing && item.imageId && existingById.has(item.imageId)) {
+                            keepExistingIds.add(item.imageId);
+
+                            const { error } = await client
+                                .from("listing_images")
+                                .update({ sort_order: index })
+                                .eq("id", item.imageId)
+                                .eq("listing_id", id);
+
+                            if (error) throw error;
+                            continue;
+                        }
+
+                        if (item?.file) {
+                            const uploadedImage = await uploadImage(item.file, user.id);
+                            uploaded.push(uploadedImage);
+
+                            const { error } = await client.from("listing_images").insert({
+                                listing_id: id,
+                                image_url: uploadedImage.url,
+                                sort_order: index
+                            });
+
+                            if (error) throw error;
+                        }
+                    }
+
+                    const removed = (existingImages || []).filter(
+                        image => !keepExistingIds.has(image.id)
+                    );
+
+                    for (const image of removed) {
+                        const { error } = await client
+                            .from("listing_images")
+                            .delete()
+                            .eq("id", image.id)
+                            .eq("listing_id", id);
+
+                        if (error) throw error;
+
+                        const path = getStoragePath(image.image_url);
+                        if (path) {
+                            await client.storage.from(STORAGE_BUCKET).remove([path]);
+                        }
+                    }
+                } catch (imageError) {
+                    if (uploaded.length) {
+                        await client.storage
+                            .from(STORAGE_BUCKET)
+                            .remove(uploaded.map(item => item.path));
+                    }
+                    throw imageError;
+                }
+            }
+
+            const refreshed = await getListing(id);
+
+            if (!refreshed.success) {
+                return { success: true, listing: { ...currentResult.listing, ...allowedUpdates } };
+            }
+
+            return { success: true, listing: refreshed.listing };
         } catch (error) {
             console.error("CLOSET listing update error:", error);
             return { success: false, message: getListingErrorMessage(error) };
