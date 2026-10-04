@@ -1536,6 +1536,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    function setupLanguageSettings() {
+        if (!elements.settingsLanguage || typeof ClosetI18n === "undefined") {
+            return;
+        }
+
+        elements.settingsLanguage.value = ClosetI18n.getLanguage();
+
+        elements.settingsLanguage.addEventListener("change", () => {
+            ClosetI18n.setLanguage(elements.settingsLanguage.value);
+        });
+
+        window.addEventListener("closet:language-changed", event => {
+            const language = event.detail?.language;
+            if (language && elements.settingsLanguage) {
+                elements.settingsLanguage.value = language;
+            }
+        });
+    }
+
     function setupAuthStateListener() {
         window.addEventListener(
             "closet:auth",
@@ -1557,7 +1576,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupProfileActions();
         setupImagePreview();
         setupNavigationEvents();
-        setupAuthStateListener();
+        setupAuthStateListener();\n        setupLanguageSettings();
 
         const session =
             await ClosetAuth.initialize();
