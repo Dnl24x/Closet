@@ -175,7 +175,10 @@
                 <input type="search" id="browseSearch" placeholder="Search anything..." autocomplete="off">
             </label>
 
-            <button type="button" id="browseCategoryButton" class="secondary-button">Category</button>
+            <div class="browse-category-wrap">
+    <button type="button" id="browseCategoryButton" class="secondary-button" aria-expanded="false">Category</button>
+    <div id="browseCategoryMenu" class="browse-category-menu" hidden></div>
+</div>
 
             <select id="browseLocation" class="filter-select">
                 <option value="">All locations</option>
