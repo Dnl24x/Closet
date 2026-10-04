@@ -11,7 +11,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         selectedSubcategory: null,
         currentListingId: null,
         selectedImages: [],
-        draggedImageId: null
+        draggedImageId: null,
+        editingListingId: null
     };
 
     const elements = {
@@ -89,6 +90,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         myListingsGrid:
             document.getElementById("myListingsGrid"),
+
+        savedListingsGrid:
+            document.getElementById("savedListingsGrid"),
 
         profileReviews:
             document.getElementById("profileReviews"),
@@ -270,85 +274,92 @@ document.addEventListener("DOMContentLoaded", async () => {
         return "";
     }
 
+    function getSavedKey() {
+        const user = ClosetAuth.getUser();
+        return user ? \`closet-saved-listings-\${user.id}\` : "closet-saved-listings-guest";
+    }
+
+    function getSavedIds() {
+        try {
+            const value = JSON.parse(localStorage.getItem(getSavedKey()) || "[]");
+            return Array.isArray(value) ? value : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function isSavedListing(id) {
+        return getSavedIds().includes(id);
+    }
+
+    async function toggleSavedListing(id) {
+        if (!ClosetAuth.isSignedIn()) {
+            showStatus("Sign in to save listings.", "error");
+            return;
+        }
+
+        const ids = getSavedIds();
+        const index = ids.indexOf(id);
+
+        if (index >= 0) ids.splice(index, 1);
+        else ids.push(id);
+
+        localStorage.setItem(getSavedKey(), JSON.stringify(ids));
+        await loadSavedListings();
+        renderVisibleListingHearts();
+    }
+
+    function renderVisibleListingHearts() {
+        document.querySelectorAll("[data-save-listing-id]").forEach(button => {
+            const saved = isSavedListing(button.dataset.saveListingId);
+            button.classList.toggle("is-saved", saved);
+            button.textContent = saved ? "♥" : "♡";
+            button.setAttribute("aria-label", saved ? "Remove from saved" : "Save listing");
+        });
+    }
+
     function createListingCard(listing) {
         const image = getListingImage(listing);
+        const title = escapeHTML(listing?.title || "Untitled item");
+        const category = escapeHTML(getListingCategoryLabel(listing));
+        const subcategory = escapeHTML(getListingSubcategoryLabel(listing));
+        const sellerName = escapeHTML(getProfileName(listing?.profiles));
+        const saved = isSavedListing(listing.id);
+        const ownListing = ClosetAuth.getUser()?.id === listing.seller_id;
 
-        const title =
-            escapeHTML(listing?.title || "Untitled item");
-
-        const category =
-            escapeHTML(
-                getListingCategoryLabel(listing)
-            );
-
-        const subcategory =
-            escapeHTML(
-                getListingSubcategoryLabel(listing)
-            );
-
-        const sellerName =
-            escapeHTML(
-                getProfileName(listing?.profiles)
-            );
-
-        const card =
-            document.createElement("article");
-
+        const card = document.createElement("article");
         card.className = "listing-card";
-
-        card.innerHTML = `
-            <button
-                type="button"
-                class="listing-card-button"
-                data-listing-id="${escapeHTML(listing.id)}"
-                aria-label="View ${title}"
-            >
-                ${
-                    image
-                        ? `
-                            <img
-                                class="listing-image"
-                                src="${escapeHTML(image)}"
-                                alt="${title}"
-                                loading="lazy"
-                            >
-                        `
-                        : `
-                            <div
-                                class="listing-image"
-                                aria-hidden="true"
-                            ></div>
-                        `
-                }
-
-                <div class="listing-card-body">
-
-                    <h3 class="listing-card-title">
-                        ${title}
-                    </h3>
-
-                    <div class="listing-card-meta">
-                        <span>
-                            ${category}
-                            ${
-                                subcategory
-                                    ? ` · ${subcategory}`
-                                    : ""
-                            }
-                        </span>
-
-                        <span>
-                            ${sellerName}
-                        </span>
+        card.innerHTML = \`
+            <div class="listing-card-shell">
+                <button type="button" class="listing-card-button" data-listing-id="\${escapeHTML(listing.id)}" aria-label="View \${title}">
+                    \${image ? \`<img class="listing-image" src="\${escapeHTML(image)}" alt="\${title}" loading="lazy">\` : \`<div class="listing-image" aria-hidden="true"></div>\`}
+                    <div class="listing-card-body">
+                        <h3 class="listing-card-title">\${title}</h3>
+                        <div class="listing-card-meta">
+                            <span>\${category}\${subcategory ? \` · \${subcategory}\` : ""}</span>
+                            <span>\${sellerName}</span>
+                        </div>
+                        <div class="listing-card-price">\${formatPrice(listing.price_mdl)}</div>
                     </div>
-
-                    <div class="listing-card-price">
-                        ${formatPrice(listing.price_mdl)}
-                    </div>
-
+                </button>
+                <div class="listing-card-actions">
+                    <button type="button" class="listing-save-button\${saved ? " is-saved" : ""}" data-save-listing-id="\${escapeHTML(listing.id)}" aria-label="\${saved ? "Remove from saved" : "Save listing"}">\${saved ? "♥" : "♡"}</button>
+                    \${ownListing ? \`<button type="button" class="listing-edit-button" data-edit-listing-id="\${escapeHTML(listing.id)}">Edit</button>\` : ""}
                 </div>
-            </button>
-        `;
+            </div>
+        \`;
+
+        card.querySelector("[data-save-listing-id]")?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleSavedListing(listing.id);
+        });
+
+        card.querySelector("[data-edit-listing-id]")?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+            startEditingListing(listing);
+        });
 
         return card;
     }
@@ -514,6 +525,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             "When you publish an item, it will appear here."
         );
     }
+
+    async function loadSavedListings() {
+        if (!elements.savedListingsGrid) return;
+
+        if (!ClosetAuth.isSignedIn()) {
+            elements.savedListingsGrid.innerHTML = '<div class="empty-state"><h3>Sign in to save items</h3><p>Your saved listings will appear here.</p></div>';
+            return;
+        }
+
+        const ids = getSavedIds();
+        if (!ids.length) {
+            elements.savedListingsGrid.innerHTML = '<div class="empty-state"><h3>No saved listings yet</h3><p>Tap the heart on any listing to save it here.</p></div>';
+            return;
+        }
+
+        const results = await Promise.all(ids.map(id => ClosetListings.getListing(id)));
+        const listings = results.filter(result => result.success).map(result => result.listing);
+        localStorage.setItem(getSavedKey(), JSON.stringify(listings.map(listing => listing.id)));
+
+        renderListings(elements.savedListingsGrid, listings, "No saved listings yet", "Tap the heart on any listing to save it here.");
+    }
+
 
     async function openListing(id) {
         if (
@@ -1132,7 +1165,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!ClosetAuth.isSignedIn()) {
             showFormMessage(messageElement, "Please sign in before publishing an item.");
-            window.setTimeout(() => { window.location.href = "login.html"; }, 500);
+            return;
+        }
+
+        try {
+            await ClosetCategoryPicker.refresh();
+        } catch {
+            showFormMessage(messageElement, "Categories could not be refreshed. Please try again.");
             return;
         }
 
@@ -1143,7 +1182,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const condition = document.getElementById("itemCondition")?.value || "";
         const location = document.getElementById("itemLocation")?.value.trim() || "";
         const description = document.getElementById("itemDescription")?.value.trim() || "";
-        const images = [...(elements.itemImages?.files || [])];
 
         const safety = runListingSafetyCheck({ title, description, location });
         if (!safety.allowed) return showFormMessage(messageElement, safety.message);
@@ -1153,26 +1191,96 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!condition) return showFormMessage(messageElement, "Please choose the item's condition.");
         if (!location) return showFormMessage(messageElement, "Please add a location.");
         if (!description) return showFormMessage(messageElement, "Please add a description.");
-        if (!state.selectedImages.length) return showFormMessage(messageElement, "Please add at least one photo.");
+        if (!state.editingListingId && !state.selectedImages.length) return showFormMessage(messageElement, "Please add at least one photo.");
 
-        setButtonLoading(elements.publishListingButton, true, "Publishing…");
-        const result = await ClosetListings.createListing({
-            title, description, price, categoryId, subcategoryId, condition, location,
-            images: state.selectedImages.map(item => item.file)
-        });
+        setButtonLoading(elements.publishListingButton, true, state.editingListingId ? "Saving…" : "Publishing…");
+
+        const result = state.editingListingId
+            ? await ClosetListings.updateListing(state.editingListingId, {
+                title,
+                description,
+                price_mdl: Number(price),
+                category_id: subcategoryId || categoryId,
+                condition,
+                location
+            })
+            : await ClosetListings.createListing({
+                title,
+                description,
+                price,
+                categoryId,
+                subcategoryId,
+                condition,
+                location,
+                images: state.selectedImages.map(item => item.file)
+            });
+
         setButtonLoading(elements.publishListingButton, false);
-
         if (!result.success) return showFormMessage(messageElement, result.message);
 
+        const editedId = state.editingListingId;
+        state.editingListingId = null;
         state.selectedImages.forEach(item => item.url && URL.revokeObjectURL(item.url));
         state.selectedImages = [];
         elements.listingForm?.reset();
         renderImagePreviews();
         resetCategoryPickers();
+        elements.publishListingButton.textContent = "Publish listing";
 
-        showStatus("Your item has been published.", "success");
-        await Promise.all([loadHomeListings(), loadBrowseListings(), loadMyListings()]);
+        showStatus(editedId ? "Your listing has been updated." : "Your item has been published.", "success");
+        await Promise.all([loadHomeListings(), loadBrowseListings(), loadMyListings(), loadSavedListings()]);
+
         if (result.listing?.id) await openListing(result.listing.id);
+        else if (editedId) await openListing(editedId);
+    }
+
+
+    async function startEditingListing(listing) {
+        if (ClosetAuth.getUser()?.id !== listing?.seller_id) {
+            showStatus("You can only edit your own listings.", "error");
+            return;
+        }
+
+        state.editingListingId = listing.id;
+        state.currentListingId = listing.id;
+
+        const setValue = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) element.value = value ?? "";
+        };
+
+        setValue("itemName", listing.title);
+        setValue("itemPrice", listing.price_mdl);
+        setValue("itemCondition", listing.condition);
+        setValue("itemLocation", listing.location);
+        setValue("itemDescription", listing.description);
+
+        try {
+            await ClosetCategoryPicker.refresh();
+            const categories = await ClosetCategories.getFreshCategories();
+            const selected = categories.find(category => category.id === listing.category_id);
+
+            if (selected) {
+                const parent = selected.parent_id
+                    ? categories.find(category => category.id === selected.parent_id)
+                    : null;
+
+                document.getElementById("categoryPickerValue").textContent = parent?.name || selected.name;
+                document.getElementById("itemCategory").value = parent?.id || selected.id;
+
+                if (parent) {
+                    document.getElementById("subcategoryField").hidden = false;
+                    document.getElementById("subcategoryPickerValue").textContent = selected.name;
+                    document.getElementById("itemSubcategory").value = selected.id;
+                }
+            }
+        } catch {}
+
+        state.selectedImages = [];
+        renderImagePreviews();
+        elements.publishListingButton.textContent = "Save changes";
+        clearFormMessage(document.getElementById("listingFormMessage"));
+        ClosetNavigation.show("sell");
     }
 
     function runListingSafetyCheck({ title, description, location }) {
@@ -1480,6 +1588,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (view === "profile") {
                     await loadProfile();
+                    await loadSavedListings();
                 }
 
                 if (view === "edit-profile") {
