@@ -120,6 +120,10 @@
         return translations[lang]?.[value] ?? value;
     }
 
+    function replaceBrand(value) {
+        return String(value).replace(/CLOSET/g, brand());
+    }
+
     function translateElement(element) {
         if (element.nodeType === Node.TEXT_NODE) {
             const value = element.nodeValue;
@@ -127,7 +131,7 @@
             if (!trimmed) return;
             const translated = translateValue(trimmed);
             if (translated !== trimmed) {
-                element.nodeValue = value.replace(trimmed, translated);
+                element.nodeValue = replaceBrand(value.replace(trimmed, translated));
             }
             return;
         }
@@ -137,7 +141,7 @@
             const value = element.getAttribute(attr);
             if (value) {
                 const translated = translateValue(value);
-                if (translated !== value) element.setAttribute(attr, translated);
+                element.setAttribute(attr, replaceBrand(translated));
             }
         });
         element.childNodes.forEach(translateElement);
@@ -147,17 +151,32 @@
         const lang = getLanguage();
         document.documentElement.lang = lang;
         document.title = "A doua șansă — Moldova Marketplace";
+        translateElement(document.body);
         document.querySelectorAll(".logo, .site-footer strong").forEach(el => {
             el.textContent = brand();
         });
-        translateElement(document.body);
         window.dispatchEvent(new CustomEvent("closet:language-changed", { detail: { language: lang } }));
     }
 
-    function setLanguage(lang) {
+    async function setLanguage(lang, saveToAccount = true) {
         if (!SUPPORTED.includes(lang)) return;
         localStorage.setItem(STORAGE_KEY, lang);
         apply();
+
+        if (
+            saveToAccount &&
+            window.supabaseClient &&
+            typeof ClosetAuth !== "undefined" &&
+            ClosetAuth.isSignedIn()
+        ) {
+            try {
+                await window.supabaseClient.auth.updateUser({
+                    data: { language: lang }
+                });
+            } catch (error) {
+                console.error("CLOSET language preference error:", error);
+            }
+        }
     }
 
     function openPicker(force = false) {
