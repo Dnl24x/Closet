@@ -302,7 +302,7 @@ const ClosetListings = (() => {
             const select = lightweight
                 ? `
                     id, category_id, title, price_mdl, condition, status, location, created_at,
-                    profiles (id, display_name, username, avatar_url),
+                    profiles (id, display_name, username, avatar_url, avatar_color),
                     categories (id, name, slug, parent_id),
                     listing_images (id, image_url, sort_order)
                 `
@@ -358,7 +358,7 @@ const ClosetListings = (() => {
         try {
             const { data, error } = await client.from("listings").select(`
                 id, seller_id, category_id, title, description, price_mdl, condition, status, location, attributes, created_at, updated_at,
-                profiles (id, display_name, username, bio, location, avatar_url, created_at),
+                profiles (id, display_name, username, bio, location, avatar_url, avatar_color, created_at),
                 categories (id, name, slug, parent_id),
                 listing_images (id, image_url, sort_order)
             `).eq("id", id).maybeSingle();
