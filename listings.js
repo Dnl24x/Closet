@@ -134,7 +134,13 @@ const ClosetListings = (() => {
                 listing_images (id, image_url, sort_order)
             \`).eq("status", "active");
 
-            if (categoryId) query = query.eq("category_id", categoryId);
+            if (categoryId) {
+                const children = typeof ClosetCategories !== "undefined"
+                    ? await ClosetCategories.getSubcategories(categoryId)
+                    : [];
+                const categoryIds = [categoryId, ...children.map(item => item.id)];
+                query = query.in("category_id", categoryIds);
+            }
 
             const cleanSearch = String(search || "").trim();
             if (cleanSearch) {
