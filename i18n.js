@@ -529,6 +529,40 @@
     Object.assign(translations.ro, extraTranslations.ro);
     Object.assign(translations.ru, extraTranslations.ru);
 
+    Object.assign(translations.en, {
+        "Use initials": "Use initials",
+        "Avatar background": "Avatar background",
+        "Used behind your initial when no photo is shown.": "Used behind your initial when no photo is shown.",
+        "Photo must be exactly 512 × 512 pixels. JPG, PNG or WebP.": "Photo must be exactly 512 × 512 pixels. JPG, PNG or WebP.",
+        "Profile photos must be exactly 512 × 512 pixels.": "Profile photos must be exactly 512 × 512 pixels.",
+        "Please choose a JPG, PNG or WebP image.": "Please choose a JPG, PNG or WebP image.",
+        "We couldn't read that image. Please choose another one.": "We couldn't read that image. Please choose another one.",
+        "Description": "Description"
+    });
+
+    Object.assign(translations.ro, {
+        "Use initials": "Folosește inițiale",
+        "Avatar background": "Fundal avatar",
+        "Used behind your initial when no photo is shown.": "Folosit în spatele inițialei tale atunci când nu este afișată nicio fotografie.",
+        "Photo must be exactly 512 × 512 pixels. JPG, PNG or WebP.": "Fotografia trebuie să aibă exact 512 × 512 pixeli. JPG, PNG sau WebP.",
+        "Profile photos must be exactly 512 × 512 pixels.": "Fotografiile de profil trebuie să aibă exact 512 × 512 pixeli.",
+        "Please choose a JPG, PNG or WebP image.": "Alege o imagine JPG, PNG sau WebP.",
+        "We couldn't read that image. Please choose another one.": "Imaginea nu a putut fi citită. Alege altă imagine.",
+        "Description": "Descriere"
+    });
+
+    Object.assign(translations.ru, {
+        "Use initials": "Использовать инициалы",
+        "Avatar background": "Фон аватара",
+        "Used behind your initial when no photo is shown.": "Используется за инициалом, когда фотография не отображается.",
+        "Photo must be exactly 512 × 512 pixels. JPG, PNG or WebP.": "Фотография должна быть ровно 512 × 512 пикселей. JPG, PNG или WebP.",
+        "Profile photos must be exactly 512 × 512 pixels.": "Фото профиля должно быть ровно 512 × 512 пикселей.",
+        "Please choose a JPG, PNG or WebP image.": "Выбери изображение JPG, PNG или WebP.",
+        "We couldn't read that image. Please choose another one.": "Не удалось прочитать изображение. Выбери другое.",
+        "Description": "Описание"
+    });
+
+
     function getLanguage() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return SUPPORTED.includes(saved) ? saved : "en";
