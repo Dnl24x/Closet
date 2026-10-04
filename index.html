@@ -635,19 +635,26 @@
                             id="editProfileAvatar"
                             class="profile-avatar large"
                         >
-                            <span>
-                                C
-                            </span>
+                            <span>C</span>
                         </div>
 
-                        <div>
+                        <div class="profile-photo-editor-controls">
+                            <div class="profile-photo-editor-actions">
+                                <label
+                                    for="profileImage"
+                                    class="secondary-button"
+                                >
+                                    Change photo
+                                </label>
 
-                            <label
-                                for="profileImage"
-                                class="secondary-button"
-                            >
-                                Change photo
-                            </label>
+                                <button
+                                    type="button"
+                                    id="removeProfilePhotoButton"
+                                    class="text-button"
+                                >
+                                    Use initials
+                                </button>
+                            </div>
 
                             <input
                                 type="file"
@@ -656,10 +663,20 @@
                                 hidden
                             >
 
-                            <p>
-                                JPG, PNG or WebP.
-                            </p>
+                            <label for="profileAvatarColor">Avatar background</label>
+                            <div class="avatar-color-row">
+                                <input
+                                    type="color"
+                                    id="profileAvatarColor"
+                                    value="#E8E0D6"
+                                    aria-label="Avatar background color"
+                                >
+                                <span>Used behind your initial when no photo is shown.</span>
+                            </div>
 
+                            <p>
+                                Photo must be exactly 512 × 512 pixels. JPG, PNG or WebP.
+                            </p>
                         </div>
 
                     </div>
