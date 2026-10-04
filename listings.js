@@ -182,31 +182,6 @@ const ClosetListings = (() => {
         let listing = null;
 
         try {
-            // Do not read profiles here: the table may intentionally be
-            // unreadable to the browser. Try to create the caller's own
-            // profile instead; if it already exists, PostgreSQL returns the
-            // duplicate-key error and we can safely continue.
-            const displayName = String(
-                user.user_metadata?.name ||
-                user.email?.split("@")[0] ||
-                "A doua șansă user"
-            ).trim().slice(0, 80);
-
-            const { error: profileEnsureError } = await client
-                .from("profiles")
-                .insert({
-                    id: user.id,
-                    display_name: displayName
-                });
-
-            if (
-                profileEnsureError &&
-                profileEnsureError.code !== "23505" &&
-                !String(profileEnsureError.message || "").toLowerCase().includes("duplicate key")
-            ) {
-                throw profileEnsureError;
-            }
-
             const requestedCategoryId = subcategoryId || categoryId;
 
             let finalCategoryId = requestedCategoryId;
@@ -470,14 +445,6 @@ const ClosetListings = (() => {
         const message = String(error?.message || "").toLowerCase();
         if (message.includes("row-level security")) return "You don't have permission to perform that action.";
         if (message.includes("bucket") || message.includes("storage")) return "The image could not be uploaded. Check that the listing image storage bucket and its policies are configured, then try again.";
-        if (
-            message.includes("profiles") &&
-            (message.includes("permission denied") ||
-             message.includes("row-level security") ||
-             message.includes("seller_id"))
-        ) {
-            return "Your seller profile cannot be used for publishing yet. Please sign out and sign back in once, then try again.";
-        }
         if (
             message.includes("category_id") ||
             message.includes("categories_id")
