@@ -172,7 +172,7 @@ const ClosetListings = (() => {
         const displayName = String(
             user.user_metadata?.name ||
             user.email?.split("@")[0] ||
-            "A doua šansă user"
+            "A doua șansă user"
         ).trim().slice(0, 80);
 
         const { error: profileInsertError } = await client
@@ -191,6 +191,8 @@ const ClosetListings = (() => {
         price,
         categoryId,
         subcategoryId,
+        categoryName = "",
+        subcategoryName = "",
         condition,
         location = "",
         attributes = {},
@@ -208,7 +210,62 @@ const ClosetListings = (() => {
         try {
             await ensureSellerProfile(user);
 
-            const finalCategoryId = subcategoryId || categoryId;
+            const requestedCategoryId = subcategoryId || categoryId;
+
+            let finalCategoryId = requestedCategoryId;
+            const { data: categoryById, error: categoryByIdError } = await client
+                .from("categories")
+                .select("id, name, parent_id")
+                .eq("id", requestedCategoryId)
+                .eq("is_active", true)
+                .maybeSingle();
+
+            if (categoryByIdError) throw categoryByIdError;
+
+            if (categoryById) {
+                finalCategoryId = categoryById.id;
+            } else if (subcategoryId && subcategoryName && categoryName) {
+                const { data: parentCategory, error: parentCategoryError } = await client
+                    .from("categories")
+                    .select("id")
+                    .eq("name", categoryName)
+                    .is("parent_id", null)
+                    .eq("is_active", true)
+                    .maybeSingle();
+
+                if (parentCategoryError) throw parentCategoryError;
+
+                if (parentCategory) {
+                    const { data: fallbackSubcategory, error: fallbackSubcategoryError } = await client
+                        .from("categories")
+                        .select("id")
+                        .eq("name", subcategoryName)
+                        .eq("parent_id", parentCategory.id)
+                        .eq("is_active", true)
+                        .maybeSingle();
+
+                    if (fallbackSubcategoryError) throw fallbackSubcategoryError;
+                    if (fallbackSubcategory) finalCategoryId = fallbackSubcategory.id;
+                }
+            } else if (!subcategoryId && categoryName) {
+                const { data: fallbackCategory, error: fallbackCategoryError } = await client
+                    .from("categories")
+                    .select("id")
+                    .eq("name", categoryName)
+                    .is("parent_id", null)
+                    .eq("is_active", true)
+                    .maybeSingle();
+
+                if (fallbackCategoryError) throw fallbackCategoryError;
+                if (fallbackCategory) finalCategoryId = fallbackCategory.id;
+            }
+
+            if (!categoryById && finalCategoryId === requestedCategoryId) {
+                return {
+                    success: false,
+                    message: "The selected category is no longer available. Please refresh the category list and choose another category."
+                };
+            }
 
             const { data: listingData, error: listingError } = await client
                 .from("listings")
