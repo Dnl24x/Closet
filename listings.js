@@ -159,31 +159,6 @@ const ClosetListings = (() => {
         return null;
     }
 
-    async function ensureSellerProfile(user) {
-        const { data: existingProfile, error: profileLookupError } = await client
-            .from("profiles")
-            .select("id")
-            .eq("id", user.id)
-            .maybeSingle();
-
-        if (profileLookupError) throw profileLookupError;
-        if (existingProfile) return;
-
-        const displayName =
-            String(user.user_metadata?.name || user.email?.split("@")[0] || "A doua șansă user")
-                .trim()
-                .slice(0, 80);
-
-        const { error: profileInsertError } = await client
-            .from("profiles")
-            .insert({
-                id: user.id,
-                display_name: displayName
-            });
-
-        if (profileInsertError) throw profileInsertError;
-    }
-
     async function createListing({
         title,
         description,
@@ -205,34 +180,19 @@ const ClosetListings = (() => {
         let listing = null;
 
         try {
-            // Some existing accounts were created before the profile trigger
-            // existed. A listing references profiles(id), so repair that
-            // missing row before attempting the listing insert.
-            await ensureSellerProfile(user);
-
-            // Resolve the category from the live database, never from a cached
-            // UUID. If a subcategory was selected, make sure it actually
-            // belongs to the selected parent category.
-            let categoryQuery = client
+            // Never trust a cached category ID when publishing. Verify the
+            // selected category directly against the current database rows.
+            const requestedCategoryId = subcategoryId || categoryId;
+            const { data: currentCategory, error: categoryError } = await client
                 .from("categories")
                 .select("id, parent_id, is_active")
-                .eq("is_active", true);
-
-            if (subcategoryId) {
-                categoryQuery = categoryQuery
-                    .eq("id", subcategoryId)
-                    .eq("parent_id", categoryId);
-            } else {
-                categoryQuery = categoryQuery
-                    .eq("id", categoryId)
-                    .is("parent_id", null);
-            }
-
-            const { data: currentCategory, error: categoryError } = await categoryQuery.maybeSingle();
+                .eq("id", requestedCategoryId)
+                .eq("is_active", true)
+                .maybeSingle();
 
             if (categoryError) throw categoryError;
             if (!currentCategory) {
-                throw new Error("Selected category could not be matched to the current category list.");
+                throw new Error("Selected category no longer exists. Please refresh the category list and choose another category.");
             }
 
             const finalCategoryId = currentCategory.id;
@@ -462,48 +422,11 @@ const ClosetListings = (() => {
 
     function getListingErrorMessage(error) {
         const message = String(error?.message || "").toLowerCase();
-        const details = String(error?.details || "").toLowerCase();
-        const hint = String(error?.hint || "").toLowerCase();
-        const combined = [message, details, hint].join(" ");
-
-        if (combined.includes("row-level security")) {
-            return "You don't have permission to perform that action.";
-        }
-
-        if (combined.includes("bucket") || combined.includes("storage")) {
-            return "The image could not be uploaded. Check that the listing image storage bucket and its policies are configured, then try again.";
-        }
-
-        // Do not label every foreign-key failure as a category problem.
-        // listings also has seller_id -> profiles.id, and older accounts can
-        // exist without their profile row.
-        if (
-            combined.includes("seller_id") ||
-            combined.includes("listings_seller_id") ||
-            combined.includes("profiles_id")
-        ) {
-            return "Your seller profile is missing. Please try publishing again; A doua șansă will repair it automatically.";
-        }
-
-        if (
-            combined.includes("category_id") ||
-            combined.includes("listings_category_id") ||
-            combined.includes("categories_id")
-        ) {
-            return "The selected category is no longer available. Please choose another category.";
-        }
-
-        if (combined.includes("foreign key")) {
-            return "The listing could not be linked to one of its required records. Please try again.";
-        }
-
-        if (combined.includes("violates check constraint")) {
-            return "One of the listing details is invalid. Please check the information and try again.";
-        }
-
-        if (combined.includes("network") || combined.includes("fetch")) {
-            return "Please check your internet connection and try again.";
-        }
+        if (message.includes("row-level security")) return "You don't have permission to perform that action.";
+        if (message.includes("bucket") || message.includes("storage")) return "The image could not be uploaded. Check that the listing image storage bucket and its policies are configured, then try again.";
+        if (message.includes("foreign key")) return "The selected category is no longer available. Please choose another category.";
+        if (message.includes("violates check constraint")) return "One of the listing details is invalid. Please check the information and try again.";
+        if (message.includes("network") || message.includes("fetch")) return "Please check your internet connection and try again.";
 
         return error?.message || "We couldn't complete that action. Please try again.";
     }
