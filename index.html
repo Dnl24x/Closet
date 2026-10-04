@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>CLOSET — Moldova Fashion Marketplace</title>
+<title>CLOSET — Moldova Marketplace</title>
 <meta
     name="description"
-    content="CLOSET is a fashion marketplace for buying and selling clothes across Moldova."
+    content="CLOSET is a Moldova-focused marketplace for buying and selling almost anything locally."
 >
 
 <link rel="stylesheet" href="style.css">
@@ -116,741 +116,258 @@
          HOME
          ===================================== -->
 
-    <section
-        id="homeView"
-        class="app-view"
-        data-view-section="home"
-    >
+    <section id="homeView" class="app-view" data-view-section="home">
 
-        <div class="hero">
-
+        <div class="hero marketplace-hero">
             <div class="hero-content">
-
-                <p class="eyebrow">
-                    MADE FOR MOLDOVA
-                </p>
-
-                <h1>
-                    Your clothes.<br>
-                    Their next story.
-                </h1>
-
+                <p class="eyebrow">MADE FOR MOLDOVA</p>
+                <h1>Give your life<br> a second life.</h1>
                 <p class="hero-description">
-                    Buy, sell and discover clothes from people
-                    across Moldova. A simpler way to give fashion
-                    a second life.
+                    Buy, sell and discover useful things from people across Moldova.
+                    One local marketplace for the stuff you already have — and the things you're looking for.
                 </p>
-
                 <div class="hero-actions">
-
-                    <button
-                        id="browseButton"
-                        class="primary-button"
-                        type="button"
-                        data-view="browse"
-                    >
-                        Browse clothes
-                    </button>
-
-                    <button
-                        id="heroSellButton"
-                        class="secondary-button"
-                        type="button"
-                        data-view="sell"
-                    >
-                        Sell something
-                    </button>
-
+                    <button id="browseButton" class="primary-button" type="button" data-view="browse">Browse marketplace</button>
+                    <button id="heroSellButton" class="secondary-button" type="button" data-view="sell">Sell something</button>
                 </div>
-
             </div>
-
             <div class="hero-visual">
-
                 <div class="hero-visual-content">
-
-                    <span>SECOND</span>
-                    <strong>LIFE</strong>
-                    <span>FOR FASHION</span>
-
+                    <span>GIVE IT</span><strong>SECOND</strong><span>LIFE</span>
                 </div>
-
             </div>
-
         </div>
 
-
-        <section class="home-introduction">
-
-            <p class="eyebrow">
-                WHY CLOSET?
-            </p>
-
-            <h2>
-                A marketplace built around clothes,
-                not clutter.
-            </h2>
-
+        <section class="home-introduction marketplace-introduction">
+            <p class="eyebrow">CLOSET</p>
+            <h2>Give your life a second life.<br>Save the planet. Earn.</h2>
             <p>
-                CLOSET brings clothing buyers and sellers
-                together in one place, with profiles,
-                real listings and a simpler way to discover
-                fashion across Moldova.
+                A simpler way to keep useful things moving. Find something nearby,
+                give unused items a new home, and make a little money while you're at it.
             </p>
-
         </section>
 
-
-        <section class="home-features">
-
-            <article class="feature-card">
-
-                <span class="feature-number">01</span>
-
-                <h3>
-                    Discover
-                </h3>
-
-                <p>
-                    Find clothing listed by people across
-                    Moldova.
-                </p>
-
-            </article>
-
-
-            <article class="feature-card">
-
-                <span class="feature-number">02</span>
-
-                <h3>
-                    Sell
-                </h3>
-
-                <p>
-                    Create a listing, add your photos and
-                    put your clothes up for sale.
-                </p>
-
-            </article>
-
-
-            <article class="feature-card">
-
-                <span class="feature-number">03</span>
-
-                <h3>
-                    Connect
-                </h3>
-
-                <p>
-                    View seller profiles and build trust
-                    through reviews.
-                </p>
-
-            </article>
-
+        <section class="home-search-section">
+            <div class="home-search-bar">
+                <label class="search-field home-search-field" for="homeSearch">
+                    <span class="sr-only">Search the marketplace</span>
+                    <input type="search" id="homeSearch" placeholder="What are you looking for?" autocomplete="off">
+                </label>
+                <button type="button" id="homeCategoryButton" class="secondary-button home-category-button">Categories</button>
+            </div>
         </section>
 
+        <section class="home-category-section">
+            <div class="section-heading compact-heading">
+                <div>
+                    <p class="eyebrow">EXPLORE</p>
+                    <h2>Categories.</h2>
+                </div>
+                <button type="button" class="text-button" data-view="browse">View all →</button>
+            </div>
+            <div id="homeCategoryStrip" class="home-category-strip" aria-label="Marketplace categories">
+                <div class="listing-loading">Loading categories...</div>
+            </div>
+        </section>
 
         <section class="home-latest">
-
             <div class="section-heading">
-
                 <div>
-
-                    <p class="eyebrow">
-                        JUST LISTED
-                    </p>
-
-                    <h2>
-                        Fresh finds.
-                    </h2>
-
+                    <p class="eyebrow">JUST LISTED</p>
+                    <h2>Latest items.</h2>
                 </div>
-
-                <button
-                    type="button"
-                    class="text-button"
-                    data-view="browse"
-                >
-                    Browse everything →
-                </button>
-
+                <button type="button" class="text-button" data-view="browse">Browse everything →</button>
             </div>
-
-            <div
-                id="homeListingsGrid"
-                class="listing-grid"
-            >
-                <div class="listing-empty">
-                    <p>No listings yet.</p>
-                </div>
+            <div id="homeListingsGrid" class="listing-grid">
+                <div class="listing-loading">Loading listings...</div>
             </div>
-
         </section>
 
     </section>
-
 
     <!-- =====================================
          BROWSE
          ===================================== -->
 
-    <section
-        id="browseView"
-        class="app-view"
-        data-view-section="browse"
-        hidden
-    >
+    <section id="browseView" class="app-view" data-view-section="browse" hidden>
 
         <div class="page-header">
-
-            <p class="eyebrow">
-                EXPLORE CLOSET
-            </p>
-
-            <h1>
-                Find something<br>
-                worth wearing.
-            </h1>
-
-            <p>
-                Discover clothing listed by people
-                across Moldova.
-            </p>
-
+            <p class="eyebrow">EXPLORE CLOSET</p>
+            <h1>Find something<br>worth keeping.</h1>
+            <p>Search local listings from people across Moldova.</p>
         </div>
 
-
-        <div class="browse-controls">
-
-            <label
-                class="search-field"
-                for="browseSearch"
-            >
-
-                <span class="sr-only">
-                    Search listings
-                </span>
-
-                <input
-                    type="search"
-                    id="browseSearch"
-                    placeholder="Search clothes..."
-                    autocomplete="off"
-                >
-
+        <div class="browse-controls marketplace-browse-controls">
+            <label class="search-field browse-search-field" for="browseSearch">
+                <span class="sr-only">Search listings</span>
+                <input type="search" id="browseSearch" placeholder="Search anything..." autocomplete="off">
             </label>
 
+            <button type="button" id="browseCategoryButton" class="secondary-button">Category</button>
 
-            <div
-                id="categoryFilters"
-                class="category-filters"
-                aria-label="Listing categories"
-            >
+            <select id="browseLocation" class="filter-select">
+                <option value="">All locations</option>
+                <option value="Chișinău">Chișinău</option>
+                <option value="Bălți">Bălți</option>
+                <option value="Cahul">Cahul</option>
+                <option value="Orhei">Orhei</option>
+                <option value="Ungheni">Ungheni</option>
+                <option value="Soroca">Soroca</option>
+                <option value="Comrat">Comrat</option>
+                <option value="Other">Other</option>
+            </select>
 
-                <button
-                    type="button"
-                    class="category-filter active"
-                    data-category=""
-                >
-                    All
-                </button>
+            <select id="browseCondition" class="filter-select">
+                <option value="">Any condition</option>
+                <option value="new">New</option>
+                <option value="like_new">Like new</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+                <option value="for_parts">For parts</option>
+            </select>
 
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Tops"
-                >
-                    Tops
-                </button>
-
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Bottoms"
-                >
-                    Bottoms
-                </button>
-
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Dresses"
-                >
-                    Dresses
-                </button>
-
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Outerwear"
-                >
-                    Outerwear
-                </button>
-
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Shoes"
-                >
-                    Shoes
-                </button>
-
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Accessories"
-                >
-                    Accessories
-                </button>
-
-                <button
-                    type="button"
-                    class="category-filter"
-                    data-category="Other"
-                >
-                    Other
-                </button>
-
+            <div class="price-filter">
+                <input type="number" id="browseMinPrice" min="0" step="1" placeholder="Min MDL" aria-label="Minimum price">
+                <span>–</span>
+                <input type="number" id="browseMaxPrice" min="0" step="1" placeholder="Max MDL" aria-label="Maximum price">
             </div>
 
+            <select id="browseSort" class="filter-select">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="price_low">Price: low to high</option>
+                <option value="price_high">Price: high to low</option>
+            </select>
         </div>
 
+        <div id="browseActiveFilters" class="browse-active-filters" hidden></div>
 
-        <div
-            id="browseListingsGrid"
-            class="listing-grid"
-        >
-            <div class="listing-loading">
-                Loading listings...
-            </div>
+        <div id="browseListingsGrid" class="listing-grid">
+            <div class="listing-loading">Loading listings...</div>
         </div>
 
     </section>
-
 
     <!-- =====================================
          SELL
          ===================================== -->
 
-    <section
-        id="sellView"
-        class="app-view"
-        data-view-section="sell"
-        hidden
-    >
+    <section id="sellView" class="app-view" data-view-section="sell" hidden>
 
         <div class="sell-layout">
 
             <div class="sell-introduction">
-
-                <button
-                    type="button"
-                    class="back-button"
-                    data-view="home"
-                >
-                    ← Back
-                </button>
-
-                <p class="eyebrow">
-                    SELL ON CLOSET
-                </p>
-
-                <h1>
-                    Give your clothes<br>
-                    a new home.
-                </h1>
-
-                <p>
-                    Add the details of your item, upload
-                    a photo and publish your listing for
-                    buyers across Moldova.
-                </p>
-
+                <button type="button" class="back-button" data-view="home">← Back</button>
+                <p class="eyebrow">SELL ON CLOSET</p>
+                <h1>Give your things<br>a new home.</h1>
+                <p>Add the details of your item, upload your photos and publish your listing for buyers across Moldova.</p>
                 <div class="sell-note">
-
-                    <strong>
-                        Your listing
-                    </strong>
-
-                    <span>
-                        Your item will be saved to your
-                        CLOSET account and shown in Browse
-                        once published.
-                    </span>
-
+                    <strong>Your listing</strong>
+                    <span>Your item will appear in Browse once published. You can manage it later from your profile.</span>
                 </div>
-
             </div>
-
 
             <div class="form-card">
-
                 <form id="listingForm" novalidate>
 
-                    <div
-                        id="listingFormMessage"
-                        class="form-message"
-                        hidden
-                    ></div>
-
+                    <div id="listingFormMessage" class="form-message" hidden></div>
 
                     <div class="form-group">
-
-                        <label for="itemName">
-                            Item name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="itemName"
-                            name="title"
-                            placeholder="e.g. Vintage denim jacket"
-                            maxlength="100"
-                            required
-                        >
-
+                        <label for="itemName">Title</label>
+                        <input type="text" id="itemName" name="title" placeholder="e.g. Logitech keyboard" maxlength="100" required>
                     </div>
 
+                    <div class="form-group">
+                        <label for="itemPrice">Price</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="itemPrice" name="price" placeholder="450" min="1" max="9999999" step="0.01" required>
+                            <span>MDL</span>
+                        </div>
+                    </div>
 
-                    <div class="form-row">
-
-                        <div class="form-group">
-
-                            <label for="itemPrice">
-                                Price
-                            </label>
-
-                            <div class="input-with-suffix">
-
-                                <input
-                                    type="number"
-                                    id="itemPrice"
-                                    name="price"
-                                    placeholder="450"
-                                    min="1"
-                                    max="9999999"
-                                    step="0.01"
-                                    required
-                                >
-
-                                <span>
-                                    MDL
-                                </span>
-
+                    <div class="form-group category-picker-field">
+                        <label for="categorySearch">Category</label>
+                        <div class="category-picker" id="categoryPicker">
+                            <button type="button" id="categoryPickerTrigger" class="category-picker-trigger" aria-expanded="false" aria-controls="categoryPickerPanel">
+                                <span id="categoryPickerValue">Choose a category</span>
+                                <span class="category-picker-arrow">⌄</span>
+                            </button>
+                            <div id="categoryPickerPanel" class="category-picker-panel" hidden>
+                                <div class="category-search">
+                                    <input type="search" id="categorySearch" placeholder="Search categories..." autocomplete="off">
+                                </div>
+                                <div id="categoryResults" class="category-results"></div>
                             </div>
-
                         </div>
-
-
-                        <div class="form-group category-picker-field">
-
-    <label for="categorySearch">
-        Category
-    </label>
-
-    <div
-        class="category-picker"
-        id="categoryPicker"
-    >
-
-        <button
-            type="button"
-            id="categoryPickerTrigger"
-            class="category-picker-trigger"
-            aria-expanded="false"
-            aria-controls="categoryPickerPanel"
-        >
-            <span id="categoryPickerValue">
-                Choose a category
-            </span>
-
-            <span class="category-picker-arrow">
-                ⌄
-            </span>
-        </button>
-
-
-        <div
-            id="categoryPickerPanel"
-            class="category-picker-panel"
-            hidden
-        >
-
-            <div class="category-search">
-
-                <input
-                    type="search"
-                    id="categorySearch"
-                    placeholder="Search categories..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div
-                id="categoryResults"
-                class="category-results"
-            ></div>
-
-        </div>
-
-    </div>
-
-
-    <input
-        type="hidden"
-        id="itemCategory"
-        name="category"
-        value=""
-    >
-
-</div>
-
-
-<div
-    class="form-group category-picker-field"
-    id="subcategoryField"
-    hidden
->
-
-    <label for="subcategorySearch">
-        Subcategory
-    </label>
-
-
-    <div
-        class="category-picker"
-        id="subcategoryPicker"
-    >
-
-        <button
-            type="button"
-            id="subcategoryPickerTrigger"
-            class="category-picker-trigger"
-            aria-expanded="false"
-            aria-controls="subcategoryPickerPanel"
-        >
-            <span id="subcategoryPickerValue">
-                Choose a subcategory
-            </span>
-
-            <span class="category-picker-arrow">
-                ⌄
-            </span>
-        </button>
-
-
-        <div
-            id="subcategoryPickerPanel"
-            class="category-picker-panel"
-            hidden
-        >
-
-            <div class="category-search">
-
-                <input
-                    type="search"
-                    id="subcategorySearch"
-                    placeholder="Search subcategories..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div
-                id="subcategoryResults"
-                class="category-results"
-            ></div>
-
-        </div>
-
-    </div>
-
-
-    <input
-        type="hidden"
-        id="itemSubcategory"
-        name="subcategory"
-        value=""
-    >
-
-</div>
-
-
-                    <div class="form-row">
-
-                        <div class="form-group">
-
-                            <label for="itemSize">
-                                Size
-                            </label>
-
-                            <select
-                                id="itemSize"
-                                name="size"
-                                required
-                            >
-
-                                <option value="">
-                                    Choose a size
-                                </option>
-
-                                <option value="XS">XS</option>
-                                <option value="S">S</option>
-                                <option value="M">M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                                <option value="XXL">XXL</option>
-                                <option value="Other">Other</option>
-
-                            </select>
-
-                        </div>
-
-
-                        <div class="form-group">
-
-                            <label for="itemCondition">
-                                Condition
-                            </label>
-
-                            <select
-                                id="itemCondition"
-                                name="condition"
-                                required
-                            >
-
-                                <option value="">
-                                    Choose condition
-                                </option>
-
-                                <option value="New">
-                                    New
-                                </option>
-
-                                <option value="Like new">
-                                    Like new
-                                </option>
-
-                                <option value="Good">
-                                    Good
-                                </option>
-
-                                <option value="Fair">
-                                    Fair
-                                </option>
-
-                            </select>
-
-                        </div>
-
+                        <input type="hidden" id="itemCategory" name="category" value="">
                     </div>
 
-
-                    <div class="form-group">
-
-                        <label for="itemDescription">
-                            Description
-                        </label>
-
-                        <textarea
-                            id="itemDescription"
-                            name="description"
-                            placeholder="Tell buyers about the item, its condition and anything they should know..."
-                            maxlength="2000"
-                            rows="7"
-                            required
-                        ></textarea>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="itemImage">
-                            Photos
-                        </label>
-
-                        <div
-                            id="imageUploadArea"
-                            class="image-upload-area"
-                        >
-
-                            <input
-                                type="file"
-                                id="itemImage"
-                                name="image"
-                                accept="image/jpeg,image/png,image/webp"
-                                required
-                            >
-
-                            <label
-                                for="itemImage"
-                                class="image-upload-label"
-                            >
-
-                                <span class="upload-icon">
-                                    +
-                                </span>
-
-                                <strong>
-                                    Add a photo
-                                </strong>
-
-                                <span>
-                                    JPG, PNG or WebP
-                                </span>
-
-                            </label>
-
-                            <div
-                                id="imagePreview"
-                                class="image-preview"
-                                hidden
-                            >
-
-                                <img
-                                    id="imagePreviewImage"
-                                    src=""
-                                    alt="Selected item preview"
-                                >
-
-                                <button
-                                    type="button"
-                                    id="removeImageButton"
-                                    class="remove-image-button"
-                                >
-                                    Remove
-                                </button>
-
+                    <div class="form-group category-picker-field" id="subcategoryField" hidden>
+                        <label for="subcategorySearch">Subcategory</label>
+                        <div class="category-picker" id="subcategoryPicker">
+                            <button type="button" id="subcategoryPickerTrigger" class="category-picker-trigger" aria-expanded="false" aria-controls="subcategoryPickerPanel">
+                                <span id="subcategoryPickerValue">Choose a subcategory</span>
+                                <span class="category-picker-arrow">⌄</span>
+                            </button>
+                            <div id="subcategoryPickerPanel" class="category-picker-panel" hidden>
+                                <div class="category-search">
+                                    <input type="search" id="subcategorySearch" placeholder="Search subcategories..." autocomplete="off">
+                                </div>
+                                <div id="subcategoryResults" class="category-results"></div>
                             </div>
-
                         </div>
-
+                        <input type="hidden" id="itemSubcategory" name="subcategory" value="">
                     </div>
 
+                    <div class="form-group">
+                        <label for="itemCondition">Condition</label>
+                        <select id="itemCondition" name="condition" required>
+                            <option value="">Choose condition</option>
+                            <option value="new">New</option>
+                            <option value="like_new">Like new</option>
+                            <option value="good">Good</option>
+                            <option value="fair">Fair</option>
+                            <option value="for_parts">For parts</option>
+                        </select>
+                    </div>
 
-                    <button
-                        type="submit"
-                        id="publishListingButton"
-                        class="primary-button full-width"
-                    >
-                        Publish item
-                    </button>
+                    <div class="form-group">
+                        <label for="itemLocation">Location</label>
+                        <input type="text" id="itemLocation" name="location" maxlength="100" placeholder="e.g. Chișinău" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemDescription">Description</label>
+                        <textarea id="itemDescription" name="description" placeholder="Tell buyers about the item, its condition and anything they should know..." maxlength="2000" rows="7" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label-row">
+                            <label for="itemImages">Photos</label>
+                            <span id="imageCount" class="field-count">0 / 20</span>
+                        </div>
+
+                        <div id="imageUploadArea" class="image-upload-area multi-image-upload">
+                            <input type="file" id="itemImages" name="images" accept="image/jpeg,image/png,image/webp" multiple hidden>
+                            <label for="itemImages" class="image-upload-label">
+                                <span class="image-upload-icon">＋</span>
+                                <strong>Add photos</strong>
+                                <span>Choose files or drag them here</span>
+                                <small>Up to 20 photos · JPG, PNG or WebP</small>
+                            </label>
+                        </div>
+
+                        <div id="imagePreviewGrid" class="image-preview-grid" aria-live="polite"></div>
+                    </div>
+
+                    <button type="submit" id="publishListingButton" class="primary-button full-width">Publish listing</button>
 
                 </form>
-
             </div>
 
         </div>
 
     </section>
-
 
     <!-- =====================================
          LISTING DETAILS
@@ -1494,8 +1011,7 @@
                 </h1>
 
                 <p class="account-intro">
-                    Create an account to buy and sell
-                    clothes across Moldova.
+                    Create an account to buy and sell things across Moldova.
                 </p>
 
 
@@ -1700,14 +1216,11 @@
             </p>
 
             <h1>
-                Fashion deserves<br>
-                another story.
+                Everything deserves<br>another story.
             </h1>
 
             <p class="about-lead">
-                CLOSET is a Moldova-focused marketplace
-                built around buying, selling and discovering
-                clothing.
+                CLOSET is a Moldova-focused marketplace for buying, selling and discovering useful things locally.
             </p>
 
 
@@ -1720,12 +1233,11 @@
                     </span>
 
                     <h2>
-                        Built for clothing.
+                        Built for second lives.
                     </h2>
 
                     <p>
-                        CLOSET focuses on fashion instead of
-                        trying to be everything for everyone.
+                        CLOSET keeps useful things moving instead of letting them sit unused.
                     </p>
 
                 </div>
@@ -1742,9 +1254,7 @@
                     </h2>
 
                     <p>
-                        The marketplace is designed around
-                        people buying and selling clothes
-                        locally across Moldova.
+                        The marketplace is designed around people buying and selling locally across Moldova.
                     </p>
 
                 </div>
@@ -1790,7 +1300,7 @@
         </strong>
 
         <span>
-            Moldova fashion marketplace
+            Moldova marketplace
         </span>
 
     </div>
