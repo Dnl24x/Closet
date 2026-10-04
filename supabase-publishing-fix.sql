@@ -154,7 +154,61 @@ using (
     )
 );
 
+-- Storage privileges/policies for listing photos.
+grant select, insert, update, delete on storage.objects to authenticated;
+grant select on storage.objects to anon;
+
+drop policy if exists "Public can view listing images" on storage.objects;
+drop policy if exists "Users can upload listing images" on storage.objects;
+drop policy if exists "Users can update their listing images" on storage.objects;
+drop policy if exists "Users can delete their listing images" on storage.objects;
+
+create policy "Public can view listing images"
+on storage.objects
+for select
+to public
+using (bucket_id = 'listing-images');
+
+create policy "Users can upload listing images"
+on storage.objects
+for insert
+to authenticated
+with check (
+    bucket_id = 'listing-images'
+    and owner_id = auth.uid()::text
+);
+
+create policy "Users can update their listing images"
+on storage.objects
+for update
+to authenticated
+using (
+    bucket_id = 'listing-images'
+    and owner_id = auth.uid()::text
+)
+with check (
+    bucket_id = 'listing-images'
+    and owner_id = auth.uid()::text
+);
+
+create policy "Users can delete their listing images"
+on storage.objects
+for delete
+to authenticated
+using (
+    bucket_id = 'listing-images'
+    and owner_id = auth.uid()::text
+);
+
 -- Ensure future signups always receive a profile.
+-- Repair profile rows for accounts that already existed before the trigger.
+insert into public.profiles (id, display_name)
+select
+    u.id,
+    coalesce(u.raw_user_meta_data ->> 'name', '')
+from auth.users u
+on conflict (id) do nothing;
+
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
