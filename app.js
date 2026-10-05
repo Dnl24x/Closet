@@ -168,19 +168,99 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function setupOfflineIndicator() {
         const banner = elements.offlineBanner;
-        if (!banner) return;
+        let offline = navigator.onLine === false;
+        let probeTimer = null;
+        let probeInFlight = false;
 
-        // navigator.onLine is only a hint and can be wrong on phones.
-        // Show the banner only after a real app request fails.
         const setStatus = online => {
-            banner.hidden = online;
+            offline = !online;
+
+            if (banner) {
+                banner.hidden = online;
+            }
+
             document.body.classList.toggle("is-offline", !online);
         };
 
-        setStatus(true);
-        window.addEventListener("closet:network", event => {
-            setStatus(event.detail?.online !== false);
+        const probeConnection = async () => {
+            if (probeInFlight) return;
+            probeInFlight = true;
+
+            if (navigator.onLine === false) {
+                setStatus(false);
+                probeInFlight = false;
+                return;
+            }
+
+            const config = window.CLOSET_SUPABASE_CONFIG;
+
+            if (!config?.url || !config?.key) {
+                setStatus(true);
+                probeInFlight = false;
+                return;
+            }
+
+            const controller = new AbortController();
+            const timeout = window.setTimeout(() => controller.abort(), 5000);
+
+            try {
+                const response = await fetch(
+                    config.url + "/auth/v1/settings?closet_probe=" + Date.now(),
+                    {
+                        method: "GET",
+                        headers: {
+                            apikey: config.key
+                        },
+                        cache: "no-store",
+                        signal: controller.signal
+                    }
+                );
+
+                // Any HTTP response means the device can reach Supabase.
+                setStatus(true);
+            } catch (error) {
+                // Only expose the offline UI when the browser itself says it
+                // has no network. A Supabase/API failure is not the same thing
+                // as the user's Wi-Fi/mobile data being disconnected.
+                setStatus(navigator.onLine !== false);
+            } finally {
+                window.clearTimeout(timeout);
+                probeInFlight = false;
+            }
+        };
+
+        setStatus(!offline);
+
+        window.addEventListener("offline", () => {
+            setStatus(false);
         });
+
+        window.addEventListener("online", () => {
+            void probeConnection();
+        });
+
+        window.addEventListener("closet:network", event => {
+            if (event.detail?.online === false && navigator.onLine === false) {
+                setStatus(false);
+            } else if (event.detail?.online !== false) {
+                setStatus(true);
+            }
+        });
+
+        window.ClosetNetwork = {
+            isOffline: () => navigator.onLine === false || offline,
+            probe: probeConnection
+        };
+
+        void probeConnection();
+        probeTimer = window.setInterval(probeConnection, 15000);
+
+        window.addEventListener("pagehide", () => {
+            if (probeTimer) {
+                window.clearInterval(probeTimer);
+                probeTimer = null;
+            }
+        }, { once: true });
     }
 
     function showFormMessage(element, message, type = "error") {
