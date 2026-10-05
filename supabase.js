@@ -13,6 +13,11 @@ if (!window.supabase) {
     return;
 }
 
+window.CLOSET_SUPABASE_CONFIG = {
+    url: SUPABASE_URL,
+    key: SUPABASE_PUBLISHABLE_KEY
+};
+
 window.supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
