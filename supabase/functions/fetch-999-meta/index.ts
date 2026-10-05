@@ -33,21 +33,65 @@ function stripTags(value: string) {
         .trim();
 }
 
+function getTagAttributes(tag: string) {
+    const attrs: Record<string, string> = {};
+    const attrPattern = /([a-zA-Z_:][a-zA-Z0-9_:.-]*)\\s*=\\s*(["'])(.*?)\\2/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = attrPattern.exec(tag)) !== null) {
+        attrs[match[1].toLowerCase()] = decodeEntities(match[3]);
+    }
+
+    return attrs;
+}
+
 function pageTitle(html: string) {
-    const match = html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i);
+    const match = html.match(/<title\\b[^>]*>([\\s\\S]*?)<\\/title>/i);
     return match?.[1] ? decodeEntities(stripTags(match[1])) : "";
 }
 
-function meta(html: string, name: string) {
-    const escaped = name.replace(/[.*+?^\\{}()|[\]\\]/g, "\\$&");
-    const patterns = [
-        new RegExp(`<meta[^>]+(?:property|name)=[\\"']${escaped}[\\"'][^>]+content=[\\"']([^\\\"']*)[\\\"'][^>]*>`, "i"),
-        new RegExp(`<meta[^>]+content=[\\"']([^\\\"']*)[\\\"'][^>]+(?:property|name)=[\\"']${escaped}[\\"'][^>]*>`, "i")
-    ];
+function firstHeading(html: string) {
+    const match = html.match(/<h1\\b[^>]*>([\\s\\S]*?)<\\/h1>/i);
+    return match?.[1] ? stripTags(match[1]) : "";
+}
 
-    for (const pattern of patterns) {
-        const match = html.match(pattern);
-        if (match?.[1]) return decodeEntities(match[1]);
+function meta(html: string, name: string) {
+    const wanted = String(name || "").toLowerCase();
+    const tags = html.match(/<meta\\b[^>]*>/gi) || [];
+
+    for (const tag of tags) {
+        const attrs = getTagAttributes(tag);
+        const key = String(attrs.property || attrs.name || "").toLowerCase();
+
+        if (key === wanted && attrs.content) {
+            return attrs.content;
+        }
+    }
+
+    return "";
+}
+
+function firstImage(html: string, pageUrl: URL) {
+    const tags = html.match(/<img\\b[^>]*>/gi) || [];
+
+    for (const tag of tags) {
+        const attrs = getTagAttributes(tag);
+        const candidate =
+            attrs.src ||
+            attrs["data-src"] ||
+            attrs["data-lazy-src"] ||
+            "";
+
+        if (!candidate) continue;
+
+        const absolute = absoluteUrl(candidate, pageUrl);
+
+        if (
+            absolute &&
+            /i\\.simpalsmedia\\.com\\/999\\.md\\//i.test(absolute)
+        ) {
+            return absolute;
+        }
     }
 
     return "";
