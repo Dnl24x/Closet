@@ -303,5 +303,5 @@ create extension if not exists pg_cron;
 select cron.schedule(
     'cancel-expired-unpaid-orders',
     '*/5 * * * *',
-    $select public.cancel_expired_unpaid_orders();$
+    $$select public.cancel_expired_unpaid_orders();$$
 );
