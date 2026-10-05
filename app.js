@@ -757,6 +757,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
                     </div>
 
+                    ${
+                        ownListing
+                            ? '<div class="listing-owner-status">' +
+                              '<span class="listing-owner-status-label">Listing status</span>' +
+                              '<div class="listing-owner-status-actions">' +
+                              '<button type="button" class="status-action-button" data-detail-status="active">Active</button>' +
+                              '<button type="button" class="status-action-button" data-detail-status="reserved">Reserved</button>' +
+                              '<button type="button" class="status-action-button" data-detail-status="sold">Sold</button>' +
+                              '</div></div>'
+                            : ""
+                    }
+
                     <div class="protection-card">
                         <strong>Buying Protection</strong>
                         <p>A future A doua șansă buying feature. We'll announce when it becomes available.</p>
@@ -793,6 +805,47 @@ document.addEventListener("DOMContentLoaded", async () => {
             void startEditingListing(listing);
         });
 
+        elements.listingDetailsContent.querySelectorAll("[data-detail-status]").forEach(button => {
+            button.addEventListener("click", async event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const nextStatus = event.currentTarget.dataset.detailStatus;
+
+                if (!["active", "reserved", "sold"].includes(nextStatus)) {
+                    return;
+                }
+
+                const buttons =
+                    elements.listingDetailsContent.querySelectorAll("[data-detail-status]");
+
+                buttons.forEach(item => {
+                    item.disabled = true;
+                });
+
+                try {
+                    const result =
+                        await ClosetListings.updateListing(
+                            listing.id,
+                            { status: nextStatus }
+                        );
+
+                    if (!result.success) {
+                        window.alert(result.message);
+                        return;
+                    }
+
+                    await openListing(
+                        listing.id,
+                        { preserveBack: true }
+                    );
+                } finally {
+                    buttons.forEach(item => {
+                        item.disabled = false;
+                    });
+                }
+            });
+        });
         elements.listingDetailsContent.querySelector("[data-detail-profile-id]")?.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
