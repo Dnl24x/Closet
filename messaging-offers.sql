@@ -295,24 +295,13 @@ grant update (read_at) on table public.messages to authenticated;
 revoke update on table public.conversations from authenticated;
 grant update (updated_at) on table public.conversations to authenticated;
 
--- Enable pg_cron in Supabase Dashboard > Database > Extensions before running the schedule.
-do $$
-declare
-    existing_job_id bigint;
-begin
-    select jobid into existing_job_id
-    from cron.job
-    where jobname = 'cancel-expired-unpaid-orders'
-    limit 1;
-
-    if existing_job_id is not null then
-        perform cron.unschedule(existing_job_id);
-    end if;
-end
-$$;
+-- Supabase Cron
+-- Enable pg_cron from Supabase Dashboard > Integrations > Cron
+-- (or Database > Extensions, depending on the Dashboard view) before running this block.
+create extension if not exists pg_cron;
 
 select cron.schedule(
     'cancel-expired-unpaid-orders',
     '*/5 * * * *',
-    $$select public.cancel_expired_unpaid_orders();$$
+    $select public.cancel_expired_unpaid_orders();$
 );
