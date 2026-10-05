@@ -5,6 +5,17 @@
 
     const translations = {
         en: {
+            "Listing status": "Listing status",
+            "Active": "Active",
+            "Reserved": "Reserved",
+            "Sold": "Sold",
+            "Resend verification email": "Resend verification email",
+            "Verify your email": "Verify your email",
+            "For security purposes, open your Gmail and click the verification link from A doua șansă.": "For security purposes, open your Gmail and click the verification link from A doua șansă.",
+            "Open Gmail": "Open Gmail",
+            "Done": "Done",
+            "Thank you for verifying.": "Thank you for verifying.",
+            "You can now continue your experience. Your email has been verified successfully. You can now start selling.": "You can now continue your experience. Your email has been verified successfully. You can now start selling.",
             "Home":"Home","Browse":"Browse","About":"About","Profile":"Profile","Sell an item":"Sell an item",
             "Search the marketplace...":"Search the marketplace...","Search":"Search","Categories":"Categories",
             "Give your items a second life.":"Give your items a second life.","Save the planet. Earn.":"Save the planet. Earn.",
@@ -39,6 +50,17 @@
             "Electronics & Phones":"Electronics & Phones","Computers & PC Hardware":"Computers & PC Hardware","Cars & Auto Parts":"Cars & Auto Parts","Home & Garden":"Home & Garden","Clothing & Shoes":"Clothing & Shoes","Gaming":"Gaming","Books & Education":"Books & Education","Tools & Equipment":"Tools & Equipment","Kids & Baby":"Kids & Baby","Pets & Pet Supplies":"Pets & Pet Supplies","Music & Instruments":"Music & Instruments","Sports & Outdoors":"Sports & Outdoors","Collectibles & Vintage":"Collectibles & Vintage","Jewelry & Accessories":"Jewelry & Accessories","Property":"Property","Jobs & Services":"Jobs & Services","Other":"Other"
         },
         ro: {
+            "Listing status": "Starea anunțului",
+            "Active": "Activ",
+            "Reserved": "Rezervat",
+            "Sold": "Vândut",
+            "Resend verification email": "Retrimite emailul de verificare",
+            "Verify your email": "Verifică-ți adresa de email",
+            "For security purposes, open your Gmail and click the verification link from A doua șansă.": "Pentru securitate, deschide Gmail și apasă pe linkul de verificare trimis de A doua șansă.",
+            "Open Gmail": "Deschide Gmail",
+            "Done": "Gata",
+            "Thank you for verifying.": "Îți mulțumim că ai verificat.",
+            "You can now continue your experience. Your email has been successfully verified. You can now start selling.": "Poți continua. Adresa ta de email a fost verificată cu succes. Acum poți începe să vinzi.",
             "Home":"Acasă","Browse":"Explorează","About":"Despre","Profile":"Profil","Sell an item":"Vinde un articol",
             "Search the marketplace...":"Caută în marketplace...","Search":"Caută","Categories":"Categorii",
             "Give your items a second life.":"Dă-le articolelor tale o a doua viață.","Save the planet. Earn.":"Protejează planeta. Câștigă.",
@@ -73,6 +95,17 @@
             "Electronics & Phones":"Electronice și telefoane","Computers & PC Hardware":"Calculatoare și componente","Cars & Auto Parts":"Mașini și piese auto","Home & Garden":"Casă și grădină","Clothing & Shoes":"Îmbrăcăminte și încălțăminte","Gaming":"Jocuri","Books & Education":"Cărți și educație","Tools & Equipment":"Unelte și echipamente","Kids & Baby":"Copii și bebeluși","Pets & Pet Supplies":"Animale și accesorii","Music & Instruments":"Muzică și instrumente","Sports & Outdoors":"Sport și activități în aer liber","Collectibles & Vintage":"Colecționabile și vintage","Jewelry & Accessories":"Bijuterii și accesorii","Property":"Imobiliare","Jobs & Services":"Locuri de muncă și servicii","Other":"Altele"
         },
         ru: {
+            "Listing status": "Статус объявления",
+            "Active": "Активно",
+            "Reserved": "Зарезервировано",
+            "Sold": "Продано",
+            "Resend verification email": "Отправить письмо подтверждения снова",
+            "Verify your email": "Подтвердите свою почту",
+            "For security purposes, open your Gmail and click the verification link from A doua șansă.": "В целях безопасности откройте Gmail и нажмите ссылку подтверждения от A doua șansă.",
+            "Open Gmail": "Открыть Gmail",
+            "Done": "Готово",
+            "Thank you for verifying.": "Спасибо за подтверждение.",
+            "You can now continue your experience. Your email has been successfully verified. You can now start selling.": "Можно продолжить. Ваш email успешно подтверждён. Теперь вы можете начать продавать.",
             "Home":"Главная","Browse":"Обзор","About":"О нас","Profile":"Профиль","Sell an item":"Продать товар",
             "Search the marketplace...":"Поиск по маркетплейсу...","Search":"Поиск","Categories":"Категории",
             "Give your items a second life.":"Дай своим вещам вторую жизнь.","Save the planet. Earn.":"Береги планету. Зарабатывай.",
@@ -851,7 +884,7 @@
     "Temporary phone number": "Временный номер телефона"
 });
 
-        function getLanguage() {
+    function getLanguage() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return SUPPORTED.includes(saved) ? saved : "en";
     }
@@ -860,7 +893,7 @@
 
     function translateValue(value) {
         const lang = getLanguage();
-        return extraTranslations[lang]?.[value] ?? translations[lang]?.[value] ?? value;
+        return translations[lang]?.[value] ?? value;
     }
 
     function replaceBrand(value) {
