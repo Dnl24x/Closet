@@ -156,6 +156,34 @@ const ClosetListings = (() => {
         if (!description || String(description).trim().length < 5) return "Please add a description.";
         if (!Array.isArray(images) || images.length === 0) return "Please add at least one photo.";
         if (images.length > MAX_IMAGES) return `You can upload up to ${MAX_IMAGES} photos.`;
+
+        for (const image of images) {
+            if (image?.file) {
+                if (!ALLOWED_IMAGE_TYPES.has(image.file.type)) {
+                    return "Please choose a JPG, PNG or WebP image.";
+                }
+                continue;
+            }
+
+            if (image?.imported && image?.url) {
+                try {
+                    const importedUrl = new URL(image.url);
+                    const hostname = importedUrl.hostname.toLowerCase();
+                    if (
+                        importedUrl.protocol !== "https:" ||
+                        !(hostname === "i.simpalsmedia.com" || hostname.endsWith(".simpalsmedia.com"))
+                    ) {
+                        return "The imported 999.md photo URL is not supported.";
+                    }
+                } catch {
+                    return "The imported photo URL is invalid.";
+                }
+                continue;
+            }
+
+            return "One of the selected photos is invalid. Please remove it and try again.";
+        }
+
         return null;
     }
 
@@ -258,8 +286,15 @@ const ClosetListings = (() => {
             listing = listingData;
 
             for (let index = 0; index < images.length; index += 1) {
-                const image = await uploadImage(images[index], user.id);
-                uploaded.push(image);
+                const item = images[index];
+
+                const image = item?.imported && item?.url
+                    ? { path: null, url: item.url }
+                    : await uploadImage(item?.file || item, user.id);
+
+                if (image.path) {
+                    uploaded.push(image);
+                }
 
                 const { error: imageError } = await client.from("listing_images").insert({
                     listing_id: listing.id,
