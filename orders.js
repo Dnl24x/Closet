@@ -11,7 +11,8 @@
     const nameInput = document.getElementById("novaBuyerName");
     const phoneInput = document.getElementById("novaBuyerPhone");
     const cityInput = document.getElementById("novaBuyerCity");
-    const pickupInput = document.getElementById("novaBuyerPickup");
+    const pickupTypeInput = document.getElementById("novaBuyerPickupTypeValue");
+    const pickupNumberInput = document.getElementById("novaBuyerPickupNumber");
     const listingTitle = document.getElementById("novaPostListingTitle");
     const listingPrice = document.getElementById("novaPostListingPrice");
 
@@ -49,14 +50,14 @@
                 button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
             });
 
-        if (pickupInput) pickupInput.value = "locker";
+        if (pickupTypeInput) pickupTypeInput.value = "locker";
 
         if (formStep) formStep.hidden = false;
         if (successStep) successStep.hidden = true;
     }
 
     function selectedPickupType() {
-        return pickupInput?.value === "branch" ? "branch" : "locker";
+        return pickupTypeInput?.value === "branch" ? "branch" : "locker";
     }
 
     function open(listing, seller) {
@@ -100,7 +101,7 @@
                 ? "branch"
                 : "locker";
 
-            if (pickupInput) pickupInput.value = type;
+            if (pickupTypeInput) pickupTypeInput.value = type;
 
             document
                 .querySelectorAll("#novaPostPickupType button")
@@ -139,9 +140,7 @@
         const phone = (phoneInput?.value || "").replace(/\s+/g, "");
         const city = cityInput?.value.trim() || "";
         const pickup = pickupInput?.value || "locker";
-        const pickupNumber = pickupInput
-            ? (document.getElementById("novaBuyerPickup")?.value || "").trim()
-            : "";
+        const pickupNumber = pickupNumberInput?.value.trim() || "";
 
         if (fullName.length < 2) {
             showMessage("Please enter your full name.");
