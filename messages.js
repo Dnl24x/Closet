@@ -37,6 +37,41 @@
         return isNetworkError(error) && navigator.onLine === false;
     }
 
+    async function getAuthenticatedUser() {
+        try {
+            const { data, error } = await client.auth.getUser();
+
+            if (error) {
+                console.error("A doua șansă: auth check failed:", error);
+                return { user: null, error };
+            }
+
+            return {
+                user: data?.user || ClosetAuth.getUser() || null,
+                error: null
+            };
+        } catch (error) {
+            console.error("A doua șansă: auth check crashed:", error);
+            return { user: null, error };
+        }
+    }
+
+    function describeSupabaseError(error) {
+        const code = String(error?.code || "").toUpperCase();
+        const status = Number(error?.status || error?.statusCode || 0);
+        const message = String(error?.message || "").toLowerCase();
+
+        if (code === "42501" || status === 401 || status === 403) {
+            return t("Your session is not authorized to access messages. Please sign in again.");
+        }
+
+        if (code === "42P01" || message.includes("could not find the table")) {
+            return t("The messaging table could not be found in Supabase.");
+        }
+
+        return t("There was a problem reaching your conversations. Please try again.");
+    }
+
     function showRetry(container, heading, message) {
         if (!container) return;
 
@@ -85,8 +120,22 @@
     }
     async function loadConversations(showLoading=true){
         const list=el.list(); if(!list)return false;
-        const user=ClosetAuth.getUser();
-        if(!user){list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("Sign in to see your messages"))+"</h3><p>"+esc(t("Your conversations will appear here."))+"</p></div>";return false;}
+        const auth = await getAuthenticatedUser();
+        const user = auth.user;
+
+        if(!user){
+            if (auth.error && !isActuallyOffline(auth.error)) {
+                showRetry(
+                    list,
+                    t("We couldn't load your messages"),
+                    describeSupabaseError(auth.error)
+                );
+                return false;
+            }
+
+            list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("Sign in to see your messages"))+"</h3><p>"+esc(t("Your conversations will appear here."))+"</p></div>";
+            return false;
+        }
         if(showLoading)list.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
         const result=await client.from("conversations").select("id,buyer_id,seller_id,listing_id,updated_at").or("buyer_id.eq."+user.id+",seller_id.eq."+user.id).order("updated_at",{ascending:false});
         if(result.error){
@@ -99,7 +148,7 @@
                 showRetry(
                     list,
                     t("We couldn't load your messages"),
-                    t("There was a problem reaching your conversations. Please try again.")
+                    describeSupabaseError(result.error)
                 );
             }
             return false;
@@ -122,7 +171,20 @@
         return true;
     }
     async function loadThread(id,showLoading=true){
-        const user=ClosetAuth.getUser(),box=el.messages();if(!user||!box)return;
+        const auth = await getAuthenticatedUser();
+        const user = auth.user;
+        const box = el.messages();
+
+        if(!user||!box){
+            if (box && auth.error && !isActuallyOffline(auth.error)) {
+                showRetry(
+                    box,
+                    t("Messages could not be loaded"),
+                    describeSupabaseError(auth.error)
+                );
+            }
+            return;
+        }
         if(showLoading)box.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
         const result=await client.from("messages").select("id,sender_id,body,created_at").eq("conversation_id",id).order("created_at",{ascending:true});
         if(result.error){
@@ -148,7 +210,40 @@
     }
     async function openConversation(id){
         state.activeConversationId=id;const thread=el.thread(),empty=el.empty();if(!thread||!empty)return;empty.hidden=true;thread.hidden=false;document.getElementById("messagesShell")?.classList.add("is-thread-open");
-        const user=ClosetAuth.getUser(),c=(await client.from("conversations").select("id,buyer_id,seller_id,listing_id").eq("id",id).single()).data;if(!c||!user)return;
+        const auth = await getAuthenticatedUser();
+        const user = auth.user;
+
+        if (!user) {
+            if (auth.error && !isActuallyOffline(auth.error)) {
+                showRetry(
+                    el.messages(),
+                    t("Messages could not be loaded"),
+                    describeSupabaseError(auth.error)
+                );
+            }
+            return;
+        }
+
+        const conversationResult = await client
+            .from("conversations")
+            .select("id,buyer_id,seller_id,listing_id")
+            .eq("id",id)
+            .single();
+
+        if (conversationResult.error) {
+            console.error("A doua șансă: conversation open failed:", conversationResult.error);
+
+            showRetry(
+                el.messages(),
+                t("Messages could not be loaded"),
+                isActuallyOffline(conversationResult.error)
+                    ? t("You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.")
+                    : describeSupabaseError(conversationResult.error)
+            );
+            return;
+        }
+
+        const c = conversationResult.data;
         const oid=c.buyer_id===user.id?c.seller_id:c.buyer_id;
         const profile=(await client.from("profiles").select("id,display_name,username,avatar_url").eq("id",oid).maybeSingle()).data;
         const listing=c.listing_id?(await client.from("listings").select("id,title,price_mdl").eq("id",c.listing_id).maybeSingle()).data:null;
