@@ -35,7 +35,7 @@ function stripTags(value: string) {
 
 function getTagAttributes(tag: string) {
     const attrs: Record<string, string> = {};
-    const attrPattern = /([a-zA-Z_:][a-zA-Z0-9_:.-]*)\\s*=\\s*(["'])(.*?)\\2/g;
+    const attrPattern = /([a-zA-Z_:][a-zA-Z0-9_:.-]*)\s*=\s*(["'])(.*?)\2/g;
     let match: RegExpExecArray | null;
 
     while ((match = attrPattern.exec(tag)) !== null) {
@@ -46,18 +46,18 @@ function getTagAttributes(tag: string) {
 }
 
 function pageTitle(html: string) {
-    const match = html.match(/<title\\b[^>]*>([\\s\\S]*?)<\\/title>/i);
+    const match = html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i);
     return match?.[1] ? decodeEntities(stripTags(match[1])) : "";
 }
 
 function firstHeading(html: string) {
-    const match = html.match(/<h1\\b[^>]*>([\\s\\S]*?)<\\/h1>/i);
+    const match = html.match(/<h1\b[^>]*>([\s\S]*?)<\\/h1>/i);
     return match?.[1] ? stripTags(match[1]) : "";
 }
 
 function meta(html: string, name: string) {
     const wanted = String(name || "").toLowerCase();
-    const tags = html.match(/<meta\\b[^>]*>/gi) || [];
+    const tags = html.match(/<meta\b[^>]*>/gi) || [];
 
     for (const tag of tags) {
         const attrs = getTagAttributes(tag);
@@ -72,7 +72,7 @@ function meta(html: string, name: string) {
 }
 
 function firstImage(html: string, pageUrl: URL) {
-    const tags = html.match(/<img\\b[^>]*>/gi) || [];
+    const tags = html.match(/<img\b[^>]*>/gi) || [];
 
     for (const tag of tags) {
         const attrs = getTagAttributes(tag);
@@ -88,7 +88,7 @@ function firstImage(html: string, pageUrl: URL) {
 
         if (
             absolute &&
-            /i\\.simpalsmedia\\.com\\/999\\.md\\//i.test(absolute)
+            /i\.simpalsmedia\\.com\\/999\.md\\//i.test(absolute)
         ) {
             return absolute;
         }
@@ -287,18 +287,22 @@ Deno.serve(async request => {
         const title =
             meta(html, "og:title") ||
             meta(html, "twitter:title") ||
-            pageTitle(html);
+            pageTitle(html) ||
+            firstHeading(html);
 
         const description =
             meta(html, "og:description") ||
             meta(html, "description") ||
             "";
 
-        const imageUrl = absoluteUrl(
+        const imageMeta =
             meta(html, "og:image") ||
-            meta(html, "twitter:image"),
-            sourceUrl
-        );
+            meta(html, "twitter:image") ||
+            "";
+
+        const imageUrl =
+            absoluteUrl(imageMeta, sourceUrl) ||
+            firstImage(html, sourceUrl);
 
         const sourcePrice = detectPrice(html);
 
