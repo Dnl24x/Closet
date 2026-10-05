@@ -14,7 +14,6 @@
         list: () => document.getElementById("conversationList"),
         thread: () => document.getElementById("messageThread"),
         empty: () => document.getElementById("messageThreadEmpty"),
-        header: () => document.getElementById("messageThreadHeader"),
         headerContent: () => document.getElementById("messageThreadHeaderContent"),
         mobileBack: () => document.getElementById("messagesMobileBack"),
         messages: () => document.getElementById("messageList"),
@@ -39,22 +38,17 @@
 
     function time(value) {
         const date = new Date(value);
-        return Number.isNaN(date.getTime())
-            ? ""
-            : date.toLocaleString(undefined, {
-                day: "numeric",
-                month: "short",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-    }
 
-    function notifyNetwork(online) {
-        window.dispatchEvent(
-            new CustomEvent("closet:network", {
-                detail: { online }
-            })
-        );
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        return date.toLocaleString(undefined, {
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
     }
 
     function isNetworkError(error) {
@@ -77,6 +71,14 @@
         }
 
         return isNetworkError(error) && navigator.onLine === false;
+    }
+
+    function notifyNetwork(online) {
+        window.dispatchEvent(
+            new CustomEvent("closet:network", {
+                detail: { online }
+            })
+        );
     }
 
     async function getAuthenticatedUser() {
@@ -136,15 +138,17 @@
     }
 
     function showRetry(container, heading, message) {
-        if (!container) return;
+        if (!container) {
+            return;
+        }
 
         container.innerHTML =
-            "<div class="empty-state">" +
-            "<h3>" + esc(heading) + "</h3>" +
-            "<p>" + esc(message) + "</p>" +
-            "<button type="button" class="secondary-button message-retry-button">" +
-            esc(t("Try again")) +
-            "</button>" +
+            "<div class='empty-state'>" +
+                "<h3>" + esc(heading) + "</h3>" +
+                "<p>" + esc(message) + "</p>" +
+                "<button type='button' class='secondary-button message-retry-button'>" +
+                    esc(t("Try again")) +
+                "</button>" +
             "</div>";
 
         container.querySelector(".message-retry-button")?.addEventListener(
@@ -163,9 +167,12 @@
     function updateUnreadBadge(total) {
         const badge = document.getElementById("messagesUnreadBadge");
 
-        if (!badge) return;
+        if (!badge) {
+            return;
+        }
 
         const count = Number(total) || 0;
+
         badge.textContent = count > 99 ? "99+" : String(count);
         badge.hidden = count <= 0;
     }
@@ -181,10 +188,7 @@
         stopRefresh();
 
         state.refreshTimer = setInterval(() => {
-            if (
-                state.activeConversationId &&
-                navigator.onLine !== false
-            ) {
+            if (state.activeConversationId && navigator.onLine !== false) {
                 void loadThread(state.activeConversationId, false);
             }
 
@@ -205,15 +209,15 @@
             };
         }
 
-        const buyerId = user.id;
-        const sellerId = otherUserId;
-
         const pairs = [
-            [buyerId, sellerId],
-            [sellerId, buyerId]
+            [user.id, otherUserId],
+            [otherUserId, user.id]
         ];
 
-        for (const [first, second] of pairs) {
+        for (const pair of pairs) {
+            const first = pair[0];
+            const second = pair[1];
+
             let query = client
                 .from("conversations")
                 .select("id,buyer_id,seller_id,listing_id")
@@ -224,16 +228,16 @@
                 ? query.eq("listing_id", listingId)
                 : query.is("listing_id", null);
 
-            const found = await query.maybeSingle();
+            const result = await query.maybeSingle();
 
-            if (found.error) {
-                throw found.error;
+            if (result.error) {
+                throw result.error;
             }
 
-            if (found.data) {
+            if (result.data) {
                 return {
                     success: true,
-                    conversation: found.data
+                    conversation: result.data
                 };
             }
         }
@@ -241,25 +245,20 @@
         const created = await client
             .from("conversations")
             .insert({
-                buyer_id: buyerId,
-                seller_id: sellerId,
+                buyer_id: user.id,
+                seller_id: otherUserId,
                 listing_id: listingId || null
             })
             .select("id,buyer_id,seller_id,listing_id")
             .single();
 
         if (created.error) {
-            const retryPairs = [
-                [buyerId, sellerId],
-                [sellerId, buyerId]
-            ];
-
-            for (const [first, second] of retryPairs) {
+            for (const pair of pairs) {
                 let retryQuery = client
                     .from("conversations")
                     .select("id,buyer_id,seller_id,listing_id")
-                    .eq("buyer_id", first)
-                    .eq("seller_id", second);
+                    .eq("buyer_id", pair[0])
+                    .eq("seller_id", pair[1]);
 
                 retryQuery = listingId
                     ? retryQuery.eq("listing_id", listingId)
@@ -301,12 +300,12 @@
             [otherUserId, user.id]
         ];
 
-        for (const [first, second] of pairs) {
+        for (const pair of pairs) {
             let query = client
                 .from("conversations")
                 .select("id,buyer_id,seller_id,listing_id")
-                .eq("buyer_id", first)
-                .eq("seller_id", second);
+                .eq("buyer_id", pair[0])
+                .eq("seller_id", pair[1]);
 
             query = listingId
                 ? query.eq("listing_id", listingId)
@@ -340,11 +339,14 @@
             .order("created_at", { ascending: true });
 
         if (result.error) {
-            const errorText = String(result.error.message || "").toLowerCase();
+            const text = String(result.error.message || "").toLowerCase();
 
             if (
-                errorText.includes("read_at") ||
-                errorText.includes("column") && errorText.includes("messages")
+                text.includes("read_at") ||
+                (
+                    text.includes("column") &&
+                    text.includes("messages")
+                )
             ) {
                 result = await client
                     .from("messages")
@@ -353,14 +355,64 @@
                     .order("created_at", { ascending: true });
 
                 return {
-                    ...result,
+                    data: result.data || [],
+                    error: result.error,
                     hasReadState: false
                 };
             }
         }
 
         return {
-            ...result,
+            data: result.data || [],
+            error: result.error,
+            hasReadState: true
+        };
+    }
+
+    async function fetchConversationSummaryMessages(conversationIds) {
+        if (!conversationIds.length) {
+            return {
+                data: [],
+                error: null,
+                hasReadState: false
+            };
+        }
+
+        let result = await client
+            .from("messages")
+            .select("id,conversation_id,sender_id,body,created_at,read_at")
+            .in("conversation_id", conversationIds)
+            .order("created_at", { ascending: false })
+            .limit(1000);
+
+        if (result.error) {
+            const text = String(result.error.message || "").toLowerCase();
+
+            if (
+                text.includes("read_at") ||
+                (
+                    text.includes("column") &&
+                    text.includes("messages")
+                )
+            ) {
+                result = await client
+                    .from("messages")
+                    .select("id,conversation_id,sender_id,body,created_at")
+                    .in("conversation_id", conversationIds)
+                    .order("created_at", { ascending: false })
+                    .limit(1000);
+
+                return {
+                    data: result.data || [],
+                    error: result.error,
+                    hasReadState: false
+                };
+            }
+        }
+
+        return {
+            data: result.data || [],
+            error: result.error,
             hasReadState: true
         };
     }
@@ -368,7 +420,9 @@
     async function loadConversations(showLoading = true) {
         const list = el.list();
 
-        if (!list) return false;
+        if (!list) {
+            return false;
+        }
 
         const auth = await getAuthenticatedUser();
         const user = auth.user;
@@ -386,7 +440,7 @@
             }
 
             list.innerHTML =
-                "<div class="empty-state"><h3>" +
+                "<div class='empty-state'><h3>" +
                 esc(t("Sign in to see your messages")) +
                 "</h3><p>" +
                 esc(t("Your conversations will appear here.")) +
@@ -397,7 +451,7 @@
 
         if (showLoading) {
             list.innerHTML =
-                "<div class="message-list-loading">" +
+                "<div class='message-list-loading'>" +
                 esc(t("Loading messages…")) +
                 "</div>";
         }
@@ -405,7 +459,7 @@
         const conversationFields =
             "id,buyer_id,seller_id,listing_id,updated_at";
 
-        const [buyerResult, sellerResult] = await Promise.all([
+        const results = await Promise.all([
             client
                 .from("conversations")
                 .select(conversationFields)
@@ -416,7 +470,7 @@
                 .eq("seller_id", user.id)
         ]);
 
-        const firstError = buyerResult.error || sellerResult.error;
+        const firstError = results[0].error || results[1].error;
 
         if (firstError) {
             console.error(
@@ -428,7 +482,7 @@
                 notifyNetwork(false);
 
                 list.innerHTML =
-                    "<div class="empty-state"><h3>" +
+                    "<div class='empty-state'><h3>" +
                     esc(t("You are offline")) +
                     "</h3><p>" +
                     esc(t("Reconnect to Wi-Fi or mobile data to load your messages.")) +
@@ -446,16 +500,16 @@
 
         notifyNetwork(true);
 
-        const conversationMap = new Map();
+        const map = new Map();
 
         [
-            ...(buyerResult.data || []),
-            ...(sellerResult.data || [])
+            ...(results[0].data || []),
+            ...(results[1].data || [])
         ].forEach(conversation => {
-            conversationMap.set(conversation.id, conversation);
+            map.set(conversation.id, conversation);
         });
 
-        const conversations = [...conversationMap.values()]
+        const conversations = [...map.values()]
             .sort(
                 (a, b) =>
                     new Date(b.updated_at).getTime() -
@@ -466,7 +520,7 @@
             updateUnreadBadge(0);
 
             list.innerHTML =
-                "<div class="empty-state"><h3>" +
+                "<div class='empty-state'><h3>" +
                 esc(t("No conversations yet")) +
                 "</h3><p>" +
                 esc(t("When you message a seller, your conversations will appear here.")) +
@@ -489,11 +543,7 @@
             .map(conversation => conversation.listing_id)
             .filter(Boolean);
 
-        const [
-            profilesResult,
-            listingsResult,
-            messageResult
-        ] = await Promise.all([
+        const [profilesResult, listingsResult] = await Promise.all([
             client
                 .from("profiles")
                 .select("id,display_name,username,avatar_url,avatar_color")
@@ -503,28 +553,11 @@
                     .from("listings")
                     .select("id,title,price_mdl,seller_id")
                     .in("id", listingIds)
-                : Promise.resolve({ data: [], error: null }),
-            client
-                .from("messages")
-                .select("id,conversation_id,sender_id,body,created_at")
-                .in(
-                    "conversation_id",
-                    conversations.map(conversation => conversation.id)
-                )
-                .order("created_at", { ascending: false })
-                .limit(1000)
+                : Promise.resolve({ data: [], error: null })
         ]);
 
-        if (profilesResult.error || listingsResult.error || messageResult.error) {
-            const error =
-                profilesResult.error ||
-                listingsResult.error ||
-                messageResult.error;
-
-            console.error(
-                "A doua șansă: message list enrichment failed:",
-                error
-            );
+        if (profilesResult.error || listingsResult.error) {
+            const error = profilesResult.error || listingsResult.error;
 
             showRetry(
                 list,
@@ -537,30 +570,49 @@
             return false;
         }
 
-        const profiles = profilesResult.data || [];
-        const listings = listingsResult.data || [];
-        const messages = messageResult.data || [];
+        const summary = await fetchConversationSummaryMessages(
+            conversations.map(conversation => conversation.id)
+        );
+
+        if (summary.error) {
+            showRetry(
+                list,
+                t("We couldn't load your messages"),
+                isActuallyOffline(summary.error)
+                    ? t("You are offline. Reconnect to Wi-Fi or mobile data to load your messages.")
+                    : t("There was a problem loading your message list. Please try again.")
+            );
+
+            return false;
+        }
 
         const profileMap = new Map(
-            profiles.map(profile => [profile.id, profile])
+            (profilesResult.data || []).map(profile => [
+                profile.id,
+                profile
+            ])
         );
 
         const listingMap = new Map(
-            listings.map(listing => [listing.id, listing])
+            (listingsResult.data || []).map(listing => [
+                listing.id,
+                listing
+            ])
         );
 
-        const latestMessageMap = new Map();
+        const latestMap = new Map();
         const unreadMap = new Map();
 
-        messages.forEach(messageRow => {
-            if (!latestMessageMap.has(messageRow.conversation_id)) {
-                latestMessageMap.set(
-                    messageRow.conversation_id,
-                    messageRow
-                );
+        (summary.data || []).forEach(messageRow => {
+            if (!latestMap.has(messageRow.conversation_id)) {
+                latestMap.set(messageRow.conversation_id, messageRow);
             }
 
-            if (messageRow.sender_id !== user.id && !messageRow.read_at) {
+            if (
+                summary.hasReadState &&
+                messageRow.sender_id !== user.id &&
+                !messageRow.read_at
+            ) {
                 unreadMap.set(
                     messageRow.conversation_id,
                     (unreadMap.get(messageRow.conversation_id) || 0) + 1
@@ -569,7 +621,6 @@
         });
 
         let totalUnread = 0;
-
         list.innerHTML = "";
 
         conversations.forEach(conversation => {
@@ -580,7 +631,7 @@
 
             const profile = profileMap.get(otherId) || {};
             const listing = listingMap.get(conversation.listing_id) || {};
-            const latest = latestMessageMap.get(conversation.id);
+            const latest = latestMap.get(conversation.id);
             const unread = unreadMap.get(conversation.id) || 0;
 
             totalUnread += unread;
@@ -590,16 +641,20 @@
                     ? listing.seller_id === user.id
                     : conversation.seller_id === user.id;
 
-            const role = isSeller ? t("Seller") : t("Buyer");
+            const role = isSeller
+                ? t("Seller")
+                : t("Buyer");
 
-            let preview = latest?.body || t("No messages yet.");
+            let preview =
+                latest?.body ||
+                t("No messages yet.");
 
             if (latest?.sender_id === user.id) {
                 preview = t("You: ") + preview;
             }
 
             const avatar = profile.avatar_url
-                ? "<img src="" + esc(profile.avatar_url) + "" alt="">"
+                ? "<img src='" + esc(profile.avatar_url) + "' alt=''>"
                 : esc(
                     (
                         profile.display_name ||
@@ -612,39 +667,49 @@
             button.type = "button";
             button.className =
                 "conversation-item" +
-                (state.activeConversationId === conversation.id
-                    ? " is-active"
-                    : "") +
-                (unread ? " has-unread" : "");
-
-            button.innerHTML =
-                "<span class="conversation-avatar">" +
-                avatar +
-                "</span>" +
-                "<span class="conversation-copy">" +
-                "<strong>" +
-                esc(profile.display_name || profile.username || t("A doua șansă member")) +
-                "</strong>" +
-                "<span class="conversation-copy-listing">" +
-                esc(listing.title || t("Marketplace")) +
-                "</span>" +
-                "<span class="conversation-copy-meta">" +
-                esc(role) +
-                " · " +
-                esc(preview) +
-                "</span>" +
-                "</span>" +
-                "<span class="conversation-side">" +
-                "<time>" +
-                esc(time(conversation.updated_at)) +
-                "</time>" +
                 (
-                    unread
-                        ? "<span class="conversation-unread-badge">" +
-                          (unread > 99 ? "99+" : String(unread)) +
-                          "</span>"
+                    state.activeConversationId === conversation.id
+                        ? " is-active"
                         : ""
                 ) +
+                (
+                    unread
+                        ? " has-unread"
+                        : ""
+                );
+
+            button.innerHTML =
+                "<span class='conversation-avatar'>" +
+                    avatar +
+                "</span>" +
+                "<span class='conversation-copy'>" +
+                    "<strong>" +
+                        esc(
+                            profile.display_name ||
+                            profile.username ||
+                            t("A doua șansă member")
+                        ) +
+                    "</strong>" +
+                    "<span class='conversation-copy-listing'>" +
+                        esc(listing.title || t("Marketplace")) +
+                    "</span>" +
+                    "<span class='conversation-copy-meta'>" +
+                        esc(role) +
+                        " · " +
+                        esc(preview) +
+                    "</span>" +
+                "</span>" +
+                "<span class='conversation-side'>" +
+                    "<time>" +
+                        esc(time(conversation.updated_at)) +
+                    "</time>" +
+                    (
+                        unread
+                            ? "<span class='conversation-unread-badge'>" +
+                                (unread > 99 ? "99+" : String(unread)) +
+                              "</span>"
+                            : ""
+                    ) +
                 "</span>";
 
             button.addEventListener(
@@ -666,7 +731,11 @@
         const box = el.messages();
 
         if (!user || !box) {
-            if (box && auth.error && !isActuallyOffline(auth.error)) {
+            if (
+                box &&
+                auth.error &&
+                !isActuallyOffline(auth.error)
+            ) {
                 showRetry(
                     box,
                     t("Messages could not be loaded"),
@@ -679,7 +748,7 @@
 
         if (showLoading) {
             box.innerHTML =
-                "<div class="message-list-loading">" +
+                "<div class='message-list-loading'>" +
                 esc(t("Loading messages…")) +
                 "</div>";
         }
@@ -688,7 +757,7 @@
 
         if (result.error) {
             console.error(
-                "A doua șансă: thread load failed:",
+                "A doua șансa: thread load failed:",
                 result.error
             );
 
@@ -696,7 +765,7 @@
                 notifyNetwork(false);
 
                 box.innerHTML =
-                    "<div class="empty-state"><p>" +
+                    "<div class='empty-state'><p>" +
                     esc(
                         t(
                             "You are offline. Reconnect to Wi-Fi or mobile data to load this conversation."
@@ -728,19 +797,14 @@
                 .map(messageRow => messageRow.id);
 
             if (unreadIds.length) {
-                const { error: readError } = await client
+                const readResult = await client
                     .from("messages")
                     .update({
                         read_at: new Date().toISOString()
                     })
                     .in("id", unreadIds);
 
-                if (readError) {
-                    console.warn(
-                        "A doua șанса: unable to mark messages read:",
-                        readError
-                    );
-                } else {
+                if (!readResult.error) {
                     void loadConversations(false);
                 }
             }
@@ -764,7 +828,10 @@
             box.clientHeight <
             120;
 
-        if (!showLoading && signature === state.lastThreadSignature) {
+        if (
+            !showLoading &&
+            signature === state.lastThreadSignature
+        ) {
             return;
         }
 
@@ -774,7 +841,7 @@
 
         if (!rows.length) {
             box.innerHTML =
-                "<div class="message-thread-empty-inline">" +
+                "<div class='message-thread-empty-inline'>" +
                 esc(t("No messages yet. Say hello!")) +
                 "</div>";
         } else {
@@ -789,13 +856,13 @@
                             : "is-other"
                     );
 
-                const text = document.createElement("p");
-                text.textContent = messageRow.body;
+                const textNode = document.createElement("p");
+                textNode.textContent = messageRow.body;
 
                 const timestamp = document.createElement("time");
                 timestamp.textContent = time(messageRow.created_at);
 
-                bubble.append(text, timestamp);
+                bubble.append(textNode, timestamp);
                 box.appendChild(bubble);
             });
         }
@@ -808,7 +875,9 @@
     async function loadThreadHeader(conversation, user) {
         const content = el.headerContent();
 
-        if (!content) return;
+        if (!content) {
+            return;
+        }
 
         const otherId =
             conversation.buyer_id === user.id
@@ -844,17 +913,29 @@
                     .limit(1)
                     .maybeSingle();
 
-                listingImage = imageResult.data?.image_url || "";
+                listingImage =
+                    imageResult.data?.image_url || "";
             }
         }
 
-        state.activeSellerId = listing?.seller_id || otherId;
-        state.activeListingId = conversation.listing_id || null;
+        state.activeSellerId =
+            listing?.seller_id ||
+            otherId;
+
+        state.activeListingId =
+            conversation.listing_id || null;
+
+        const profileName =
+            profile.display_name ||
+            profile.username ||
+            t("A doua șansă member");
 
         const safetyHtml =
-            "<div class="message-safety-notice">" +
+            "<div class='message-safety-notice'>" +
                 "<div>" +
-                    "<strong>" + esc(t("Beware of scams")) + "</strong>" +
+                    "<strong>" +
+                        esc(t("Beware of scams")) +
+                    "</strong>" +
                     "<span>" +
                         esc(
                             t(
@@ -863,55 +944,63 @@
                         ) +
                     "</span>" +
                 "</div>" +
-                "<a href="scam-policy.html">" +
+                "<a href='scam-policy.html'>" +
                     esc(t("Read our scam policy")) +
                 "</a>" +
             "</div>";
 
         const listingHtml = listing
             ? (
-                "<button type="button" class="message-listing-card" data-message-listing-id="" +
-                esc(listing.id) +
-                "">" +
-                    "<span class="message-listing-card-image">" +
+                "<button type='button' class='message-listing-card' data-message-listing-id='" +
+                    esc(listing.id) +
+                "'>" +
+                    "<span class='message-listing-card-image'>" +
                         (
                             listingImage
-                                ? "<img src="" + esc(listingImage) + "" alt="" loading="lazy" decoding="async">"
-                                : "<span aria-hidden="true"></span>"
+                                ? "<img src='" +
+                                    esc(listingImage) +
+                                  "' alt='' loading='lazy' decoding='async' onerror=\"this.onerror=null;this.src='fallback-placeholder.svg';\">"
+                                : "<span aria-hidden='true'></span>"
                         ) +
                     "</span>" +
-                    "<span class="message-listing-card-copy">" +
-                        "<strong>" + esc(listing.title || t("Listing")) + "</strong>" +
+                    "<span class='message-listing-card-copy'>" +
+                        "<strong>" +
+                            esc(listing.title || t("Listing")) +
+                        "</strong>" +
                         "<span>" +
-                            esc(
+                            (
                                 Number.isFinite(Number(listing.price_mdl))
                                     ? Number(listing.price_mdl).toLocaleString("en-US") + " MDL"
                                     : ""
                             ) +
                         "</span>" +
-                        "<small>" + esc(t("Open listing")) + " →</small>" +
+                        "<small>" +
+                            esc(t("Open listing")) +
+                            " →" +
+                        "</small>" +
                     "</span>" +
                 "</button>"
             )
             : "";
 
-        const profileName =
-            profile.display_name ||
-            profile.username ||
-            t("A doua șansă member");
-
         content.innerHTML =
-            "<div class="message-thread-person">" +
-                "<div class="conversation-avatar large">" +
+            "<div class='message-thread-person'>" +
+                "<div class='conversation-avatar large'>" +
                     (
                         profile.avatar_url
-                            ? "<img src="" + esc(profile.avatar_url) + "" alt="">"
+                            ? "<img src='" +
+                                esc(profile.avatar_url) +
+                              "' alt=''>"
                             : esc(profileName.charAt(0).toUpperCase())
                     ) +
                 "</div>" +
                 "<div>" +
-                    "<strong>" + esc(profileName) + "</strong>" +
-                    "<span>" + esc(t("Private conversation")) + "</span>" +
+                    "<strong>" +
+                        esc(profileName) +
+                    "</strong>" +
+                    "<span>" +
+                        esc(t("Private conversation")) +
+                    "</span>" +
                 "</div>" +
             "</div>" +
             safetyHtml +
@@ -919,15 +1008,18 @@
 
         content
             .querySelector("[data-message-listing-id]")
-            ?.addEventListener("click", () => {
-                window.dispatchEvent(
-                    new CustomEvent("closet:open-listing", {
-                        detail: {
-                            listingId: conversation.listing_id
-                        }
-                    })
-                );
-            });
+            ?.addEventListener(
+                "click",
+                () => {
+                    window.dispatchEvent(
+                        new CustomEvent("closet:open-listing", {
+                            detail: {
+                                listingId: conversation.listing_id
+                            }
+                        })
+                    );
+                }
+            );
     }
 
     async function openConversation(id) {
@@ -937,7 +1029,9 @@
         const thread = el.thread();
         const empty = el.empty();
 
-        if (!thread || !empty) return;
+        if (!thread || !empty) {
+            return;
+        }
 
         empty.hidden = true;
         thread.hidden = false;
@@ -961,34 +1055,26 @@
             return;
         }
 
-        const conversationResult = await client
+        const result = await client
             .from("conversations")
             .select("id,buyer_id,seller_id,listing_id")
             .eq("id", id)
             .single();
 
-        if (conversationResult.error) {
-            console.error(
-                "A doua șansă: conversation open failed:",
-                conversationResult.error
-            );
-
+        if (result.error) {
             showRetry(
                 el.messages(),
                 t("Messages could not be loaded"),
-                isActuallyOffline(conversationResult.error)
+                isActuallyOffline(result.error)
                     ? t("You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.")
-                    : describeSupabaseError(conversationResult.error)
+                    : describeSupabaseError(result.error)
             );
 
             return;
         }
 
-        const conversation = conversationResult.data;
-
-        await loadThreadHeader(conversation, user);
+        await loadThreadHeader(result.data, user);
         await loadThread(id);
-
         await loadConversations(false);
         startRefresh();
     }
@@ -1006,12 +1092,16 @@
 
         const body = input.value.trim();
 
-        if (!body) return;
+        if (!body) {
+            return;
+        }
 
-        const button =
-            el.composer()?.querySelector("button[type=submit]");
+        const sendButton =
+            el.composer()?.querySelector("button[type='submit']");
 
-        if (button) button.disabled = true;
+        if (sendButton) {
+            sendButton.disabled = true;
+        }
 
         const result = await client
             .from("messages")
@@ -1021,34 +1111,25 @@
                 body
             });
 
-        if (button) button.disabled = false;
+        if (sendButton) {
+            sendButton.disabled = false;
+        }
 
         if (result.error) {
-            if (isActuallyOffline(result.error)) {
-                notifyNetwork(false);
-
-                window.dispatchEvent(
-                    new CustomEvent("closet:message-error", {
-                        detail: {
-                            message: t("You are offline. Your message was not sent.")
-                        }
-                    })
-                );
-            } else {
-                window.dispatchEvent(
-                    new CustomEvent("closet:message-error", {
-                        detail: {
-                            message: t("Message could not be sent.")
-                        }
-                    })
-                );
-            }
+            window.dispatchEvent(
+                new CustomEvent("closet:message-error", {
+                    detail: {
+                        message: isActuallyOffline(result.error)
+                            ? t("You are offline. Your message was not sent.")
+                            : t("Message could not be sent.")
+                    }
+                })
+            );
 
             return;
         }
 
         notifyNetwork(true);
-
         input.value = "";
         state.lastThreadSignature = "";
 
@@ -1087,15 +1168,12 @@
             }
 
             ClosetNavigation.show("messages");
-
-            await openConversation(
-                result.conversation.id
-            );
+            await openConversation(result.conversation.id);
 
             return result.conversation;
         } catch (error) {
             console.error(
-                "A doua шансa messaging error:",
+                "A doua șansă messaging error:",
                 error
             );
 
@@ -1112,7 +1190,9 @@
     }
 
     function initialize() {
-        if (state.initialized) return;
+        if (state.initialized) {
+            return;
+        }
 
         state.initialized = true;
         notifyNetwork(true);
@@ -1132,8 +1212,13 @@
 
                 stopRefresh();
 
-                if (el.thread()) el.thread().hidden = true;
-                if (el.empty()) el.empty().hidden = false;
+                if (el.thread()) {
+                    el.thread().hidden = true;
+                }
+
+                if (el.empty()) {
+                    el.empty().hidden = false;
+                }
 
                 document
                     .getElementById("messagesShell")
@@ -1164,9 +1249,7 @@
         window.addEventListener(
             "closet:auth",
             () => {
-                if (
-                    ClosetNavigation.getCurrentView() === "messages"
-                ) {
+                if (ClosetNavigation.getCurrentView() === "messages") {
                     void loadConversations();
                 }
             }
