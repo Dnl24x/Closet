@@ -639,3 +639,21 @@ create index if not exists messages_unread_idx
 on public.messages(conversation_id, sender_id, read_at)
 where read_at is null;
 
+-- --------------------------------------------
+-- SECURITY HARDENING: LIMIT CLIENT UPDATES
+-- --------------------------------------------
+-- Conversation participants only need to advance updated_at from the client.
+-- They must not be able to rewrite buyer/seller/listing ownership fields.
+revoke update on table public.conversations from authenticated;
+grant update (updated_at) on table public.conversations to authenticated;
+
+-- Message recipients only need to mark received messages as read.
+-- They must not be able to rewrite message body, sender, or conversation.
+revoke update on table public.messages from authenticated;
+grant update (read_at) on table public.messages to authenticated;
+
+-- Offer status is the only mutable offer field exposed to the client.
+-- Amount, participants, listing and conversation remain immutable after creation.
+revoke update on table public.offers from authenticated;
+grant update (status) on table public.offers to authenticated;
+
