@@ -11,7 +11,9 @@
         lastThreadSignature: "",
         lastThreadMessageIds: new Set(),
         lastKnownUnreadCount: null,
-        audioContext: null
+        audioContext: null,
+        activeListing: null,
+        activeOtherName: ""
     };
 
     const el = {
@@ -853,24 +855,200 @@
         return true;
     }
 
+    async function fetchOfferRows(conversationId) {
+        const result = await client
+            .from("offers")
+            .select(
+                "id,conversation_id,listing_id,buyer_id,seller_id,amount_mdl,percentage_below,counter_amount_mdl,status,created_at,updated_at"
+            )
+            .eq("conversation_id", conversationId)
+            .order("created_at", { ascending: true });
+
+        return {
+            data: result.data || [],
+            error: result.error
+        };
+    }
+
+    function offerEffectiveAmount(offer) {
+        if (
+            offer?.status === "accepted" &&
+            Number.isFinite(Number(offer.counter_amount_mdl))
+        ) {
+            return Number(offer.counter_amount_mdl);
+        }
+
+        if (
+            offer?.status === "countered" &&
+            Number.isFinite(Number(offer.counter_amount_mdl))
+        ) {
+            return Number(offer.counter_amount_mdl);
+        }
+
+        return Number(offer?.amount_mdl) || 0;
+    }
+
+    function makeOfferCard(offer, user) {
+        const card = document.createElement("div");
+        card.className = "offer-message-card offer-message-" + String(offer.status || "pending");
+
+        const isBuyer = user.id === offer.buyer_id;
+        const isSeller = user.id === offer.seller_id;
+        const originalAmount = Number(offer.amount_mdl) || 0;
+        const counterAmount = Number(offer.counter_amount_mdl);
+        const effectiveAmount = offerEffectiveAmount(offer);
+
+        const heading = document.createElement("strong");
+        const amount = document.createElement("div");
+        amount.className = "offer-message-amount";
+
+        const detail = document.createElement("p");
+        detail.className = "offer-message-detail";
+
+        const actions = document.createElement("div");
+        actions.className = "offer-message-actions";
+
+        const addAction = (label, action, primary = false) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className =
+                (primary ? "primary-button" : "secondary-button") +
+                " offer-action-button";
+            button.textContent = label;
+            button.addEventListener("click", async event => {
+                event.preventDefault();
+                button.disabled = true;
+
+                try {
+                    if (action === "buy-now") {
+                        const opened =
+                            await window.CLOSETOrders?.openAcceptedOffer?.(
+                                offer,
+                                state.activeListing,
+                                { id: state.activeSellerId }
+                            );
+
+                        if (!opened) {
+                            button.disabled = false;
+                        }
+                        return;
+                    }
+
+                    const success =
+                        await window.CLOSETOffers?.respondToOffer?.(
+                            offer,
+                            action
+                        );
+
+                    if (!success) {
+                        button.disabled = false;
+                    }
+                } catch (error) {
+                    console.error("A doua șansă offer action error:", error);
+                    button.disabled = false;
+                }
+            });
+            actions.appendChild(button);
+        };
+
+        if (offer.status === "pending") {
+            heading.textContent =
+                isSeller
+                    ? t("New offer")
+                    : t("Your offer");
+
+            amount.textContent =
+                originalAmount.toLocaleString("en-US") + " MDL";
+
+            detail.textContent =
+                originalAmount.toLocaleString("en-US") +
+                " MDL · " +
+                Number(offer.percentage_below).toLocaleString("en-US") +
+                "% below asking price";
+
+            if (isSeller) {
+                addAction(t("Accept"), "accept", true);
+                addAction(t("Decline"), "decline");
+                addAction(t("Offer higher / lower"), "counter");
+            } else if (isBuyer) {
+                detail.textContent =
+                    t("Waiting for the seller to respond.");
+            }
+        } else if (offer.status === "countered") {
+            heading.textContent =
+                isBuyer
+                    ? t("Seller sent a counter offer")
+                    : t("Your counter offer");
+
+            amount.textContent =
+                Number.isFinite(counterAmount)
+                    ? counterAmount.toLocaleString("en-US") + " MDL"
+                    : t("Counter offer");
+
+            detail.textContent =
+                isBuyer
+                    ? t("Choose whether to accept or decline the seller's counter.")
+                    : t("Waiting for the buyer to respond.");
+
+            if (isBuyer) {
+                addAction(t("Accept counter"), "accept", true);
+                addAction(t("Decline"), "decline");
+            }
+        } else if (offer.status === "accepted") {
+            heading.textContent =
+                isBuyer
+                    ? t("Success! Seller accepted your offer.")
+                    : t("Offer accepted");
+
+            amount.textContent =
+                effectiveAmount.toLocaleString("en-US") + " MDL";
+
+            detail.textContent =
+                isBuyer
+                    ? t("Complete your purchase within 24 hours.")
+                    : t("Waiting for ") + state.activeOtherName + t(" to complete the purchase.");
+
+            if (isBuyer) {
+                addAction(t("Buy now"), "buy-now", true);
+            }
+        } else if (offer.status === "declined") {
+            heading.textContent = t("Offer declined");
+            amount.textContent =
+                effectiveAmount.toLocaleString("en-US") + " MDL";
+            detail.textContent = t("This negotiation has ended.");
+        } else {
+            heading.textContent = t("Offer");
+            amount.textContent =
+                effectiveAmount.toLocaleString("en-US") + " MDL";
+            detail.textContent = t("This offer is no longer active.");
+        }
+
+        const top = document.createElement("div");
+        top.className = "offer-message-top";
+        top.append(heading);
+
+        card.append(top, amount, detail);
+
+        if (actions.childElementCount) {
+            card.appendChild(actions);
+        }
+
+        return card;
+    }
+
     async function loadThread(id, showLoading = true) {
         const auth = await getAuthenticatedUser();
         const user = auth.user;
         const box = el.messages();
 
         if (!user || !box) {
-            if (
-                box &&
-                auth.error &&
-                !isActuallyOffline(auth.error)
-            ) {
+            if (box && auth.error && !isActuallyOffline(auth.error)) {
                 showRetry(
                     box,
                     t("Messages could not be loaded"),
                     describeSupabaseError(auth.error)
                 );
             }
-
             return;
         }
 
@@ -881,24 +1059,24 @@
                 "</div>";
         }
 
-        const result = await fetchMessageRows(id);
+        const [messageResult, offerResult] = await Promise.all([
+            fetchMessageRows(id),
+            fetchOfferRows(id)
+        ]);
 
-        if (result.error) {
+        if (messageResult.error || offerResult.error) {
+            const error = messageResult.error || offerResult.error;
+
             console.error(
-                "A doua șансa: thread load failed:",
-                result.error
+                "A doua șansă: thread load failed:",
+                error
             );
 
-            if (isActuallyOffline(result.error)) {
+            if (isActuallyOffline(error)) {
                 notifyNetwork(false);
-
                 box.innerHTML =
                     "<div class='empty-state'><p>" +
-                    esc(
-                        t(
-                            "You are offline. Reconnect to Wi-Fi or mobile data to load this conversation."
-                        )
-                    ) +
+                    esc(t("You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.")) +
                     "</p></div>";
             } else {
                 showRetry(
@@ -913,9 +1091,10 @@
 
         notifyNetwork(true);
 
-        const rows = result.data || [];
+        const rows = messageResult.data || [];
+        const offers = offerResult.data || [];
 
-        if (result.hasReadState) {
+        if (messageResult.hasReadState) {
             const unreadIds = rows
                 .filter(
                     messageRow =>
@@ -938,6 +1117,23 @@
             }
         }
 
+        const timeline = [
+            ...rows.map(messageRow => ({
+                kind: "message",
+                created_at: messageRow.created_at,
+                data: messageRow
+            })),
+            ...offers.map(offer => ({
+                kind: "offer",
+                created_at: offer.created_at,
+                data: offer
+            }))
+        ].sort(
+            (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime()
+        );
+
         if (state.lastThreadMessageIds.size > 0) {
             const hasNewIncomingMessage = rows.some(
                 messageRow =>
@@ -945,53 +1141,74 @@
                     !state.lastThreadMessageIds.has(messageRow.id)
             );
 
-            if (hasNewIncomingMessage && !showLoading) {
+            const previousOfferIds = state.lastThreadMessageIds;
+            const hasNewIncomingOffer = offers.some(
+                offer =>
+                    offer.seller_id === user.id &&
+                    !previousOfferIds.has("offer:" + offer.id)
+            );
+
+            if ((hasNewIncomingMessage || hasNewIncomingOffer) && !showLoading) {
                 playIncomingDing();
             }
         }
 
-        state.lastThreadMessageIds = new Set(
-            rows.map(messageRow => messageRow.id)
-        );
+        state.lastThreadMessageIds = new Set([
+            ...rows.map(messageRow => messageRow.id),
+            ...offers.map(offer => "offer:" + offer.id)
+        ]);
 
-        const signature = rows
-            .map(
-                messageRow =>
-                    [
+        const signature = timeline
+            .map(event => {
+                if (event.kind === "message") {
+                    const messageRow = event.data;
+                    return [
+                        "message",
                         messageRow.id,
                         messageRow.sender_id,
                         messageRow.body,
-                        messageRow.created_at
-                    ].join("|")
-            )
+                        messageRow.created_at,
+                        messageRow.read_at || ""
+                    ].join("|");
+                }
+
+                const offer = event.data;
+                return [
+                    "offer",
+                    offer.id,
+                    offer.status,
+                    offer.amount_mdl,
+                    offer.counter_amount_mdl || "",
+                    offer.updated_at,
+                    offer.created_at
+                ].join("|");
+            })
             .join("||");
 
         const nearBottom =
-            box.scrollHeight -
-            box.scrollTop -
-            box.clientHeight <
-            120;
+            box.scrollHeight - box.scrollTop - box.clientHeight < 120;
 
-        if (
-            !showLoading &&
-            signature === state.lastThreadSignature
-        ) {
+        if (!showLoading && signature === state.lastThreadSignature) {
             return;
         }
 
         state.lastThreadSignature = signature;
-
         box.innerHTML = "";
 
-        if (!rows.length) {
+        if (!timeline.length) {
             box.innerHTML =
                 "<div class='message-thread-empty-inline'>" +
                 esc(t("No messages yet. Say hello!")) +
                 "</div>";
         } else {
-            rows.forEach(messageRow => {
-                const bubble = document.createElement("div");
+            timeline.forEach(event => {
+                if (event.kind === "offer") {
+                    box.appendChild(makeOfferCard(event.data, user));
+                    return;
+                }
 
+                const messageRow = event.data;
+                const bubble = document.createElement("div");
                 bubble.className =
                     "message-bubble " +
                     (
@@ -1068,6 +1285,9 @@
 
         state.activeListingId =
             conversation.listing_id || null;
+
+        state.activeListing = listing;
+
 
         const profileName =
             profile.display_name ||
@@ -1360,6 +1580,8 @@
                 state.activeConversationId = null;
                 state.activeSellerId = null;
                 state.activeListingId = null;
+                state.activeListing = null;
+                state.activeOtherName = "";
                 state.lastThreadSignature = "";
                 state.lastThreadMessageIds = new Set();
 
@@ -1401,6 +1623,21 @@
 
         window.addEventListener(
             "closet:offer-sent",
+            event => {
+                if (
+                    event.detail?.conversationId &&
+                    state.activeConversationId === event.detail.conversationId
+                ) {
+                    state.lastThreadSignature = "";
+                    void loadThread(state.activeConversationId, false);
+                }
+
+                void loadConversations(false);
+            }
+        );
+
+        window.addEventListener(
+            "closet:offer-updated",
             event => {
                 if (
                     event.detail?.conversationId &&
