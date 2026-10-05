@@ -4927,3 +4927,436 @@ body.nova-post-modal-open {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* =========================================================
+   IN-SITE SAFETY MESSAGING + OFFERS
+   ========================================================= */
+
+.messages-nav-link {
+    position: relative;
+    min-width: 44px;
+    width: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.messages-nav-icon {
+    width: 21px;
+    height: 21px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.messages-nav-icon svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.messages-unread-badge {
+    position: absolute;
+    top: -3px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--surface);
+    border-radius: 999px;
+    background: #d62f2f;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 850;
+    line-height: 1;
+    box-shadow: 0 3px 8px rgba(0,0,0,.16);
+}
+
+.messages-unread-badge[hidden] {
+    display: none;
+}
+
+.conversation-item {
+    min-width: 0;
+}
+
+.conversation-item.has-unread {
+    background: var(--surface);
+}
+
+.conversation-copy {
+    min-width: 0;
+}
+
+.conversation-copy-listing,
+.conversation-copy-meta {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.conversation-copy-listing {
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.conversation-copy-meta {
+    color: var(--text-soft);
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.conversation-side {
+    min-width: 46px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    align-self: stretch;
+    gap: 8px;
+}
+
+.conversation-unread-badge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #d62f2f;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+.message-thread-header {
+    padding: 12px;
+    align-items: flex-start;
+}
+
+#messageThreadHeaderContent {
+    min-width: 0;
+    width: 100%;
+}
+
+.message-thread-person {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    padding: 4px 4px 11px;
+}
+
+.message-thread-person > div:last-child {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.message-thread-person strong,
+.message-thread-person span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.message-thread-person strong {
+    font-size: 14px;
+}
+
+.message-thread-person span {
+    color: var(--text-soft);
+    font-size: 11px;
+}
+
+.message-thread-person .conversation-avatar.large {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+}
+
+.message-safety-notice {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 10px;
+    padding: 10px 11px;
+    border: 1px solid rgba(180, 35, 24, .18);
+    border-radius: 12px;
+    background: var(--danger-soft);
+}
+
+.message-safety-notice > div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.message-safety-notice strong {
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.message-safety-notice span,
+.message-safety-notice a {
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.message-safety-notice span {
+    color: var(--text-soft);
+}
+
+.message-safety-notice a {
+    color: var(--text);
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+}
+
+.message-listing-card {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: border-color .18s ease, transform .18s ease;
+}
+
+.message-listing-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+}
+
+.message-listing-card-image {
+    width: 54px;
+    height: 54px;
+    overflow: hidden;
+    display: block;
+    border-radius: 9px;
+    background: var(--surface-soft);
+}
+
+.message-listing-card-image img,
+.message-listing-card-image > span {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.message-listing-card-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.message-listing-card-copy strong,
+.message-listing-card-copy span,
+.message-listing-card-copy small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.message-listing-card-copy strong {
+    font-size: 12px;
+}
+
+.message-listing-card-copy span {
+    font-size: 11px;
+    color: var(--text-soft);
+}
+
+.message-listing-card-copy small {
+    font-size: 9px;
+    color: var(--text-soft);
+    font-weight: 750;
+}
+
+.message-list {
+    overflow-anchor: none;
+}
+
+.message-bubble {
+    min-width: 0;
+    contain: content;
+}
+
+.message-bubble p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.48;
+}
+
+.listing-message-icon-button {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.listing-message-icon-button svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.listing-offer-button {
+    min-width: 120px;
+}
+
+.offer-modal[hidden] {
+    display: none !important;
+}
+
+.offer-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 7200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(17,17,17,.45);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.offer-modal-card {
+    width: min(100%, 520px);
+    max-height: min(760px, calc(100dvh - 24px));
+    overflow: auto;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+    box-shadow: 0 24px 80px rgba(0,0,0,.18);
+}
+
+.offer-item-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 10px 0 22px;
+    color: var(--text-soft);
+    font-size: 13px;
+}
+
+.offer-item-line strong {
+    color: var(--text);
+}
+
+.offer-percent-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 7px;
+}
+
+.offer-percent-button {
+    min-height: 44px;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.offer-percent-button.is-active {
+    border-color: var(--text);
+    background: var(--text);
+    color: #fff;
+}
+
+.offer-custom-row {
+    margin-bottom: 0;
+}
+
+.offer-preview {
+    min-height: 18px;
+    margin: -3px 0 0;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+body.offer-modal-open {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .messages-nav-link {
+        width: 42px;
+        min-width: 42px;
+    }
+
+    .message-safety-notice {
+        grid-template-columns: 1fr;
+    }
+
+    .message-safety-notice a {
+        justify-self: start;
+    }
+
+    .offer-modal-card {
+        width: 100%;
+        padding: 23px 18px;
+        border-radius: 18px;
+    }
+
+    .offer-percent-grid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
+    .offer-custom-row {
+        grid-template-columns: 1fr;
+    }
+
+    .listing-detail-actions .listing-message-icon-button,
+    .listing-detail-actions .listing-buy-button,
+    .listing-detail-actions .listing-offer-button {
+        min-height: 48px;
+    }
+}
