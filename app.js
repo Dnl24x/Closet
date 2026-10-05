@@ -969,12 +969,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     return;
                 }
 
-                try {
-                    window.CLOSETOrders.open(listing, seller);
-                } catch (error) {
+                void window.CLOSETOrders.open(listing, seller).catch(error => {
                     console.error("A doua șansă checkout open error:", error);
                     showStatus("Nova Post checkout could not be opened. Please try again.", "error");
-                }
+                });
             });
         }
 
