@@ -25,6 +25,43 @@
             message.includes("load failed");
     }
 
+    function isActuallyOffline(error = null) {
+        if (window.ClosetNetwork?.isOffline) {
+            return window.ClosetNetwork.isOffline();
+        }
+
+        if (navigator.onLine === false) {
+            return true;
+        }
+
+        return isNetworkError(error) && navigator.onLine === false;
+    }
+
+    function showRetry(container, heading, message) {
+        if (!container) return;
+
+        const buttonLabel = t("Try again");
+        container.innerHTML =
+            "<div class=\"empty-state\">" +
+            "<h3>" + esc(heading) + "</h3>" +
+            "<p>" + esc(message) + "</p>" +
+            "<button type=\"button\" class=\"secondary-button message-retry-button\">" +
+            esc(buttonLabel) +
+            "</button>" +
+            "</div>";
+
+        container.querySelector(".message-retry-button")?.addEventListener(
+            "click",
+            () => {
+                if (state.activeConversationId) {
+                    void loadThread(state.activeConversationId);
+                }
+                void loadConversations();
+            },
+            { once: true }
+        );
+    }
+
 
     function esc(v){ return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
     function time(v){ const d=new Date(v); return Number.isNaN(d.getTime()) ? "" : d.toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }
@@ -53,8 +90,18 @@
         if(showLoading)list.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
         const result=await client.from("conversations").select("id,buyer_id,seller_id,listing_id,updated_at").or("buyer_id.eq."+user.id+",seller_id.eq."+user.id).order("updated_at",{ascending:false});
         if(result.error){
-            if(isNetworkError(result.error)) notifyNetwork(false);
-            list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("Messages unavailable"))+"</h3><p>"+esc(t("Please try again when you are online."))+"</p></div>";
+            console.error("A doua șansă: conversation load failed:", result.error);
+
+            if(isActuallyOffline(result.error)){
+                notifyNetwork(false);
+                list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("You are offline"))+"</h3><p>"+esc(t("Reconnect to Wi-Fi or mobile data to load your messages."))+"</p></div>";
+            } else {
+                showRetry(
+                    list,
+                    t("We couldn't load your messages"),
+                    t("There was a problem reaching your conversations. Please try again.")
+                );
+            }
             return false;
         }
         notifyNetwork(true);
@@ -79,8 +126,18 @@
         if(showLoading)box.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
         const result=await client.from("messages").select("id,sender_id,body,created_at").eq("conversation_id",id).order("created_at",{ascending:true});
         if(result.error){
-            if(isNetworkError(result.error)) notifyNetwork(false);
-            box.innerHTML="<div class=\"empty-state\"><p>"+esc(t("Messages could not be loaded."))+"</p></div>";
+            console.error("A doua șansă: thread load failed:", result.error);
+
+            if(isActuallyOffline(result.error)){
+                notifyNetwork(false);
+                box.innerHTML="<div class=\"empty-state\"><p>"+esc(t("You are offline. Reconnect to Wi-Fi or mobile data to load this conversation."))+"</p></div>";
+            } else {
+                showRetry(
+                    box,
+                    t("Messages could not be loaded"),
+                    t("There was a problem loading this conversation. Please try again.")
+                );
+            }
             return;
         }
         notifyNetwork(true);
@@ -106,7 +163,7 @@
         const button=el.composer()?.querySelector("button[type=submit]");if(button)button.disabled=true;
         const result=await client.from("messages").insert({conversation_id:state.activeConversationId,sender_id:user.id,body});if(button)button.disabled=false;
         if(result.error){
-            if(isNetworkError(result.error)){
+            if(isActuallyOffline(result.error)){
                 notifyNetwork(false);
                 window.dispatchEvent(new CustomEvent("closet:message-error",{detail:{message:t("You are offline. Your message was not sent.")}}));
             } else {
