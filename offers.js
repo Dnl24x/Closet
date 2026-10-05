@@ -42,68 +42,62 @@
         return Number(activeListing?.price_mdl) || 0;
     }
 
-    function updatePreview() {
+    function renderPreview(amount, percent) {
+        if (!preview) return;
+
+        preview.textContent =
+            amount.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) +
+            " MDL · " +
+            percent +
+            "% below asking price";
+    }
+
+    function updateFromPercentage() {
         const askingPriceNumber = asking();
-        const amount = Number(amountInput.value);
         const percent = Number(percentageInput.value);
 
-        if (!askingPriceNumber) {
+        if (
+            !askingPriceNumber ||
+            !Number.isFinite(percent) ||
+            percent < 1 ||
+            percent > 80
+        ) {
             if (preview) preview.textContent = "";
             return;
         }
 
-        if (
-            Number.isFinite(amount) &&
-            amount > 0 &&
-            amount < askingPriceNumber
-        ) {
-            const below = Math.round(
-                (100 - (amount / askingPriceNumber) * 100) * 100
+        const calculated =
+            Math.round(
+                askingPriceNumber * (1 - percent / 100) * 100
             ) / 100;
 
-            percentageInput.value = String(below);
+        amountInput.value = String(calculated);
+        renderPreview(calculated, percent);
+    }
 
-            if (preview) {
-                preview.textContent =
-                    amount.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) +
-                    " MDL · " +
-                    below +
-                    "% below asking price";
-            }
-
-            return;
-        }
+    function updateFromAmount() {
+        const askingPriceNumber = asking();
+        const amount = Number(amountInput.value);
 
         if (
-            Number.isFinite(percent) &&
-            percent >= 1 &&
-            percent <= 80
+            !askingPriceNumber ||
+            !Number.isFinite(amount) ||
+            amount <= 0 ||
+            amount >= askingPriceNumber
         ) {
-            const calculated =
-                Math.round(
-                    askingPriceNumber * (1 - percent / 100) * 100
-                ) / 100;
-
-            amountInput.value = String(calculated);
-
-            if (preview) {
-                preview.textContent =
-                    calculated.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }) +
-                    " MDL · " +
-                    percent +
-                    "% below asking price";
-            }
-
+            if (preview) preview.textContent = "";
             return;
         }
 
-        if (preview) preview.textContent = "";
+        const below = Math.round(
+            (100 - (amount / askingPriceNumber) * 100) * 100
+        ) / 100;
+
+        percentageInput.value = String(below);
+        renderPreview(amount, below);
     }
 
     function close() {
@@ -127,7 +121,7 @@
         amountInput.value =
             Math.round(asking() * 0.9 * 100) / 100;
 
-        updatePreview();
+        updateFromPercentage();
     }
 
     function open(listing, seller, conversationId) {
@@ -185,7 +179,7 @@
                 item.classList.toggle("is-active", item === button);
             });
 
-            updatePreview();
+            updateFromPercentage();
         });
     });
 
@@ -198,7 +192,7 @@
             );
         });
 
-        updatePreview();
+        updateFromPercentage();
     });
 
     amountInput.addEventListener("input", () => {
@@ -206,7 +200,7 @@
             button.classList.remove("is-active");
         });
 
-        updatePreview();
+        updateFromAmount();
     });
 
     closeButtons.forEach(button => {
