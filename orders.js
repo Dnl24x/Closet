@@ -11,7 +11,7 @@
     const nameInput = document.getElementById("novaBuyerName");
     const phoneInput = document.getElementById("novaBuyerPhone");
     const cityInput = document.getElementById("novaBuyerCity");
-    const pickupTypeInput = document.getElementById("novaBuyerPickupTypeValue");
+    const pickupTypeInput = document.getElementById("novaPostPickupTypeValue");
     const pickupNumberInput = document.getElementById("novaBuyerPickupNumber");
     const listingTitle = document.getElementById("novaPostListingTitle");
     const listingPrice = document.getElementById("novaPostListingPrice");
