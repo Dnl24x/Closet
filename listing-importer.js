@@ -2,6 +2,7 @@
     const form = document.getElementById("listingImportForm");
     const urlInput = document.getElementById("listingImportUrl");
     const button = document.getElementById("listingImportButton");
+    const consent = document.getElementById("listingImportConsent");
     const message = document.getElementById("listingImportMessage");
     const preview = document.getElementById("listingImportPreview");
 
@@ -90,6 +91,17 @@
         const user = window.ClosetAuth?.getUser?.();
         if (!user) {
             window.location.href = "login.html";
+            return;
+        }
+
+        if (consent && !consent.checked) {
+            showMessage(
+                window.ClosetI18n?.translateValue?.(
+                    "Please confirm that you own the listing or have permission to reuse its text and photos."
+                ) ||
+                "Please confirm that you own the listing or have permission to reuse its text and photos.",
+                "error"
+            );
             return;
         }
 
