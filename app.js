@@ -170,24 +170,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         const banner = elements.offlineBanner;
         if (!banner) return;
 
-        // Do not probe Supabase here. A failed API request does NOT mean the
-        // phone is offline: mobile networks can briefly block, delay, or
-        // reject a request while the device is still online. For this banner,
-        // the browser's network state is the correct signal.
+        // navigator.onLine is only a hint and can be wrong on phones.
+        // Show the banner only after a real app request fails.
         const setStatus = online => {
             banner.hidden = online;
             document.body.classList.toggle("is-offline", !online);
         };
 
-        const refresh = () => setStatus(navigator.onLine !== false);
-
-        window.addEventListener("online", refresh);
-        window.addEventListener("offline", refresh);
-        document.addEventListener("visibilitychange", () => {
-            if (!document.hidden) refresh();
+        setStatus(true);
+        window.addEventListener("closet:network", event => {
+            setStatus(event.detail?.online !== false);
         });
-
-        refresh();
     }
 
     function showFormMessage(element, message, type = "error") {
@@ -385,6 +378,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    function getListingStatusLabel(status) {
+        const labels = { active: "Active", sold: "Sold", hidden: "Hidden" };
+        return labels[status] || "Active";
+    }
+
+    async function setMyListingStatus(listing, status, card) {
+        if (!listing?.id || !["active", "sold", "hidden"].includes(status)) return;
+        const buttons = card?.querySelectorAll("[data-listing-status]") || [];
+        buttons.forEach(button => { button.disabled = true; });
+        try {
+            const result = await ClosetListings.updateListing(listing.id, { status });
+            if (!result.success) {
+                showStatus(result.message || "We couldn't update this listing.", "error");
+                return;
+            }
+            showStatus(
+                status === "hidden" ? "Your listing is hidden." :
+                status === "sold" ? "Your listing is marked as sold." :
+                "Your listing is active again.",
+                "success"
+            );
+            await Promise.all([
+                loadMyListings(),
+                loadHomeListings(),
+                loadBrowseListings(),
+                loadSavedListings()
+            ]);
+        } catch (error) {
+            console.error("A doua șansă listing status error:", error);
+            showStatus("We couldn't update this listing. Please try again.", "error");
+        } finally {
+            buttons.forEach(button => { button.disabled = false; });
+        }
+    }
+
     function createListingCard(listing) {
         const image = getListingImage(listing);
         const title = escapeHTML(listing?.title || "Untitled item");
@@ -396,6 +424,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const card = document.createElement("article");
         card.className = "listing-card";
+        const status = listing?.status || "active";
+        card.classList.toggle("is-listing-hidden", status === "hidden");
+
         card.innerHTML = `
             <div class="listing-card-shell">
                 <button type="button" class="listing-card-button"
@@ -406,6 +437,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                         : `<div class="listing-image" aria-hidden="true"></div>`
                     }
                     <div class="listing-card-body">
+                        <div class="listing-card-status-row">
+                            ${ownListing ? `<span class="listing-status-badge status-${escapeHTML(status)}">${escapeHTML(getListingStatusLabel(status))}</span>` : ""}
+                        </div>
                         <h3 class="listing-card-title">${title}</h3>
                         <div class="listing-card-meta">
                             <span>${category}${subcategory ? ` · ${subcategory}` : ""}</span>
@@ -414,17 +448,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                         <div class="listing-card-price">${formatPrice(listing.price_mdl)}</div>
                     </div>
                 </button>
-
                 <div class="listing-card-actions">
-                    <button type="button"
-                        class="listing-save-button${saved ? " is-saved" : ""}"
+                    <button type="button" class="listing-save-button${saved ? " is-saved" : ""}"
                         data-save-listing-id="${escapeHTML(listing.id)}"
                         aria-label="${saved ? "Remove from saved" : "Save listing"}">${saved ? "♥" : "♡"}</button>
-                    ${ownListing
-                        ? `<button type="button" class="listing-edit-button"
-                            data-edit-listing-id="${escapeHTML(listing.id)}">Edit</button>`
-                        : ""}
+                    ${ownListing ? `<button type="button" class="listing-edit-button"
+                        data-edit-listing-id="${escapeHTML(listing.id)}">Edit</button>` : ""}
                 </div>
+                ${ownListing ? `
+                    <div class="listing-card-management">
+                        <span class="listing-card-management-label">Manage ad</span>
+                        <div class="listing-card-status-actions">
+                            <button type="button" class="status-action-button${status === "active" ? " is-current" : ""}" data-listing-status="active" ${status === "active" ? "disabled" : ""}>Make active</button>
+                            <button type="button" class="status-action-button${status === "sold" ? " is-current" : ""}" data-listing-status="sold" ${status === "sold" ? "disabled" : ""}>Make sold</button>
+                            <button type="button" class="status-action-button${status === "hidden" ? " is-current" : ""}" data-listing-status="hidden" ${status === "hidden" ? "disabled" : ""}>Hide ad</button>
+                        </div>
+                    </div>
+                ` : ""}
             </div>
         `;
 
@@ -432,6 +472,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             event.preventDefault();
             event.stopPropagation();
             void toggleSavedListing(listing.id);
+        });
+
+        card.querySelectorAll("[data-listing-status]").forEach(button => {
+            button.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                void setMyListingStatus(listing, event.currentTarget.dataset.listingStatus, card);
+            });
         });
 
         card.querySelector("[data-edit-listing-id]")?.addEventListener("click", event => {
@@ -787,9 +835,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ? '<div class="listing-owner-status">' +
                               '<span class="listing-owner-status-label">Listing status</span>' +
                               '<div class="listing-owner-status-actions">' +
-                              '<button type="button" class="status-action-button" data-detail-status="active">Active</button>' +
-                              '<button type="button" class="status-action-button" data-detail-status="reserved">Reserved</button>' +
-                              '<button type="button" class="status-action-button" data-detail-status="sold">Sold</button>' +
+                              '<button type="button" class="status-action-button" data-detail-status="active">Make active</button>' +
+                              '<button type="button" class="status-action-button" data-detail-status="sold">Make sold</button>' +
+                              '<button type="button" class="status-action-button" data-detail-status="hidden">Hide ad</button>' +
                               '</div></div>'
                             : ""
                     }
@@ -852,7 +900,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 const nextStatus = event.currentTarget.dataset.detailStatus;
 
-                if (!["active", "reserved", "sold"].includes(nextStatus)) {
+                if (!["active", "sold", "hidden"].includes(nextStatus)) {
                     return;
                 }
 
