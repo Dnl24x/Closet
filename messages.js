@@ -39,20 +39,45 @@
 
     async function getAuthenticatedUser() {
         try {
-            const { data, error } = await client.auth.getUser();
+            // Prefer the restored Supabase session. getUser() makes a
+            // network request and can briefly return 401 while the browser
+            // is restoring or refreshing the session.
+            const sessionResult = await client.auth.getSession();
+            const session = sessionResult?.data?.session || null;
 
-            if (error) {
-                console.error("A doua șansă: auth check failed:", error);
-                return { user: null, error };
+            if (session?.user) {
+                return { user: session.user, error: null };
             }
 
-            return {
-                user: data?.user || ClosetAuth.getUser() || null,
-                error: null
-            };
+            const localUser = ClosetAuth.getUser();
+            if (localUser) {
+                return { user: localUser, error: null };
+            }
+
+            // Give Supabase one explicit chance to refresh an expired session.
+            const refreshResult = await client.auth.refreshSession();
+            if (refreshResult?.data?.session?.user) {
+                return {
+                    user: refreshResult.data.session.user,
+                    error: null
+                };
+            }
+
+            if (sessionResult?.error) {
+                console.error("A doua șansă: auth session check failed:", sessionResult.error);
+                return { user: null, error: sessionResult.error };
+            }
+
+            if (refreshResult?.error) {
+                console.error("A doua șansă: auth session refresh failed:", refreshResult.error);
+                return { user: null, error: refreshResult.error };
+            }
+
+            return { user: null, error: null };
         } catch (error) {
             console.error("A doua șansă: auth check crashed:", error);
-            return { user: null, error };
+            const localUser = ClosetAuth.getUser();
+            return { user: localUser || null, error: localUser ? null : error };
         }
     }
 
@@ -185,7 +210,7 @@
         const ids=[...new Set(conversations.map(c=>c.buyer_id===user.id?c.seller_id:c.buyer_id))];
         const profiles=(await client.from("profiles").select("id,display_name,username,avatar_url,avatar_color").in("id",ids)).data||[];
         const pm=new Map(profiles.map(p=>[p.id,p]));
-        const lids=result.data.map(c=>c.listing_id).filter(Boolean);
+        const lids=conversations.map(c=>c.listing_id).filter(Boolean);
         const listings=lids.length?((await client.from("listings").select("id,title").in("id",lids)).data||[]):[];
         const lm=new Map(listings.map(l=>[l.id,l]));
         list.innerHTML="";
