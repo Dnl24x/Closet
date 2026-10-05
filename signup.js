@@ -45,6 +45,11 @@
     const verificationEmail =
         document.getElementById("signupVerificationEmail");
 
+    const resendVerificationButton =
+        document.getElementById("signupResendVerification");
+
+    let pendingVerificationEmail = "";
+
 
     function showMessage(text, type = "error") {
         if (!message) {
@@ -250,6 +255,7 @@
                     "success"
                 );
 
+                pendingVerificationEmail = email;
                 form.reset();
                 showVerificationModal(email);
 
@@ -343,6 +349,39 @@
         toggleConfirmPassword,
         confirmPasswordInput
     );
+
+    resendVerificationButton?.addEventListener("click", async () => {
+        const email =
+            pendingVerificationEmail ||
+            verificationEmail?.textContent?.trim() ||
+            "";
+
+        if (!email) {
+            showMessage("Please enter your email address again to resend the verification email.");
+            return;
+        }
+
+        resendVerificationButton.disabled = true;
+        resendVerificationButton.textContent = "Sending...";
+
+        try {
+            const result =
+                await ClosetAuth.resendVerification(email);
+
+            if (result.success) {
+                showMessage(result.message, "success");
+            } else {
+                showMessage(result.message);
+            }
+        } finally {
+            resendVerificationButton.disabled = false;
+            resendVerificationButton.textContent =
+                window.ClosetI18n?.translateValue?.(
+                    "Resend verification email"
+                ) ||
+                "Resend verification email";
+        }
+    });
 
     verificationDone?.addEventListener("click", closeVerificationModal);
 
