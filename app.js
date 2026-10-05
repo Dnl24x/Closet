@@ -1023,7 +1023,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 event.preventDefault();
                 event.stopPropagation();
 
-                if (typeof ClosetMessages === "undefined" || typeof ClosetOffers === "undefined") {
+                if (
+                    typeof ClosetMessages === "undefined" ||
+                    !window.CLOSETOffers?.open
+                ) {
                     showStatus("Offers are temporarily unavailable. Please try again.", "error");
                     return;
                 }
