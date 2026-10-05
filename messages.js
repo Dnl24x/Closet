@@ -137,32 +137,59 @@
             return false;
         }
         if(showLoading)list.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
-        const result=await client.from("conversations").select("id,buyer_id,seller_id,listing_id,updated_at").or("buyer_id.eq."+user.id+",seller_id.eq."+user.id).order("updated_at",{ascending:false});
-        if(result.error){
-            console.error("A doua șansă: conversation load failed:", result.error);
+        const conversationFields = "id,buyer_id,seller_id,listing_id,updated_at";
 
-            if(isActuallyOffline(result.error)){
+        const [buyerResult, sellerResult] = await Promise.all([
+            client
+                .from("conversations")
+                .select(conversationFields)
+                .eq("buyer_id", user.id),
+            client
+                .from("conversations")
+                .select(conversationFields)
+                .eq("seller_id", user.id)
+        ]);
+
+        const firstError = buyerResult.error || sellerResult.error;
+
+        if(firstError){
+            console.error("A doua șansă: conversation load failed:", firstError);
+
+            if(isActuallyOffline(firstError)){
                 notifyNetwork(false);
                 list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("You are offline"))+"</h3><p>"+esc(t("Reconnect to Wi-Fi or mobile data to load your messages."))+"</p></div>";
             } else {
                 showRetry(
                     list,
                     t("We couldn't load your messages"),
-                    describeSupabaseError(result.error)
+                    describeSupabaseError(firstError)
                 );
             }
             return false;
         }
+
         notifyNetwork(true);
-        if(!result.data?.length){list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("No conversations yet"))+"</h3><p>"+esc(t("When you message a seller, your conversations will appear here."))+"</p></div>";return true;}
-        const ids=[...new Set(result.data.map(c=>c.buyer_id===user.id?c.seller_id:c.buyer_id))];
+
+        const conversationMap = new Map();
+        [...(buyerResult.data || []), ...(sellerResult.data || [])]
+            .forEach(conversation => conversationMap.set(conversation.id, conversation));
+
+        const conversations = [...conversationMap.values()]
+            .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+
+        if(!conversations.length){
+            list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("No conversations yet"))+"</h3><p>"+esc(t("When you message a seller, your conversations will appear here."))+"</p></div>";
+            return true;
+        }
+
+        const ids=[...new Set(conversations.map(c=>c.buyer_id===user.id?c.seller_id:c.buyer_id))];
         const profiles=(await client.from("profiles").select("id,display_name,username,avatar_url,avatar_color").in("id",ids)).data||[];
         const pm=new Map(profiles.map(p=>[p.id,p]));
         const lids=result.data.map(c=>c.listing_id).filter(Boolean);
         const listings=lids.length?((await client.from("listings").select("id,title").in("id",lids)).data||[]):[];
         const lm=new Map(listings.map(l=>[l.id,l]));
         list.innerHTML="";
-        result.data.forEach(c=>{
+        conversations.forEach(c=>{
             const oid=c.buyer_id===user.id?c.seller_id:c.buyer_id,p=pm.get(oid)||{},l=lm.get(c.listing_id)||{};
             const b=document.createElement("button");b.type="button";b.className="conversation-item"+(state.activeConversationId===c.id?" is-active":"");
             b.innerHTML="<span class=\"conversation-avatar\">"+(p.avatar_url?"<img src=\""+esc(p.avatar_url)+"\" alt=\"\">":esc((p.display_name||p.username||"A").charAt(0).toUpperCase()))+"</span><span class=\"conversation-copy\"><strong>"+esc(p.display_name||p.username||t("A doua șansă member"))+"</strong><span>"+esc(l.title||t("Marketplace"))+"</span></span><time>"+esc(time(c.updated_at))+"</time>";
