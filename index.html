@@ -11,7 +11,7 @@
     content="A doua șansă is a Moldova-focused marketplace for buying and selling almost anything locally."
 >
 
-<link rel="stylesheet" href="style.css?v=messages-mobile-2">
+<link rel="stylesheet" href="style.css?v=messages-mobile-3">
 
 
 </head>
@@ -610,7 +610,10 @@
             </div>
             <div id="messagesShell" class="messages-shell">
                 <aside class="conversation-list-panel">
-                    <div class="conversation-list-header"><strong data-i18n="Conversations">Conversations</strong></div>
+                    <div class="conversation-list-header">
+    <strong data-i18n="Conversations">Conversations</strong>
+    <span data-i18n="Tap a conversation to open it">Tap a conversation to open it</span>
+</div>
                     <div id="conversationList" class="conversation-list">
                         <div class="empty-state">
                             <h3 data-i18n="No conversations yet">No conversations yet</h3>
@@ -624,7 +627,7 @@
                         <h2 data-i18n="Choose a conversation">Choose a conversation</h2>
                         <p data-i18n="Your messages will appear here.">Your messages will appear here.</p>
                     </div>
-                    <div id="messageThread" class="message-thread" hidden>
+                    <div id="messageThread" class="message-thread" hidden aria-label="Conversation">
                         <div id="messageThreadHeader" class="message-thread-header"><button type="button" id="messagesMobileBack" class="messages-mobile-back" aria-label="Back to conversations">← <span data-i18n="Conversations">Conversations</span></button><div id="messageThreadHeaderContent"></div></div>
                         <div id="messageList" class="message-list" aria-live="polite"></div>
                         <form id="messageComposer" class="message-composer">
