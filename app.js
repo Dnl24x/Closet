@@ -959,20 +959,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const buyButton = elements.listingDetailsContent.querySelector(".listing-buy-button");
         const saveButton = elements.listingDetailsContent.querySelector("[data-detail-save-listing-id]");
-        if (!ownListing && seller?.id && buyButton) {
-            const messageButton = document.createElement("button");
-            messageButton.type = "button";
-            messageButton.className = "secondary-button listing-message-seller-button";
-            messageButton.textContent = typeof ClosetI18n !== "undefined" ? ClosetI18n.translateValue("Message seller") : "Message seller";
-            messageButton.addEventListener("click", event => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (typeof ClosetMessages !== "undefined") {
-                    void ClosetMessages.openConversationWithSeller(seller.id, listing.id);
-                }
-            });
-            buyButton.insertAdjacentElement("afterend", messageButton);
-        }
         const messageSellerButton =
             elements.listingDetailsContent.querySelector("[data-detail-message-seller]");
 
