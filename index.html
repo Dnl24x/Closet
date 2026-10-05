@@ -52,10 +52,18 @@
         </button>
         <button
             type="button"
-            class="nav-link"
+            class="nav-link messages-nav-link"
             data-view="messages"
+            id="messagesNavButton"
+            aria-label="Messages"
+            title="Messages"
         >
-            Messages
+            <span class="messages-nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4.3A2.5 2.5 0 0 1 3 13.5v-8A2.5 2.5 0 0 1 4 5.5Z"></path>
+                </svg>
+            </span>
+            <span class="messages-unread-badge" id="messagesUnreadBadge" hidden>0</span>
         </button>
 <button
             type="button"
@@ -663,7 +671,12 @@
                         <p data-i18n="Your messages will appear here.">Your messages will appear here.</p>
                     </div>
                     <div id="messageThread" class="message-thread" hidden aria-label="Conversation">
-                        <div id="messageThreadHeader" class="message-thread-header"><button type="button" id="messagesMobileBack" class="messages-mobile-back" aria-label="Back to conversations">← <span data-i18n="Conversations">Conversations</span></button><div id="messageThreadHeaderContent"></div></div>
+                        <div id="messageThreadHeader" class="message-thread-header">
+                            <button type="button" id="messagesMobileBack" class="messages-mobile-back" aria-label="Back to conversations">
+                                ← <span data-i18n="Conversations">Conversations</span>
+                            </button>
+                            <div id="messageThreadHeaderContent"></div>
+                        </div>
                         <div id="messageList" class="message-list" aria-live="polite"></div>
                         <form id="messageComposer" class="message-composer">
                             <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Write a message..." data-i18n="Write a message..." required></textarea>
@@ -1693,6 +1706,60 @@
     </div>
 </div>
 
+<div id="offerModal" class="offer-modal" hidden role="dialog" aria-modal="true" aria-labelledby="offerModalTitle">
+    <div class="offer-modal-card">
+        <button type="button" class="checkout-close" data-close-offer aria-label="Close offer">×</button>
+
+        <p class="eyebrow">OFFER</p>
+        <h2 id="offerModalTitle">Make an offer</h2>
+        <p class="offer-item-line">
+            <strong id="offerListingTitle">Listing</strong>
+            <span>Asking price: <strong id="offerAskingPrice">0 MDL</strong></span>
+        </p>
+
+        <form id="offerForm" class="checkout-form" novalidate>
+            <div id="offerMessage" class="form-message" role="alert" hidden></div>
+
+            <div class="form-group">
+                <label>Choose a quick discount</label>
+                <div class="offer-percent-grid">
+                    <button type="button" class="offer-percent-button" data-offer-percent="5">5% below</button>
+                    <button type="button" class="offer-percent-button is-active" data-offer-percent="10">10% below</button>
+                    <button type="button" class="offer-percent-button" data-offer-percent="15">15% below</button>
+                    <button type="button" class="offer-percent-button" data-offer-percent="20">20% below</button>
+                    <button type="button" class="offer-percent-button" data-offer-percent="25">25% below</button>
+                    <button type="button" class="offer-percent-button" data-offer-percent="30">30% below</button>
+                </div>
+            </div>
+
+            <div class="form-row offer-custom-row">
+                <div class="form-group">
+                    <label for="offerPercentage">Discount</label>
+                    <div class="input-with-suffix">
+                        <input id="offerPercentage" type="number" min="1" max="80" step="0.5" value="10" required>
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="offerAmount">Your offer</label>
+                    <div class="input-with-suffix">
+                        <input id="offerAmount" type="number" min="0.01" step="0.01" required>
+                        <span>MDL</span>
+                    </div>
+                </div>
+            </div>
+
+            <p id="offerPreview" class="offer-preview"></p>
+            <p class="checkout-note">
+                This sends a purchase offer to the seller inside A doua șansă. It does not charge you and does not complete a purchase.
+            </p>
+
+            <button id="offerSubmit" type="submit" class="primary-button full-width">Send offer</button>
+        </form>
+    </div>
+</div>
+
 <div id="languageModal" class="language-modal" hidden role="dialog" aria-modal="true" aria-labelledby="languageModalTitle">
     <div class="language-modal-card">
         <p class="eyebrow">A doua șansă</p>
@@ -1721,11 +1788,12 @@
 <script src="listings.js"></script>
 
 <script src="profile.js"></script>
-<script src="messages.js?v=messages-state-6"></script>
+<script src="messages.js?v=messages-safe-7"></script>
 
 <script src="app.js?v=checkout-fix-2"></script>
 <script src="listing-importer.js?v=999-import-2"></script>
 <script src="orders.js?v=novapost-3"></script>
+<script src="offers.js?v=offers-1"></script>
 
 
 
