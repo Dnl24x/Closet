@@ -4450,3 +4450,59 @@ body.verification-modal-open {
         width: min(calc(100% - 22px), var(--content-width));
     }
 }
+
+.listing-owner-status {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.listing-owner-status-label {
+    display: block;
+    margin-bottom: 9px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.listing-owner-status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.status-action-button {
+    min-height: 40px;
+    padding: 0 13px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.status-action-button:hover:not(:disabled) {
+    background: var(--surface-soft);
+}
+
+.status-action-button:disabled {
+    cursor: wait;
+    opacity: .55;
+}
+
+@media (max-width: 520px) {
+    .listing-owner-status-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .status-action-button {
+        padding: 0 8px;
+        font-size: 12px;
+    }
+}
