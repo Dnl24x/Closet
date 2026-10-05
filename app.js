@@ -896,7 +896,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </button>
 
                     <div class="listing-detail-actions">
-                        <button type="button" class="primary-button listing-buy-button" data-i18n="Buy now">Buy now</button>
+                        <button type="button" class="primary-button listing-buy-button" data-i18n="Buy via Nova Post">Buy via Nova Post</button>
                         <button
                             type="button"
                             class="listing-save-button${saved ? " is-saved" : ""}"
@@ -956,6 +956,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             buyButton.insertAdjacentElement("afterend", messageButton);
         }
+        buyButton?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (typeof window.CLOSETOrders?.open !== "function") {
+                showStatus("Nova Post checkout is temporarily unavailable. Please try again.", "error");
+                return;
+            }
+
+            window.CLOSETOrders.open(listing, seller);
+        });
+
         saveButton?.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
@@ -1634,7 +1646,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     subcategoryName,
                     condition,
                     location,
-                    images: state.selectedImages.map(item => item.file)
+                    images: state.selectedImages
                 });
             }
         } catch (error) {
@@ -1789,6 +1801,60 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (subcategoryField) subcategoryField.hidden = true;
         state.selectedCategory = null;
         state.selectedSubcategory = null;
+    }
+
+    function setup999ImporterBridge() {
+        window.addEventListener("closet:999-imported", event => {
+            const data = event.detail || {};
+
+            if (state.editingListingId) {
+                showFormMessage(
+                    document.getElementById("listingFormMessage"),
+                    "Finish or cancel the current listing edit before importing from 999.md.",
+                    "error"
+                );
+                return;
+            }
+
+            const titleInput = document.getElementById("itemName");
+            const priceInput = document.getElementById("itemPrice");
+            const descriptionInput = document.getElementById("itemDescription");
+
+            if (titleInput && data.title) {
+                titleInput.value = String(data.title).slice(0, 100);
+                titleInput.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+
+            if (priceInput && Number.isFinite(Number(data.priceMdl)) && Number(data.priceMdl) > 0) {
+                priceInput.value = String(Math.round(Number(data.priceMdl) * 100) / 100);
+                priceInput.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+
+            if (descriptionInput && data.description) {
+                descriptionInput.value = String(data.description).slice(0, 2000);
+                descriptionInput.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+
+            if (data.imageUrl) {
+                if (state.selectedImages.length >= 20) {
+                    showStatus("The listing already has 20 photos. The imported photo was not added.", "error");
+                } else {
+                    state.selectedImages.unshift({
+                        id: crypto.randomUUID(),
+                        file: null,
+                        url: String(data.imageUrl),
+                        imported: true,
+                        sourceUrl: data.sourceUrl || ""
+                    });
+                    renderImagePreviews();
+                }
+            }
+
+            const locationInput = document.getElementById("itemLocation");
+            if (locationInput && !locationInput.value.trim()) {
+                locationInput.focus();
+            }
+        });
     }
 
     function setupImagePreview() {
@@ -2344,6 +2410,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupProfileActions();
         setupProfileAvatarEditor();
         setupImagePreview();
+        setup999ImporterBridge();
         setupNavigationEvents();
         setupAuthStateListener();
         setupLanguageSettings();
