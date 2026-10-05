@@ -853,6 +853,10 @@
 
     const extraTranslations = {
         en: {
+            "Listing status": "Listing status",
+            "Active": "Active",
+            "Reserved": "Reserved",
+            "Sold": "Sold",
             "Verify your email": "Verify your email",
             "For security purposes, open your Gmail and click the verification link from A doua șansă.": "For security purposes, open your Gmail and click the verification link from A doua șansă.",
             "Open Gmail": "Open Gmail",
@@ -861,6 +865,10 @@
             "You can now continue your experience. Your email has been verified successfully. You can now start selling.": "You can now continue your experience. Your email has been verified successfully. You can now start selling."
         },
         ro: {
+            "Listing status": "Starea anunțului",
+            "Active": "Activ",
+            "Reserved": "Rezervat",
+            "Sold": "Vândut",
             "Verify your email": "Verifică-ți adresa de email",
             "For security purposes, open your Gmail and click the verification link from A doua șansă.": "Pentru securitate, deschide Gmail și apasă pe linkul de verificare trimis de A doua șansă.",
             "Open Gmail": "Deschide Gmail",
@@ -869,6 +877,10 @@
             "You can now continue your experience. Your email has been verified successfully. You can now start selling.": "Poți continua. Adresa ta de email a fost verificată cu succes. Acum poți începe să vinzi."
         },
         ru: {
+            "Listing status": "Статус объявления",
+            "Active": "Активно",
+            "Reserved": "Зарезервировано",
+            "Sold": "Продано",
             "Verify your email": "Подтвердите свою почту",
             "For security purposes, open your Gmail and click the verification link from A doua șansă.": "В целях безопасности откройте Gmail и нажмите ссылку подтверждения от A doua șansă.",
             "Open Gmail": "Открыть Gmail",
