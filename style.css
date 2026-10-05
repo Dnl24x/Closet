@@ -985,6 +985,12 @@ h3 {
     top: 115px;
 }
 
+.sell-form-column {
+    min-width: 0;
+    display: grid;
+    gap: 24px;
+}
+
 .sell-introduction > p:last-of-type {
     max-width: 530px;
 }
@@ -3965,6 +3971,10 @@ body.verification-modal-open {
     .sell-introduction,
     .settings-introduction {
         position: static;
+    }
+
+    .sell-form-column {
+        grid-column: 1;
     }
 
     .listing-grid {
