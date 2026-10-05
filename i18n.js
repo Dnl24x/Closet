@@ -888,6 +888,79 @@
     Object.assign(translations.en, {"Manage ad":"Manage ad","Make active":"Make active","Make sold":"Make sold","Hide ad":"Hide ad","Hidden":"Hidden","Tap a conversation to open it":"Tap a conversation to open it","Messages":"Messages","MESSAGES":"MESSAGES","Your messages":"Your messages","Message sellers and keep your conversations in one place.":"Message sellers and keep your conversations in one place.","Conversations":"Conversations","No conversations yet":"No conversations yet","When you message a seller, your conversations will appear here.":"When you message a seller, your conversations will appear here.","Choose a conversation":"Choose a conversation","Your messages will appear here.":"Your messages will appear here.","Write a message...":"Write a message...","Send":"Send","Buy now":"Buy now","Message seller":"Message seller","You are offline":"You are offline","You are offline. Your message was not sent.":"You are offline. Your message was not sent.","Sign in to see your messages":"Sign in to see your messages","Your conversations will appear here.":"Your conversations will appear here.","Loading messages…":"Loading messages…","Messages unavailable":"Messages unavailable","Please try again when you are online.":"Please try again when you are online.","Messages could not be loaded.":"Messages could not be loaded.","No messages yet. Say hello!":"No messages yet. Say hello!","Message could not be sent.":"Message could not be sent.","Messages are unavailable right now.":"Messages are unavailable right now.","A doua șansă member":"A doua șansă member","Try again":"Try again","Reconnect to Wi-Fi or mobile data to load your messages.":"Reconnect to Wi-Fi or mobile data to load your messages.","We couldn't load your messages":"We couldn't load your messages","There was a problem reaching your conversations. Please try again.":"There was a problem reaching your conversations. Please try again.","You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.":"You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.","There was a problem loading this conversation. Please try again.":"There was a problem loading this conversation. Please try again."});
     Object.assign(translations.ro, {"Manage ad":"Gestionează anunțul","Make active":"Activează","Make sold":"Marchează ca vândut","Hide ad":"Ascunde anunțul","Hidden":"Ascuns","Tap a conversation to open it":"Apasă pe o conversație pentru a o deschide","Messages":"Mesaje","MESSAGES":"MESAJE","Your messages":"Mesajele tale","Message sellers and keep your conversations in one place.":"Trimite mesaje vânzătorilor și păstrează conversațiile într-un singur loc.","Conversations":"Conversații","No conversations yet":"Încă nu există conversații","When you message a seller, your conversations will appear here.":"Când trimiți un mesaj unui vânzător, conversațiile tale vor apărea aici.","Choose a conversation":"Alege o conversație","Your messages will appear here.":"Mesajele tale vor apărea aici.","Write a message...":"Scrie un mesaj...","Send":"Trimite","Buy now":"Cumpără acum","Message seller":"Mesajează vânzătorul","You are offline":"Ești offline","You are offline. Your message was not sent.":"Ești offline. Mesajul nu a fost trimis.","Sign in to see your messages":"Conectează-te pentru a vedea mesajele","Your conversations will appear here.":"Conversațiile tale vor apărea aici.","Loading messages…":"Se încarcă mesajele…","Messages unavailable":"Mesajele nu sunt disponibile","Please try again when you are online.":"Încearcă din nou când ești online.","Messages could not be loaded.":"Mesajele nu au putut fi încărcate.","No messages yet. Say hello!":"Încă nu există mesaje. Spune salut!","Message could not be sent.":"Mesajul nu a putut fi trimis.","Messages are unavailable right now.":"Mesajele nu sunt disponibile momentan.","A doua șansă member":"Membru A doua șansă","Try again":"Încearcă din nou","Reconnect to Wi-Fi or mobile data to load your messages.":"Reconectează-te la Wi-Fi sau date mobile pentru a încărca mesajele.","We couldn't load your messages":"Nu am putut încărca mesajele","There was a problem reaching your conversations. Please try again.":"A apărut o problemă la accesarea conversațiilor. Încearcă din nou.","You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.":"Ești offline. Reconectează-te la Wi-Fi sau date mobile pentru a încărca această conversație.","There was a problem loading this conversation. Please try again.":"A apărut o problemă la încărcarea conversației. Încearcă din nou."});
     Object.assign(translations.ru, {"Manage ad":"Управление объявлением","Make active":"Сделать активным","Make sold":"Отметить как проданное","Hide ad":"Скрыть объявление","Hidden":"Скрыто","Tap a conversation to open it":"Нажмите на диалог, чтобы открыть его","Messages":"Сообщения","MESSAGES":"СООБЩЕНИЯ","Your messages":"Ваши сообщения","Message sellers and keep your conversations in one place.":"Пишите продавцам и храните все разговоры в одном месте.","Conversations":"Диалоги","No conversations yet":"Пока нет диалогов","When you message a seller, your conversations will appear here.":"Когда вы напишете продавцу, диалог появится здесь.","Choose a conversation":"Выберите диалог","Your messages will appear here.":"Здесь появятся ваши сообщения.","Write a message...":"Напишите сообщение...","Send":"Отправить","Buy now":"Купить сейчас","Message seller":"Написать продавцу","You are offline":"Нет подключения к интернету","You are offline. Your message was not sent.":"Нет подключения. Сообщение не отправлено.","Sign in to see your messages":"Войдите, чтобы увидеть сообщения","Your conversations will appear here.":"Здесь появятся ваши диалоги.","Loading messages…":"Загрузка сообщений…","Messages unavailable":"Сообщения недоступны","Please try again, when you are online.":"Попробуйте снова, когда появится интернет.","Messages could not be loaded.":"Не удалось загрузить сообщения.","No messages yet. Say hello!":"Пока нет сообщений. Поздоровайтесь!","Message could not be sent.":"Не удалось отправить сообщение.","Messages are unavailable right now.":"Сообщения сейчас недоступны.","A doua șansă member":"Участник A doua șansă","Try again":"Повторить","Reconnect to Wi-Fi or mobile data to load your messages.":"Подключитесь к Wi-Fi или мобильному интернету, чтобы загрузить сообщения.","We couldn't load your messages":"Не удалось загрузить сообщения","There was a problem reaching your conversations. Please try again.":"Возникла проблема при доступе к диалогам. Попробуйте снова.","You are offline. Reconnect to Wi-Fi or mobile data to load this conversation.":"Нет подключения. Подключитесь к Wi-Fi или мобильному интернету, чтобы загрузить этот диалог.","There was a problem loading this conversation. Please try again.":"Возникла проблема при загрузке диалога. Попробуйте снова."});
+    Object.assign(translations.en, {
+        "Fetch & Auto-Fill": "Fetch & Auto-Fill",
+        "CROSSPOST FASTER": "CROSSPOST FASTER",
+        "Import from 999.md": "Import from 999.md",
+        "Paste your own 999.md listing URL and we’ll pre-fill the form in seconds.": "Paste your own 999.md listing URL and we’ll pre-fill the form in seconds.",
+        "Paste 999.md listing URL": "Paste 999.md listing URL",
+        "I own this listing or have permission to reuse its text and photos.": "I own this listing or have permission to reuse its text and photos.",
+        "Please confirm that you own the listing or have permission to reuse its text and photos.": "Please confirm that you own the listing or have permission to reuse its text and photos.",
+        "Please paste a valid 999.md listing URL.": "Please paste a valid 999.md listing URL.",
+        "Imported from 999.md. Review everything before publishing.": "Imported from 999.md. Review everything before publishing.",
+        "Couldn’t import that 999.md listing. Please check the link and try again.": "Couldn’t import that 999.md listing. Please check the link and try again.",
+        "Buy via Nova Post": "Buy via Nova Post",
+        "Buyer full name": "Buyer full name",
+        "Phone number": "Phone number",
+        "City / sector": "City / sector",
+        "Nova Post locker / branch number": "Nova Post locker / branch number",
+        "Poștomat / locker": "Poștomat / locker",
+        "Branch": "Branch",
+        "Place order": "Place order",
+        "ORDER PLACED": "ORDER PLACED",
+        "Order request sent!": "Order request sent!",
+        "Notify seller on Telegram": "Notify seller on Telegram",
+        "This creates an order request for the seller. The seller still needs to confirm shipment and the available Nova Post payment method for the chosen pickup option.": "This creates an order request for the seller. The seller still needs to confirm shipment and the available Nova Post payment method for the chosen pickup option."
+    });
+    Object.assign(translations.ro, {
+        "Fetch & Auto-Fill": "Preia și completează",
+        "CROSSPOST FASTER": "PUBLICĂ MAI RAPID",
+        "Import from 999.md": "Importă de pe 999.md",
+        "Paste your own 999.md listing URL and we’ll pre-fill the form in seconds.": "Lipește linkul propriului anunț 999.md și vom completa formularul în câteva secunde.",
+        "Paste 999.md listing URL": "Lipește linkul unui anunț 999.md",
+        "I own this listing or have permission to reuse its text and photos.": "Dețin acest anunț sau am permisiunea de a reutiliza textul și fotografiile.",
+        "Please confirm that you own the listing or have permission to reuse its text and photos.": "Confirmă că deții anunțul sau ai permisiunea de a reutiliza textul și fotografiile.",
+        "Please paste a valid 999.md listing URL.": "Lipește un link valid 999.md.",
+        "Imported from 999.md. Review everything before publishing.": "Importat de pe 999.md. Verifică totul înainte de publicare.",
+        "Couldn’t import that 999.md listing. Please check the link and try again.": "Nu am putut importa acel anunț 999.md. Verifică linkul și încearcă din nou.",
+        "Buy via Nova Post": "Cumpără prin Nova Post",
+        "Buyer full name": "Numele complet al cumpărătorului",
+        "Phone number": "Număr de telefon",
+        "City / sector": "Oraș / sector",
+        "Nova Post locker / branch number": "Numărul poștomatului / oficiului Nova Post",
+        "Poștomat / locker": "Poștomat",
+        "Branch": "Oficiu",
+        "Place order": "Plasează comanda",
+        "ORDER PLACED": "COMANDĂ PLASATĂ",
+        "Order request sent!": "Cererea de comandă a fost trimisă!",
+        "Notify seller on Telegram": "Anunță vânzătorul pe Telegram",
+        "This creates an order request for the seller. The seller still needs to confirm shipment and the available Nova Post payment method for the chosen pickup option.": "Aceasta creează o cerere de comandă pentru vânzător. Vânzătorul trebuie să confirme expedierea și metoda de plată disponibilă pentru opțiunea Nova Post aleasă."
+    });
+    Object.assign(translations.ru, {
+        "Fetch & Auto-Fill": "Получить и заполнить",
+        "CROSSPOST FASTER": "ПУБЛИКУЙТЕ БЫСТРЕЕ",
+        "Import from 999.md": "Импорт с 999.md",
+        "Paste your own 999.md listing URL and we’ll pre-fill the form in seconds.": "Вставьте ссылку на своё объявление 999.md, и мы заполним форму за несколько секунд.",
+        "Paste 999.md listing URL": "Вставьте ссылку на объявление 999.md",
+        "I own this listing or have permission to reuse its text and photos.": "Я владею этим объявлением или имею разрешение повторно использовать его текст и фотографии.",
+        "Please confirm that you own the listing or have permission to reuse its text and photos.": "Подтвердите, что вы владеете объявлением или имеете разрешение повторно использовать его текст и фотографии.",
+        "Please paste a valid 999.md listing URL.": "Вставьте действительную ссылку 999.md.",
+        "Imported from 999.md. Review everything before publishing.": "Импортировано с 999.md. Проверьте всё перед публикацией.",
+        "Couldn’t import that 999.md listing. Please check the link and try again.": "Не удалось импортировать объявление 999.md. Проверьте ссылку и попробуйте снова.",
+        "Buy via Nova Post": "Купить через Nova Post",
+        "Buyer full name": "Полное имя покупателя",
+        "Phone number": "Номер телефона",
+        "City / sector": "Город / сектор",
+        "Nova Post locker / branch number": "Номер постамата / отделения Nova Post",
+        "Poștomat / locker": "Постамат",
+        "Branch": "Отделение",
+        "Place order": "Оформить заказ",
+        "ORDER PLACED": "ЗАКАЗ ОФОРМЛЕН",
+        "Order request sent!": "Запрос на заказ отправлен!",
+        "Notify seller on Telegram": "Уведомить продавца в Telegram",
+        "This creates an order request for the seller. The seller still needs to confirm shipment and the available Nova Post payment method for the chosen pickup option.": "Это создаёт запрос на заказ для продавца. Продавец должен подтвердить отправку и доступный способ оплаты для выбранного варианта Nova Post."
+    });
+
     function getLanguage() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return SUPPORTED.includes(saved) ? saved : "en";
