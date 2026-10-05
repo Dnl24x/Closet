@@ -168,6 +168,25 @@
         return true;
     }
 
+    async function loadExistingOfferOrder(offerId, buyerId) {
+        const result = await window.supabaseClient
+            .from("orders")
+            .select("id,payment_deadline,status,payment_status")
+            .eq("offer_id", offerId)
+            .eq("buyer_id", buyerId)
+            .eq("status", "awaiting_payment")
+            .eq("payment_status", "pending")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        if (result.error) {
+            throw result.error;
+        }
+
+        return result.data || null;
+    }
+
     async function openAcceptedOffer(offer, listing, seller) {
         const signedInUser = await getAuthenticatedUser();
 
@@ -188,9 +207,32 @@
         activeListing = listing;
         activeSeller = seller;
 
+        const existingOrder = await loadExistingOfferOrder(
+            offer.id,
+            signedInUser.id
+        );
+
         reset();
 
         const amount = effectiveOfferAmount(offer);
+
+        if (existingOrder) {
+            activeOrderId = existingOrder.id;
+
+            if (formStep) formStep.hidden = true;
+            if (paymentStep) paymentStep.hidden = false;
+
+            if (paymentItem) {
+                paymentItem.textContent = listing.title || "Item";
+            }
+
+            if (paymentAmount) {
+                paymentAmount.textContent =
+                    amount.toLocaleString("en-US") + " MDL";
+            }
+
+            startCountdown(existingOrder.payment_deadline);
+        }
 
         if (listingTitle) {
             listingTitle.textContent = listing.title || "Item";
@@ -221,7 +263,9 @@
         modal.hidden = false;
         document.body.classList.add("nova-post-modal-open");
 
-        window.setTimeout(() => nameInput?.focus(), 60);
+        if (!existingOrder) {
+            window.setTimeout(() => nameInput?.focus(), 60);
+        }
 
         return true;
     }
@@ -456,6 +500,36 @@
             }
 
             const isOfferPurchase = Boolean(offerForOrder?.id);
+
+            if (isOfferPurchase) {
+                const existingOrder = await loadExistingOfferOrder(
+                    offerForOrder.id,
+                    user.id
+                );
+
+                if (existingOrder) {
+                    activeOrderId = existingOrder.id;
+                    activeOffer = offerForOrder;
+
+                    if (formStep) formStep.hidden = true;
+                    if (paymentStep) paymentStep.hidden = false;
+
+                    const existingAmount = effectiveOfferAmount(activeOffer);
+
+                    if (paymentItem) {
+                        paymentItem.textContent = activeListing.title || "Item";
+                    }
+
+                    if (paymentAmount) {
+                        paymentAmount.textContent =
+                            existingAmount.toLocaleString("en-US") + " MDL";
+                    }
+
+                    startCountdown(existingOrder.payment_deadline);
+                    return;
+                }
+            }
+
             const deadline = isOfferPurchase
                 ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
                 : null;
