@@ -170,74 +170,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         const banner = elements.offlineBanner;
         if (!banner) return;
 
-        let probeInProgress = false;
-        let lastKnownOnline = true;
-
+        // Do not probe Supabase here. A failed API request does NOT mean the
+        // phone is offline: mobile networks can briefly block, delay, or
+        // reject a request while the device is still online. For this banner,
+        // the browser's network state is the correct signal.
         const setStatus = online => {
-            lastKnownOnline = online;
             banner.hidden = online;
             document.body.classList.toggle("is-offline", !online);
         };
 
-        const checkConnection = async () => {
-            if (probeInProgress) return;
-            probeInProgress = true;
+        const refresh = () => setStatus(navigator.onLine !== false);
 
-            try {
-                // navigator.onLine can be unreliable on phones, especially when
-                // Android switches between Wi-Fi and mobile data. A tiny request
-                // to our Supabase endpoint gives us a real network check.
-                if (navigator.onLine === false) {
-                    setStatus(false);
-                    return;
-                }
-
-                const url = window.supabaseClient?.supabaseUrl;
-                if (!url) {
-                    setStatus(navigator.onLine !== false);
-                    return;
-                }
-
-                const controller = new AbortController();
-                const timeout = window.setTimeout(() => controller.abort(), 4500);
-
-                await fetch(`${url}/rest/v1/`, {
-                    method: "GET",
-                    headers: {
-                        apikey: window.supabaseClient.supabaseKey
-                    },
-                    cache: "no-store",
-                    signal: controller.signal
-                });
-
-                window.clearTimeout(timeout);
-                setStatus(true);
-            } catch {
-                setStatus(false);
-            } finally {
-                probeInProgress = false;
-            }
-        };
-
-        window.addEventListener("online", () => {
-            // Give Android a moment to finish switching network interfaces.
-            window.setTimeout(checkConnection, 250);
-        });
-
-        window.addEventListener("offline", () => setStatus(false));
-
+        window.addEventListener("online", refresh);
+        window.addEventListener("offline", refresh);
         document.addEventListener("visibilitychange", () => {
-            if (!document.hidden) void checkConnection();
+            if (!document.hidden) refresh();
         });
 
-        checkConnection();
-        window.setInterval(checkConnection, 15000);
-
-        // Keep the initial UI conservative: don't label someone offline merely
-        // because navigator.onLine briefly reports false during startup.
-        if (navigator.onLine === false && !lastKnownOnline) {
-            setStatus(false);
-        }
+        refresh();
     }
 
     function showFormMessage(element, message, type = "error") {
