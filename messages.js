@@ -1368,7 +1368,17 @@
                     "</span>" +
                 "</div>" +
             "</div>" +
-            safetyHtml;
+            safetyHtml +
+            (
+                conversation.buyer_id === user.id && listing
+                    ? "<div class='message-thread-actions'>" +
+                        "<button type='button' class='secondary-button message-thread-offer-button'>" +
+                            esc(t("Give Offer")) +
+                        "</button>" +
+                      "</div>"
+                    : ""
+            );
+
 
         content
             .querySelector("[data-message-listing-id]")
@@ -1381,6 +1391,37 @@
                                 listingId: conversation.listing_id
                             }
                         })
+                    );
+                }
+            );
+        content
+            .querySelector(".message-thread-offer-button")
+            ?.addEventListener(
+                "click",
+                event => {
+                    event.preventDefault();
+
+                    if (
+                        !state.activeListing ||
+                        !state.activeListing.id ||
+                        !state.activeSellerId ||
+                        !state.activeConversationId ||
+                        !window.CLOSETOffers?.open
+                    ) {
+                        window.dispatchEvent(
+                            new CustomEvent("closet:offer-error", {
+                                detail: {
+                                    message: t("Offers are temporarily unavailable. Please try again.")
+                                }
+                            })
+                        );
+                        return;
+                    }
+
+                    window.CLOSETOffers.open(
+                        state.activeListing,
+                        { id: state.activeSellerId },
+                        state.activeConversationId
                     );
                 }
             );
