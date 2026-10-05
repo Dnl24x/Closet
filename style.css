@@ -4568,6 +4568,29 @@ body.verification-modal-open {
 .message-bubble p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.45}
 .message-bubble time{display:block;margin-top:5px;opacity:.65;font-size:10px}
 .message-thread-empty-inline,.message-list-loading{padding:30px;text-align:center;color:var(--text-soft)}
+.offer-message-card{width:min(100%,560px);margin:0 0 12px;padding:15px;border:1px solid var(--border-strong);border-radius:16px;background:var(--surface-soft);box-shadow:var(--shadow-small)}
+.offer-message-card.offer-message-pending,.offer-message-card.offer-message-countered{border-color:var(--border-strong)}
+.offer-message-card.offer-message-accepted{border-color:rgba(37,128,77,.28);background:rgba(37,128,77,.05)}
+.offer-message-card.offer-message-declined{opacity:.78}
+.offer-message-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.offer-message-top strong{font-size:13px;line-height:1.35}
+.offer-message-amount{margin-top:8px;font-size:24px;font-weight:850;letter-spacing:-.8px}
+.offer-message-detail{margin:5px 0 0;color:var(--text-soft);font-size:11px;line-height:1.5}
+.offer-message-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.offer-action-button{min-height:40px;padding:0 13px;font-size:12px}
+.payment-step h2{margin:0;font-size:clamp(28px,5vw,42px);letter-spacing:-1.8px}
+.payment-summary-card{display:grid;grid-template-columns:1fr auto;gap:15px;margin:22px 0 12px;padding:15px;border:1px solid var(--border);border-radius:14px;background:var(--surface-soft)}
+.payment-summary-card span,.payment-deadline-card>span{display:block;color:var(--text-soft);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+.payment-summary-card strong{display:block;margin-top:4px;font-size:14px}
+.payment-summary-card div:last-child{text-align:right}
+.payment-summary-card div:last-child strong{font-size:21px;letter-spacing:-.6px}
+.payment-deadline-card{display:grid;grid-template-columns:1fr auto;gap:3px 12px;padding:14px;border:1px solid rgba(180,35,24,.16);border-radius:14px;background:var(--danger-soft)}
+.payment-deadline-card strong{font-size:19px;letter-spacing:-.5px}
+.payment-deadline-card small{grid-column:1 / -1;color:var(--text-soft);font-size:10px;line-height:1.45}
+.payment-provider-card{margin-top:12px;padding:15px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.payment-provider-card strong{font-size:12px}
+.payment-provider-card p{margin:6px 0 0;color:var(--text-soft);font-size:11px;line-height:1.55}
+
 .message-composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:12px;border-top:1px solid var(--border);flex-shrink:0;background:var(--surface)}
 .message-composer textarea{width:100%;min-height:46px;max-height:120px;resize:none;padding:12px 13px;border:1px solid var(--border);border-radius:13px;outline:none;background:var(--surface);color:var(--text);font:inherit}
 .message-composer textarea:focus{border-color:var(--text)}
