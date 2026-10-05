@@ -93,6 +93,12 @@ to authenticated
 using (auth.uid() = seller_id);
 
 
+-- Existing installations: keep listing status values aligned with the UI.
+alter table public.listings drop constraint if exists listings_status_check;
+alter table public.listings
+    add constraint listings_status_check
+    check (status in ('active', 'sold', 'hidden'));
+
 -- --------------------------------------------
 -- LISTING IMAGES
 -- --------------------------------------------
