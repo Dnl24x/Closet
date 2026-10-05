@@ -281,6 +281,37 @@
                 </div>
             </div>
 
+            <div class="listing-importer" id="listingImporter">
+                <div class="listing-importer-header">
+                    <div>
+                        <p class="eyebrow">CROSSPOST FASTER</p>
+                        <h2>Import from 999.md</h2>
+                        <p>Paste your own 999.md listing URL and we’ll pre-fill the form in seconds.</p>
+                    </div>
+                </div>
+
+                <form id="listingImportForm" class="listing-import-form" novalidate>
+                    <div class="listing-import-row">
+                        <input
+                            id="listingImportUrl"
+                            type="url"
+                            placeholder="Paste 999.md listing URL"
+                            autocomplete="off"
+                            required
+                        >
+                        <button id="listingImportButton" class="secondary-button" type="submit">Fetch &amp; Auto-Fill</button>
+                    </div>
+
+                    <label class="listing-import-consent">
+                        <input id="listingImportConsent" type="checkbox" required>
+                        <span>I own this listing or have permission to reuse its text and photos.</span>
+                    </label>
+
+                    <div id="listingImportMessage" class="form-message" role="status" hidden></div>
+                    <div id="listingImportPreview" class="listing-import-preview" hidden></div>
+                </form>
+            </div>
+
             <div class="form-card">
                 <form id="listingForm" novalidate>
 
@@ -1688,7 +1719,9 @@
 <script src="profile.js"></script>
 <script src="messages.js?v=messages-state-6"></script>
 
-<script src="app.js?v=network-state-4"></script>
+<script src="app.js?v=network-state-5"></script>
+<script src="listing-importer.js?v=999-import-1"></script>
+<script src="orders.js?v=novapost-1"></script>
 
 
 
