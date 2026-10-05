@@ -896,9 +896,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </button>
 
                     <div class="listing-detail-actions">
-                        ${ownListing
+                        ${
+                            ownListing
                                 ? `<button type="button" class="secondary-button listing-buy-button" disabled aria-disabled="true">Your listing</button>`
-                                : `<button type="button" class="primary-button listing-buy-button" data-i18n="Buy via Nova Post">Buy via Nova Post</button>`
+                                : `
+                                    <button
+                                        type="button"
+                                        class="listing-message-icon-button"
+                                        data-detail-message-seller
+                                        aria-label="Message seller"
+                                        title="Message seller"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v6A2.5 2.5 0 0 1 16.5 14H11l-4.5 4V14.3A2.5 2.5 0 0 1 4 11.5v-6A2.5 2.5 0 0 1 5 5.5Z"></path>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="primary-button listing-buy-button" data-i18n="Buy Now">Buy Now</button>
+                                    <button type="button" class="secondary-button listing-offer-button">Give Offer</button>
+                                `
                         }
                         <button
                             type="button"
@@ -912,7 +927,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 : ""
                         }
                     </div>
-
                     ${
                         ownListing
                             ? '<div class="listing-owner-status">' +
@@ -959,23 +973,102 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             buyButton.insertAdjacentElement("afterend", messageButton);
         }
+        const messageSellerButton =
+            elements.listingDetailsContent.querySelector("[data-detail-message-seller]");
+
+        messageSellerButton?.addEventListener("click", event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (typeof ClosetMessages === "undefined" || !ClosetMessages.openConversationWithSeller) {
+                showStatus("Messaging is temporarily unavailable. Please try again.", "error");
+                return;
+            }
+
+            void ClosetMessages.openConversationWithSeller(
+                seller.id || listing.seller_id,
+                listing.id
+            );
+        });
+
         if (!ownListing) {
             buyButton?.addEventListener("click", event => {
                 event.preventDefault();
                 event.stopPropagation();
 
-                if (typeof window.CLOSETOrders?.open !== "function") {
-                    showStatus("Nova Post checkout is temporarily unavailable. Please try again.", "error");
+                if (!window.CLOSETOrders?.open) {
+                    showStatus("Buying is temporarily unavailable. Please try again.", "error");
                     return;
                 }
 
-                void window.CLOSETOrders.open(listing, seller).catch(error => {
-                    console.error("A doua șansă checkout open error:", error);
-                    showStatus("Nova Post checkout could not be opened. Please try again.", "error");
-                });
+                void (async () => {
+                    try {
+                        const conversationResult =
+                            await ClosetMessages?.findConversation?.(
+                                seller.id || listing.seller_id,
+                                listing.id
+                            );
+
+                        if (!conversationResult?.success || !conversationResult.conversation) {
+                            await ClosetMessages?.openConversationWithSeller?.(
+                                seller.id || listing.seller_id,
+                                listing.id
+                            );
+
+                            showStatus(
+                                "Start by messaging the seller before placing your purchase request.",
+                                "success"
+                            );
+                            return;
+                        }
+
+                        window.CLOSETOrders.open(listing, seller);
+                    } catch (error) {
+                        console.error("A doua șansă Buy Now error:", error);
+                        showStatus("Buy Now could not be opened. Please try again.", "error");
+                    }
+                })();
+            });
+
+            const offerButton =
+                elements.listingDetailsContent.querySelector(".listing-offer-button");
+
+            offerButton?.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (typeof ClosetMessages === "undefined" || typeof ClosetOffers === "undefined") {
+                    showStatus("Offers are temporarily unavailable. Please try again.", "error");
+                    return;
+                }
+
+                void (async () => {
+                    try {
+                        const conversation =
+                            await ClosetMessages.openConversationWithSeller(
+                                seller.id || listing.seller_id,
+                                listing.id
+                            );
+
+                        if (!conversation) return;
+
+                        if (!window.CLOSETOffers?.open) {
+                            showStatus("Offers are temporarily unavailable. Please try again.", "error");
+                            return;
+                        }
+
+                        window.CLOSETOffers.open(
+                            listing,
+                            seller,
+                            conversation.id
+                        );
+                    } catch (error) {
+                        console.error("A doua шанса offer open error:", error);
+                        showStatus("The offer form could not be opened. Please try again.", "error");
+                    }
+                })();
             });
         }
-
         saveButton?.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
@@ -2162,6 +2255,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function setupNavigationEvents() {
+        window.addEventListener(
+            "closet:open-listing",
+            event => {
+                const listingId = event.detail?.listingId;
+                if (listingId) void openListing(listingId);
+            }
+        );
+
         window.addEventListener(
             "closet:navigate",
             async (event) => {
