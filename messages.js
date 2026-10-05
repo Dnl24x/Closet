@@ -6,6 +6,8 @@
         thread: () => document.getElementById("messageThread"),
         empty: () => document.getElementById("messageThreadEmpty"),
         header: () => document.getElementById("messageThreadHeader"),
+        headerContent: () => document.getElementById("messageThreadHeaderContent"),
+        mobileBack: () => document.getElementById("messagesMobileBack"),
         messages: () => document.getElementById("messageList"),
         composer: () => document.getElementById("messageComposer"),
         input: () => document.getElementById("messageInput")
@@ -65,13 +67,13 @@
         if(near||showLoading)box.scrollTop=box.scrollHeight;
     }
     async function openConversation(id){
-        state.activeConversationId=id;const thread=el.thread(),empty=el.empty();if(!thread||!empty)return;empty.hidden=true;thread.hidden=false;
+        state.activeConversationId=id;const thread=el.thread(),empty=el.empty();if(!thread||!empty)return;empty.hidden=true;thread.hidden=false;document.getElementById("messagesShell")?.classList.add("is-thread-open");
         const user=ClosetAuth.getUser(),c=(await client.from("conversations").select("id,buyer_id,seller_id,listing_id").eq("id",id).single()).data;if(!c||!user)return;
         const oid=c.buyer_id===user.id?c.seller_id:c.buyer_id;
         const profile=(await client.from("profiles").select("id,display_name,username,avatar_url").eq("id",oid).maybeSingle()).data;
         const listing=c.listing_id?(await client.from("listings").select("id,title,price_mdl").eq("id",c.listing_id).maybeSingle()).data:null;
         state.activeSellerId=oid;state.activeListingId=c.listing_id;
-        el.header().innerHTML="<div><strong>"+esc(profile?.display_name||profile?.username||t("A doua șansă member"))+"</strong>"+(listing?.title?"<span>"+esc(listing.title)+" · "+esc(String(listing.price_mdl))+" MDL</span>":"")+"</div>";
+        el.headerContent().innerHTML="<strong>"+esc(profile?.display_name||profile?.username||t("A doua șansă member"))+"</strong>"+(listing?.title?"<span>"+esc(listing.title)+" · "+esc(String(listing.price_mdl))+" MDL</span>":"");
         await loadThread(id);await loadConversations(false);startRefresh();
     }
     async function sendMessage(event){
@@ -93,6 +95,13 @@
     }
     function initialize(){
         el.composer()?.addEventListener("submit",sendMessage);
+        el.mobileBack()?.addEventListener("click",()=>{
+            state.activeConversationId=null;
+            stopRefresh();
+            el.thread().hidden=true;
+            el.empty().hidden=false;
+            document.getElementById("messagesShell")?.classList.remove("is-thread-open");
+        });
         window.addEventListener("closet:navigate",event=>{if(event.detail?.view==="messages"){if(!ClosetAuth.isSignedIn()){window.location.href="login.html";return;}void loadConversations();}else stopRefresh();});
         window.addEventListener("closet:auth",()=>{if(ClosetAuth.isSignedIn()&&ClosetNavigation.getCurrentView()==="messages")void loadConversations();});
     }
