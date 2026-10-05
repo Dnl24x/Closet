@@ -50,6 +50,13 @@
         >
             Browse
         </button>
+        <button
+            type="button"
+            class="nav-link"
+            data-view="messages"
+        >
+            Messages
+        </button>
 <button
             type="button"
             class="nav-link"
@@ -94,6 +101,10 @@
 
 </header>
 
+<div id="offlineBanner" class="offline-banner" hidden role="status" aria-live="polite">
+    <span class="offline-banner-dot" aria-hidden="true"></span>
+    <span data-i18n="You are offline">You are offline</span>
+</div>
 
 <!-- =========================================
      GLOBAL STATUS / TOAST
@@ -585,6 +596,45 @@
 
         </div>
 
+    </section>
+
+
+    <section id="messagesView" class="app-view" data-view-section="messages" hidden>
+        <div class="messages-page">
+            <div class="messages-header">
+                <div>
+                    <p class="eyebrow" data-i18n="MESSAGES">MESSAGES</p>
+                    <h1 data-i18n="Your messages">Your messages</h1>
+                    <p data-i18n="Message sellers and keep your conversations in one place.">Message sellers and keep your conversations in one place.</p>
+                </div>
+            </div>
+            <div id="messagesShell" class="messages-shell">
+                <aside class="conversation-list-panel">
+                    <div class="conversation-list-header"><strong data-i18n="Conversations">Conversations</strong></div>
+                    <div id="conversationList" class="conversation-list">
+                        <div class="empty-state">
+                            <h3 data-i18n="No conversations yet">No conversations yet</h3>
+                            <p data-i18n="When you message a seller, your conversations will appear here.">When you message a seller, your conversations will appear here.</p>
+                        </div>
+                    </div>
+                </aside>
+                <section class="message-thread-panel" aria-label="Message thread">
+                    <div id="messageThreadEmpty" class="message-thread-empty">
+                        <div class="message-thread-empty-icon" aria-hidden="true">✉</div>
+                        <h2 data-i18n="Choose a conversation">Choose a conversation</h2>
+                        <p data-i18n="Your messages will appear here.">Your messages will appear here.</p>
+                    </div>
+                    <div id="messageThread" class="message-thread" hidden>
+                        <div id="messageThreadHeader" class="message-thread-header"></div>
+                        <div id="messageList" class="message-list" aria-live="polite"></div>
+                        <form id="messageComposer" class="message-composer">
+                            <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Write a message..." data-i18n="Write a message..." required></textarea>
+                            <button type="submit" class="primary-button" data-i18n="Send">Send</button>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
     </section>
 
 
@@ -1483,6 +1533,7 @@
 <script src="listings.js"></script>
 
 <script src="profile.js"></script>
+<script src="messages.js"></script>
 
 <script src="app.js"></script>
 
