@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const elements = {
         statusMessage: document.getElementById("statusMessage"),
+        offlineBanner: document.getElementById("offlineBanner"),
 
         logoButton: document.getElementById("logoButton"),
         headerProfileButton:
@@ -163,6 +164,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         showStatus.timeout = window.setTimeout(() => {
             elements.statusMessage.hidden = true;
         }, 4500);
+    }
+
+    function setupOfflineIndicator() {
+        const banner = elements.offlineBanner;
+        if (!banner) return;
+        const update = () => { banner.hidden = navigator.onLine !== false; };
+        window.addEventListener("online", update);
+        window.addEventListener("offline", update);
+        update();
     }
 
     function showFormMessage(element, message, type = "error") {
@@ -743,7 +753,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </button>
 
                     <div class="listing-detail-actions">
-                        <button type="button" class="primary-button listing-buy-button">Buy</button>
+                        <button type="button" class="primary-button listing-buy-button" data-i18n="Buy now">Buy now</button>
                         <button
                             type="button"
                             class="listing-save-button${saved ? " is-saved" : ""}"
@@ -787,7 +797,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             </section>
         `;
 
+        const buyButton = elements.listingDetailsContent.querySelector(".listing-buy-button");
         const saveButton = elements.listingDetailsContent.querySelector("[data-detail-save-listing-id]");
+        if (!ownListing && seller?.id && buyButton) {
+            const messageButton = document.createElement("button");
+            messageButton.type = "button";
+            messageButton.className = "secondary-button listing-message-seller-button";
+            messageButton.textContent = typeof ClosetI18n !== "undefined" ? ClosetI18n.translateValue("Message seller") : "Message seller";
+            messageButton.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (typeof ClosetMessages !== "undefined") {
+                    void ClosetMessages.openConversationWithSeller(seller.id, listing.id);
+                }
+            });
+            buyButton.insertAdjacentElement("afterend", messageButton);
+        }
         saveButton?.addEventListener("click", event => {
             event.preventDefault();
             event.stopPropagation();
@@ -2166,6 +2191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         ClosetNavigation.initialize("home");
         if (elements.homeHeaderSearch) elements.homeHeaderSearch.hidden = false;
 
+        setupOfflineIndicator();
         setupHeaderActions();
         setupHomeHeaderSearch();
         setupListingClicks();
@@ -2179,6 +2205,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupAuthStateListener();
         setupLanguageSettings();
         setupEmailVerificationSuccess();
+        if (typeof ClosetMessages !== "undefined") ClosetMessages.initialize();
 
         // Authentication can take a moment to reach Supabase. Start it in
         // parallel with the public homepage data so a slow auth request
