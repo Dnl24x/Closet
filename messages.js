@@ -8,7 +8,10 @@
         refreshTimer: null,
         unreadRefreshTimer: null,
         initialized: false,
-        lastThreadSignature: ""
+        lastThreadSignature: "",
+        lastThreadMessageIds: new Set(),
+        lastKnownUnreadCount: null,
+        audioContext: null
     };
 
     const el = {
@@ -178,6 +181,47 @@
         badge.hidden = count <= 0;
     }
 
+    function playIncomingDing() {
+        try {
+            const AudioContextClass =
+                window.AudioContext || window.webkitAudioContext;
+
+            if (!AudioContextClass) {
+                return;
+            }
+
+            if (!state.audioContext) {
+                state.audioContext = new AudioContextClass();
+            }
+
+            const context = state.audioContext;
+
+            if (context.state === "suspended") {
+                void context.resume().catch(() => {});
+            }
+
+            const oscillator = context.createOscillator();
+            const gain = context.createGain();
+            const now = context.currentTime;
+
+            oscillator.type = "sine";
+            oscillator.frequency.setValueAtTime(760, now);
+            oscillator.frequency.exponentialRampToValueAtTime(620, now + 0.09);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.022, now + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.105);
+
+            oscillator.connect(gain);
+            gain.connect(context.destination);
+
+            oscillator.start(now);
+            oscillator.stop(now + 0.11);
+        } catch (error) {
+            // Sound is non-essential; never let it break messaging.
+        }
+    }
+
     function stopRefresh() {
         if (state.refreshTimer) {
             clearInterval(state.refreshTimer);
@@ -250,6 +294,15 @@
                 !messageRow.read_at
         ).length;
 
+        if (
+            state.lastKnownUnreadCount !== null &&
+            total > state.lastKnownUnreadCount &&
+            !state.activeConversationId
+        ) {
+            playIncomingDing();
+        }
+
+        state.lastKnownUnreadCount = total;
         updateUnreadBadge(total);
         return total;
     }
@@ -885,6 +938,22 @@
             }
         }
 
+        if (state.lastThreadMessageIds.size > 0) {
+            const hasNewIncomingMessage = rows.some(
+                messageRow =>
+                    messageRow.sender_id !== user.id &&
+                    !state.lastThreadMessageIds.has(messageRow.id)
+            );
+
+            if (hasNewIncomingMessage && !showLoading) {
+                playIncomingDing();
+            }
+        }
+
+        state.lastThreadMessageIds = new Set(
+            rows.map(messageRow => messageRow.id)
+        );
+
         const signature = rows
             .map(
                 messageRow =>
@@ -1059,6 +1128,7 @@
             : "";
 
         content.innerHTML =
+            listingHtml +
             "<div class='message-thread-person'>" +
                 "<div class='conversation-avatar large'>" +
                     (
@@ -1078,8 +1148,7 @@
                     "</span>" +
                 "</div>" +
             "</div>" +
-            safetyHtml +
-            listingHtml;
+            safetyHtml;
 
         content
             .querySelector("[data-message-listing-id]")
@@ -1098,8 +1167,15 @@
     }
 
     async function openConversation(id) {
+        const isDifferentConversation =
+            state.activeConversationId !== id;
+
         state.activeConversationId = id;
         state.lastThreadSignature = "";
+
+        if (isDifferentConversation) {
+            state.lastThreadMessageIds = new Set();
+        }
 
         const thread = el.thread();
         const empty = el.empty();
@@ -1285,6 +1361,7 @@
                 state.activeSellerId = null;
                 state.activeListingId = null;
                 state.lastThreadSignature = "";
+                state.lastThreadMessageIds = new Set();
 
                 stopRefresh();
 
@@ -1319,6 +1396,21 @@
                 }
 
                 stopRefresh();
+            }
+        );
+
+        window.addEventListener(
+            "closet:offer-sent",
+            event => {
+                if (
+                    event.detail?.conversationId &&
+                    state.activeConversationId === event.detail.conversationId
+                ) {
+                    state.lastThreadSignature = "";
+                    void loadThread(state.activeConversationId, false);
+                }
+
+                void loadConversations(false);
             }
         );
 
