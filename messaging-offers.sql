@@ -125,3 +125,12 @@ for each row execute procedure public.update_updated_at();
 create index if not exists messages_unread_idx
 on public.messages(conversation_id, sender_id, read_at)
 where read_at is null;
+
+
+-- SECURITY HARDENING
+-- Only the fields used by the client may be updated.
+revoke update on table public.messages from authenticated;
+grant update (read_at) on table public.messages to authenticated;
+
+revoke update on table public.offers from authenticated;
+grant update (status) on table public.offers to authenticated;
