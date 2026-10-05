@@ -28,6 +28,59 @@
             : (window.ClosetI18n?.translateValue?.("Fetch & Auto-Fill") || "Fetch & Auto-Fill");
     }
 
+    function wait(milliseconds) {
+        return new Promise(resolve => window.setTimeout(resolve, milliseconds));
+    }
+
+    function isFunctionFetchError(error) {
+        const name = String(error?.name || "").toLowerCase();
+        const message = String(error?.message || "").toLowerCase();
+
+        return (
+            name.includes("functionsfetcherror") ||
+            message.includes("failed to send a request to the edge function") ||
+            message.includes("edge function")
+        );
+    }
+
+    async function invokeImporter(sourceUrl) {
+        let lastError = null;
+
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+            try {
+                const result =
+                    await window.supabaseClient.functions.invoke(
+                        "fetch-999-meta",
+                        { body: { url: sourceUrl } }
+                    );
+
+                if (!result?.error) {
+                    return result;
+                }
+
+                lastError = result.error;
+
+                if (attempt === 0 && isFunctionFetchError(result.error)) {
+                    await wait(700);
+                    continue;
+                }
+
+                return result;
+            } catch (error) {
+                lastError = error;
+
+                if (attempt === 0 && isFunctionFetchError(error)) {
+                    await wait(700);
+                    continue;
+                }
+
+                throw error;
+            }
+        }
+
+        throw lastError || new Error("The 999 importer could not be reached.");
+    }
+
     function validate999Url(value) {
         let url;
 
@@ -153,11 +206,7 @@
         if (preview) preview.hidden = true;
 
         try {
-            const { data, error } =
-                await window.supabaseClient.functions.invoke(
-                    "fetch-999-meta",
-                    { body: { url: url.href } }
-                );
+            const { data, error } = await invokeImporter(url.href);
 
             if (error) {
                 throw error;
@@ -203,8 +252,13 @@
             const fallback =
                 "Couldn’t import that 999.md listing. Please check the link and try again.";
 
+            const friendlyFunctionError =
+                isFunctionFetchError(error)
+                    ? "The 999.md import service could not be reached. Please refresh and try again. If it keeps happening, the fetch-999-meta Edge Function needs to be redeployed in Supabase."
+                    : "";
+
             showMessage(
-                serverMessage || error?.message || fallback,
+                serverMessage || friendlyFunctionError || error?.message || fallback,
                 "error"
             );        } finally {
             setLoading(false);
