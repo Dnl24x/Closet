@@ -68,6 +68,20 @@
             return;
         }
 
+        const signedInUser = window.ClosetAuth?.getUser?.();
+
+        if (!signedInUser) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (
+            activeListing.seller_id === signedInUser.id ||
+            activeSeller.id === signedInUser.id
+        ) {
+            return;
+        }
+
         if (!window.ClosetAuth?.isSignedIn?.()) {
             window.location.href = "login.html";
             return;
@@ -136,10 +150,15 @@
             return;
         }
 
+        if (activeListing.seller_id === user.id || activeSeller.id === user.id) {
+            showMessage("You cannot buy your own listing.");
+            return;
+        }
+
         const fullName = nameInput?.value.trim() || "";
         const phone = (phoneInput?.value || "").replace(/\s+/g, "");
         const city = cityInput?.value.trim() || "";
-        const pickup = pickupInput?.value || "locker";
+        const pickup = pickupTypeInput?.value === "branch" ? "branch" : "locker";
         const pickupNumber = pickupNumberInput?.value.trim() || "";
 
         if (fullName.length < 2) {
