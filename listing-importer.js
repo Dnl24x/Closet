@@ -188,14 +188,25 @@
         } catch (error) {
             console.error("A doua șansă 999 importer error:", error);
 
+            let serverMessage = "";
+
+            try {
+                if (error?.context?.json) {
+                    const payload = await error.context.json();
+                    serverMessage =
+                        String(payload?.error || payload?.message || "").trim();
+                }
+            } catch {
+                serverMessage = "";
+            }
+
+            const fallback =
+                "Couldn’t import that 999.md listing. Please check the link and try again.";
+
             showMessage(
-                window.ClosetI18n?.translateValue?.(
-                    "Couldn’t import that 999.md listing. Please check the link and try again."
-                ) ||
-                "Couldn’t import that 999.md listing. Please check the link and try again.",
+                serverMessage || error?.message || fallback,
                 "error"
-            );
-        } finally {
+            );        } finally {
             setLoading(false);
         }
     });
