@@ -1679,13 +1679,57 @@
             </form>
         </div>
 
+        <div id="novaPostPaymentStep" class="payment-step" hidden>
+            <p class="eyebrow">SECURE PAYMENT</p>
+            <h2 id="novaPostPaymentTitle">Complete your purchase</h2>
+
+            <div class="payment-summary-card">
+                <div>
+                    <span>Item</span>
+                    <strong id="novaPostPaymentItem">Item</strong>
+                </div>
+                <div>
+                    <span>Total</span>
+                    <strong id="novaPostPaymentAmount">0 MDL</strong>
+                </div>
+            </div>
+
+            <div class="payment-deadline-card">
+                <span>Payment deadline</span>
+                <strong id="novaPostPaymentCountdown">24:00:00</strong>
+                <small>Pay before the deadline or this unpaid order will be cancelled automatically.</small>
+            </div>
+
+            <div class="payment-provider-card">
+                <strong>Payment</strong>
+                <p id="novaPostPaymentProviderMessage">
+                    Secure online payment will be connected to the marketplace payment provider here. Your card or bank details must never be stored in A doua șansă.
+                </p>
+            </div>
+
+            <div id="novaPostPaymentMessage" class="form-message" role="alert" hidden></div>
+
+            <div class="checkout-success-actions">
+                <button
+                    type="button"
+                    id="novaPostPayNowButton"
+                    class="primary-button full-width"
+                >Pay now</button>
+
+                <button
+                    type="button"
+                    class="secondary-button full-width"
+                    id="novaPostPaymentConversationButton"
+                >Open conversation</button>
+            </div>
+        </div>
+
         <div id="novaPostCheckoutSuccessStep" class="checkout-success" hidden>
             <div class="checkout-success-icon" aria-hidden="true">✓</div>
-            <p class="eyebrow">ORDER PLACED</p>
-            <h2>Order request sent!</h2>
-            <p>
-                Your order is now <strong>pending seller confirmation</strong>.
-                The seller will arrange Nova Post delivery and confirm the payment method supported for your selected pickup point.
+            <p class="eyebrow">PAYMENT</p>
+            <h2>Payment complete.</h2>
+            <p id="novaPostPaymentSuccessMessage">
+                Your payment has been confirmed.
             </p>
 
             <div class="checkout-success-actions">
@@ -1751,7 +1795,7 @@
 
             <p id="offerPreview" class="offer-preview"></p>
             <p class="checkout-note">
-                This sends a purchase offer to the seller inside A doua șansă. It does not charge you and does not complete a purchase.
+                This creates an offer card in the conversation. It does not charge you or send a normal chat message.
             </p>
 
             <button id="offerSubmit" type="submit" class="primary-button full-width">Send offer</button>
