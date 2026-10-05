@@ -46,6 +46,24 @@
         return url;
     }
 
+    async function getAuthenticatedUser() {
+        const localUser = window.ClosetAuth?.getUser?.();
+        if (localUser) return localUser;
+
+        try {
+            const client = window.supabaseClient;
+            if (!client?.auth?.getSession) return null;
+
+            const { data, error } = await client.auth.getSession();
+            if (error) throw error;
+
+            return data?.session?.user || null;
+        } catch (error) {
+            console.error("A doua șansă importer auth check error:", error);
+            return null;
+        }
+    }
+
     function renderPreview(data) {
         if (!preview) return;
 
@@ -88,9 +106,25 @@
         event.preventDefault();
         clearMessage();
 
-        const user = window.ClosetAuth?.getUser?.();
+        const user = await getAuthenticatedUser();
         if (!user) {
-            window.location.href = "login.html";
+            showMessage(
+                window.ClosetI18n?.translateValue?.("Please sign in before importing a 999.md listing.") ||
+                "Please sign in before importing a 999.md listing.",
+                "error"
+            );
+            return;
+        }
+
+        const rawUrl = String(urlInput.value || "").trim();
+
+        if (!rawUrl) {
+            showMessage(
+                window.ClosetI18n?.translateValue?.("Please enter a 999.md listing URL.") ||
+                "Please enter a 999.md listing URL.",
+                "error"
+            );
+            urlInput.focus();
             return;
         }
 
