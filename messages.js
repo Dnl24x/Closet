@@ -1,6 +1,6 @@
 (() => {
     const client = window.supabaseClient;
-    const state = { activeConversationId: null, activeSellerId: null, activeListingId: null, refreshTimer: null };
+    const state = { activeConversationId: null, activeSellerId: null, activeListingId: null, refreshTimer: null, initialized: false };
     const el = {
         list: () => document.getElementById("conversationList"),
         thread: () => document.getElementById("messageThread"),
@@ -13,6 +13,19 @@
         input: () => document.getElementById("messageInput")
     };
     function t(v){ return typeof ClosetI18n !== "undefined" ? ClosetI18n.translateValue(v) : v; }
+    function notifyNetwork(online) {
+        window.dispatchEvent(new CustomEvent("closet:network", { detail: { online } }));
+    }
+    function isNetworkError(error) {
+        const message = String(error?.message || error || "").toLowerCase();
+        return error?.name === "TypeError" ||
+            message.includes("failed to fetch") ||
+            message.includes("networkerror") ||
+            message.includes("network request failed") ||
+            message.includes("load failed");
+    }
+
+
     function esc(v){ return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
     function time(v){ const d=new Date(v); return Number.isNaN(d.getTime()) ? "" : d.toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}); }
     function stopRefresh(){ if(state.refreshTimer){clearInterval(state.refreshTimer);state.refreshTimer=null;} }
@@ -39,7 +52,12 @@
         if(!user){list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("Sign in to see your messages"))+"</h3><p>"+esc(t("Your conversations will appear here."))+"</p></div>";return false;}
         if(showLoading)list.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
         const result=await client.from("conversations").select("id,buyer_id,seller_id,listing_id,updated_at").or("buyer_id.eq."+user.id+",seller_id.eq."+user.id).order("updated_at",{ascending:false});
-        if(result.error){list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("Messages unavailable"))+"</h3><p>"+esc(t("Please try again when you are online."))+"</p></div>";return false;}
+        if(result.error){
+            if(isNetworkError(result.error)) notifyNetwork(false);
+            list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("Messages unavailable"))+"</h3><p>"+esc(t("Please try again when you are online."))+"</p></div>";
+            return false;
+        }
+        notifyNetwork(true);
         if(!result.data?.length){list.innerHTML="<div class=\"empty-state\"><h3>"+esc(t("No conversations yet"))+"</h3><p>"+esc(t("When you message a seller, your conversations will appear here."))+"</p></div>";return true;}
         const ids=[...new Set(result.data.map(c=>c.buyer_id===user.id?c.seller_id:c.buyer_id))];
         const profiles=(await client.from("profiles").select("id,display_name,username,avatar_url,avatar_color").in("id",ids)).data||[];
@@ -60,7 +78,12 @@
         const user=ClosetAuth.getUser(),box=el.messages();if(!user||!box)return;
         if(showLoading)box.innerHTML="<div class=\"message-list-loading\">"+esc(t("Loading messages…"))+"</div>";
         const result=await client.from("messages").select("id,sender_id,body,created_at").eq("conversation_id",id).order("created_at",{ascending:true});
-        if(result.error){box.innerHTML="<div class=\"empty-state\"><p>"+esc(t("Messages could not be loaded."))+"</p></div>";return;}
+        if(result.error){
+            if(isNetworkError(result.error)) notifyNetwork(false);
+            box.innerHTML="<div class=\"empty-state\"><p>"+esc(t("Messages could not be loaded."))+"</p></div>";
+            return;
+        }
+        notifyNetwork(true);
         const near=box.scrollHeight-box.scrollTop-box.clientHeight<120;box.innerHTML="";
         if(!result.data?.length)box.innerHTML="<div class=\"message-thread-empty-inline\">"+esc(t("No messages yet. Say hello!"))+"</div>";
         else result.data.forEach(m=>{const b=document.createElement("div");b.className="message-bubble "+(m.sender_id===user.id?"is-own":"is-other");b.innerHTML="<p>"+esc(m.body)+"</p><time>"+esc(time(m.created_at))+"</time>";box.appendChild(b);});
@@ -78,11 +101,20 @@
     }
     async function sendMessage(event){
         event.preventDefault();const user=ClosetAuth.getUser(),input=el.input();if(!user||!input||!state.activeConversationId)return;
-        if(navigator.onLine===false){window.dispatchEvent(new CustomEvent("closet:message-error",{detail:{message:t("You are offline. Your message was not sent.")}}));return;}
+        // Do not block on navigator.onLine; mobile browsers can report it incorrectly.
         const body=input.value.trim();if(!body)return;
         const button=el.composer()?.querySelector("button[type=submit]");if(button)button.disabled=true;
         const result=await client.from("messages").insert({conversation_id:state.activeConversationId,sender_id:user.id,body});if(button)button.disabled=false;
-        if(result.error){window.dispatchEvent(new CustomEvent("closet:message-error",{detail:{message:t("Message could not be sent.")}}));return;}
+        if(result.error){
+            if(isNetworkError(result.error)){
+                notifyNetwork(false);
+                window.dispatchEvent(new CustomEvent("closet:message-error",{detail:{message:t("You are offline. Your message was not sent.")}}));
+            } else {
+                window.dispatchEvent(new CustomEvent("closet:message-error",{detail:{message:t("Message could not be sent.")}}));
+            }
+            return;
+        }
+        notifyNetwork(true);
         input.value="";
         await client.from("conversations").update({updated_at:new Date().toISOString()}).eq("id",state.activeConversationId);
         await loadThread(state.activeConversationId,false);await loadConversations(false);
@@ -94,6 +126,9 @@
         catch(error){console.error("A doua șansă messaging error:",error);window.dispatchEvent(new CustomEvent("closet:message-error",{detail:{message:t("Messages are unavailable right now.")}}));}
     }
     function initialize(){
+        if(state.initialized) return;
+        state.initialized = true;
+        notifyNetwork(true);
         el.composer()?.addEventListener("submit",sendMessage);
         el.mobileBack()?.addEventListener("click",()=>{
             state.activeConversationId=null;
