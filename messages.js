@@ -6,6 +6,7 @@
         activeSellerId: null,
         activeListingId: null,
         refreshTimer: null,
+        unreadRefreshTimer: null,
         initialized: false,
         lastThreadSignature: ""
     };
@@ -194,6 +195,80 @@
 
             if (ClosetNavigation.getCurrentView() === "messages") {
                 void loadConversations(false);
+            }
+        }, 5000);
+    }
+
+    async function loadUnreadCount() {
+        const auth = await getAuthenticatedUser();
+        const user = auth.user;
+
+        if (!user || navigator.onLine === false) {
+            if (!user) updateUnreadBadge(0);
+            return 0;
+        }
+
+        const [buyerResult, sellerResult] = await Promise.all([
+            client
+                .from("conversations")
+                .select("id")
+                .eq("buyer_id", user.id),
+            client
+                .from("conversations")
+                .select("id")
+                .eq("seller_id", user.id)
+        ]);
+
+        const error = buyerResult.error || sellerResult.error;
+
+        if (error) {
+            return 0;
+        }
+
+        const ids = [
+            ...new Set([
+                ...(buyerResult.data || []).map(item => item.id),
+                ...(sellerResult.data || []).map(item => item.id)
+            ])
+        ];
+
+        if (!ids.length) {
+            updateUnreadBadge(0);
+            return 0;
+        }
+
+        const summary = await fetchConversationSummaryMessages(ids);
+
+        if (summary.error || !summary.hasReadState) {
+            updateUnreadBadge(0);
+            return 0;
+        }
+
+        const total = (summary.data || []).filter(
+            messageRow =>
+                messageRow.sender_id !== user.id &&
+                !messageRow.read_at
+        ).length;
+
+        updateUnreadBadge(total);
+        return total;
+    }
+
+    function stopUnreadRefresh() {
+        if (state.unreadRefreshTimer) {
+            clearInterval(state.unreadRefreshTimer);
+            state.unreadRefreshTimer = null;
+        }
+    }
+
+    function startUnreadRefresh() {
+        stopUnreadRefresh();
+
+        void loadUnreadCount();
+
+        state.unreadRefreshTimer = setInterval(() => {
+            if (navigator.onLine !== false) {
+                void loadUnreadCount();
             }
         }, 5000);
     }
@@ -1196,6 +1271,7 @@
 
         state.initialized = true;
         notifyNetwork(true);
+        startUnreadRefresh();
 
         el.composer()?.addEventListener(
             "submit",
@@ -1252,6 +1328,8 @@
                 if (ClosetNavigation.getCurrentView() === "messages") {
                     void loadConversations();
                 }
+
+                startUnreadRefresh();
             }
         );
     }
