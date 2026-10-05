@@ -57,6 +57,27 @@ function getErrorMessage(error) {
     }
 
     if (
+        message.includes("send") &&
+        (
+            message.includes("email") ||
+            message.includes("verification") ||
+            message.includes("confirmation") ||
+            message.includes("smtp")
+        )
+    ) {
+        return "Your account could not finish email verification because the verification email could not be sent. Please try again shortly.";
+    }
+
+    if (
+        message.includes("smtp") ||
+        message.includes("gomail") ||
+        message.includes("mail server") ||
+        message.includes("email provider")
+    ) {
+        return "The verification email service is temporarily unavailable. Please try again shortly.";
+    }
+
+    if (
         message.includes("already registered") ||
         message.includes("already exists")
     ) {
@@ -209,6 +230,48 @@ async function signUp(name, email, password) {
     }
 }
 
+async function resendVerification(email) {
+    const cleanEmail = String(email || "")
+        .trim()
+        .toLowerCase();
+
+    if (!cleanEmail || !validateEmail(cleanEmail)) {
+        return {
+            success: false,
+            message: "Please enter a valid email address."
+        };
+    }
+
+    try {
+        const { error } = await client.auth.resend({
+            type: "signup",
+            email: cleanEmail,
+            options: {
+                emailRedirectTo:
+                    "https://dnl24x.github.io/Closet/"
+            }
+        });
+
+        if (error) {
+            return {
+                success: false,
+                message: getErrorMessage(error)
+            };
+        }
+
+        return {
+            success: true,
+            message: "A new verification email has been sent."
+        };
+    } catch (error) {
+        console.error("CLOSET verification resend error:", error);
+        return {
+            success: false,
+            message: getErrorMessage(error)
+        };
+    }
+}
+
 async function signOut() {
     try {
         const { error } =
@@ -288,6 +351,7 @@ return {
     initialize,
     signIn,
     signUp,
+    resendVerification,
     signOut,
     getSession,
     getUser,
