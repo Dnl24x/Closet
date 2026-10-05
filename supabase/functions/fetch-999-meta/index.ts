@@ -192,10 +192,24 @@ async function getEurMdlRate() {
         now.getUTCFullYear()
     ].join(".");
 
-    const response = await fetch(
-        `https://www.bnm.md/en/official_exchange_rates?get_xml=1&date=${date}`,
-        { headers: { "User-Agent": "A doua sansa importer/1.0" } }
-    );
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+
+    let response;
+
+    try {
+        response = await fetch(
+            `https://www.bnm.md/en/official_exchange_rates?get_xml=1&date=${date}`,
+            {
+                headers: {
+                    "User-Agent": "A doua sansa importer/1.0"
+                },
+                signal: controller.signal
+            }
+        );
+    } finally {
+        clearTimeout(timeout);
+    }
 
     if (!response.ok) {
         throw new Error("BNM exchange-rate request failed.");
@@ -273,7 +287,7 @@ Deno.serve(async request => {
     sourceUrl.hash = "";
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 9000);
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
         const response = await fetch(sourceUrl.href, {
@@ -290,6 +304,13 @@ Deno.serve(async request => {
         });
 
         if (!response.ok) {
+            if (response.status === 403 || response.status === 429) {
+                return json({
+                    error: "999.md temporarily refused this request. Please try again in a moment.",
+                    status: response.status
+                }, 429);
+            }
+
             return json({
                 error: "999.md did not return a readable listing page.",
                 status: response.status
@@ -302,7 +323,13 @@ Deno.serve(async request => {
             return json({ error: "That 999.md link is not a web listing page." }, 400);
         }
 
-        const html = (await response.text()).slice(0, 2_000_000);
+        const html = (await response.text()).slice(0, 3_000_000);
+
+        if (!html.trim()) {
+            return json({
+                error: "999.md returned an empty listing page."
+            }, 502);
+        }
 
         const title =
             meta(html, "og:title") ||
