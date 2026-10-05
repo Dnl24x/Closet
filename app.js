@@ -2195,12 +2195,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         const accountLanguage =
             session?.user?.user_metadata?.language;
 
+        // Keep an explicitly selected device language as the source of truth.
+        // Account metadata is only used when this device has no saved language.
+        const savedLanguage = localStorage.getItem("closet-language");
+        const hasSavedLanguage = ["en", "ro", "ru"].includes(savedLanguage);
+
         if (
+            !hasSavedLanguage &&
             accountLanguage &&
             ["en", "ro", "ru"].includes(accountLanguage) &&
             typeof ClosetI18n !== "undefined"
         ) {
-            ClosetI18n.setLanguage(accountLanguage, false);
+            await ClosetI18n.setLanguage(accountLanguage, false);
         }
 
         await updateAuthenticatedUI();
