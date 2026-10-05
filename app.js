@@ -896,7 +896,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </button>
 
                     <div class="listing-detail-actions">
-                        <button type="button" class="primary-button listing-buy-button" data-i18n="Buy via Nova Post">Buy via Nova Post</button>
+                        ${ownListing
+                                ? `<button type="button" class="secondary-button listing-buy-button" disabled aria-disabled="true">Your listing</button>`
+                                : `<button type="button" class="primary-button listing-buy-button" data-i18n="Buy via Nova Post">Buy via Nova Post</button>`
+                        }
                         <button
                             type="button"
                             class="listing-save-button${saved ? " is-saved" : ""}"
@@ -956,17 +959,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
             buyButton.insertAdjacentElement("afterend", messageButton);
         }
-        buyButton?.addEventListener("click", event => {
-            event.preventDefault();
-            event.stopPropagation();
+        if (!ownListing) {
+            buyButton?.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
 
-            if (typeof window.CLOSETOrders?.open !== "function") {
-                showStatus("Nova Post checkout is temporarily unavailable. Please try again.", "error");
-                return;
-            }
+                if (typeof window.CLOSETOrders?.open !== "function") {
+                    showStatus("Nova Post checkout is temporarily unavailable. Please try again.", "error");
+                    return;
+                }
 
-            window.CLOSETOrders.open(listing, seller);
-        });
+                try {
+                    window.CLOSETOrders.open(listing, seller);
+                } catch (error) {
+                    console.error("A doua șansă checkout open error:", error);
+                    showStatus("Nova Post checkout could not be opened. Please try again.", "error");
+                }
+            });
+        }
 
         saveButton?.addEventListener("click", event => {
             event.preventDefault();
