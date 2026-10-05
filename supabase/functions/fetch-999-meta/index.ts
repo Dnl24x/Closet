@@ -33,6 +33,11 @@ function stripTags(value: string) {
         .trim();
 }
 
+function pageTitle(html: string) {
+    const match = html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i);
+    return match?.[1] ? decodeEntities(stripTags(match[1])) : "";
+}
+
 function meta(html: string, name: string) {
     const escaped = name.replace(/[.*+?^\\{}()|[\]\\]/g, "\\$&");
     const patterns = [
@@ -238,7 +243,7 @@ Deno.serve(async request => {
         const title =
             meta(html, "og:title") ||
             meta(html, "twitter:title") ||
-            meta(html, "title");
+            pageTitle(html);
 
         const description =
             meta(html, "og:description") ||
