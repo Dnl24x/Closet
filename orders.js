@@ -39,6 +39,24 @@
         document.body.classList.remove("nova-post-modal-open");
     }
 
+    async function getAuthenticatedUser() {
+        const localUser = window.ClosetAuth?.getUser?.();
+        if (localUser) return localUser;
+
+        try {
+            const client = window.supabaseClient;
+            if (!client?.auth?.getSession) return null;
+
+            const { data, error } = await client.auth.getSession();
+            if (error) throw error;
+
+            return data?.session?.user || null;
+        } catch (error) {
+            console.error("A doua șansă checkout auth check error:", error);
+            return null;
+        }
+    }
+
     function reset() {
         form.reset();
         clearMessage();
@@ -60,7 +78,7 @@
         return pickupTypeInput?.value === "branch" ? "branch" : "locker";
     }
 
-    function open(listing, seller) {
+    async function open(listing, seller) {
         activeListing = listing || null;
         activeSeller = seller || null;
 
@@ -68,7 +86,7 @@
             return;
         }
 
-        const signedInUser = window.ClosetAuth?.getUser?.();
+        const signedInUser = await getAuthenticatedUser();
 
         if (!signedInUser) {
             window.location.href = "login.html";
@@ -79,11 +97,6 @@
             activeListing.seller_id === signedInUser.id ||
             activeSeller.id === signedInUser.id
         ) {
-            return;
-        }
-
-        if (!window.ClosetAuth?.isSignedIn?.()) {
-            window.location.href = "login.html";
             return;
         }
 
@@ -138,7 +151,7 @@
         event.preventDefault();
         clearMessage();
 
-        const user = window.ClosetAuth?.getUser?.();
+        const user = await getAuthenticatedUser();
 
         if (!user) {
             window.location.href = "login.html";
