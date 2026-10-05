@@ -487,9 +487,6 @@ create table if not exists public.orders (
 );
 
 alter table public.orders
-    add column if not exists offer_id uuid references public.offers(id) on delete restrict;
-
-alter table public.orders
     add column if not exists payment_status text not null default 'pending';
 
 alter table public.orders
@@ -636,6 +633,11 @@ alter table public.offers
     check (counter_amount_mdl is null or counter_amount_mdl > 0);
 
 alter table public.offers enable row level security;
+
+alter table public.orders
+    add column if not exists offer_id uuid references public.offers(id) on delete restrict;
+
+
 
 grant select, insert, update on table public.offers to authenticated;
 
