@@ -975,6 +975,8 @@
         }
 
         if (previous !== lang) {
+            // The account preference has been updated before reloading,
+            // so app.js cannot overwrite the new language with stale metadata.
             window.location.reload();
         }
     }
