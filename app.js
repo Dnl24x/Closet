@@ -513,7 +513,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     data-listing-id="${escapeHTML(listing.id)}"
                     aria-label="View ${title}">
                     ${image
-                        ? `<img class="listing-image" src="${escapeHTML(image)}" alt="${title}" loading="lazy">`
+                        ? `<img class="listing-image" src="${escapeHTML(image)}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'fallback-placeholder.svg\';">`
                         : `<div class="listing-image" aria-hidden="true"></div>`
                     }
                     <div class="listing-card-body">
@@ -828,7 +828,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const saved = isSavedListing(listing.id);
 
         const imageHTML = image
-            ? `<img class="listing-detail-image" src="${escapeHTML(image)}" alt="${title}">`
+            ? `<img class="listing-detail-image" src="${escapeHTML(image)}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'fallback-placeholder.svg\';">`
             : `<div class="listing-detail-image" aria-hidden="true"></div>`;
 
         const attributes =
@@ -1896,7 +1896,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 : `<button type="button" class="make-main-button">Make main</button>`;
 
             card.innerHTML = `
-                <img src="${escapeHTML(item.url)}" alt="Photo ${index + 1}">
+                <img src="${escapeHTML(item.url)}" alt="Photo ${index + 1}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'fallback-placeholder.svg\';">
                 <div class="image-preview-overlay">
                     ${mainLabel}
                     <button type="button" class="remove-photo-button" aria-label="Remove photo">×</button>
