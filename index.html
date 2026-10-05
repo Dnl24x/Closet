@@ -1508,6 +1508,156 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+
+<div
+    id="novaPostCheckoutModal"
+    class="checkout-modal"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="novaPostCheckoutTitle"
+>
+    <div class="checkout-card">
+        <button
+            type="button"
+            class="checkout-close"
+            data-close-nova-post
+            aria-label="Close checkout"
+        >×</button>
+
+        <div id="novaPostCheckoutFormStep">
+            <p class="eyebrow">NOVA POST</p>
+            <h2 id="novaPostCheckoutTitle">Buy via Nova Post</h2>
+            <p class="checkout-item-line">
+                <strong id="novaPostListingTitle">Item</strong>
+                <span id="novaPostListingPrice"></span>
+            </p>
+
+            <form id="novaPostCheckoutForm" class="checkout-form" novalidate>
+                <div
+                    id="novaPostCheckoutMessage"
+                    class="form-message"
+                    role="alert"
+                    hidden
+                ></div>
+
+                <div class="form-group">
+                    <label for="novaBuyerName">Buyer full name</label>
+                    <input
+                        id="novaBuyerName"
+                        type="text"
+                        autocomplete="name"
+                        maxlength="100"
+                        placeholder="Your full name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="novaBuyerPhone">Phone number</label>
+                    <input
+                        id="novaBuyerPhone"
+                        type="tel"
+                        inputmode="tel"
+                        autocomplete="tel"
+                        maxlength="15"
+                        placeholder="+373 69 123 456"
+                        required
+                    >
+                    <small class="checkout-field-hint">Moldova number (+373).</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="novaBuyerCity">City / sector</label>
+                    <input
+                        id="novaBuyerCity"
+                        type="text"
+                        maxlength="120"
+                        placeholder="Chișinău, Centru"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Pickup option</label>
+                    <div
+                        id="novaPostPickupType"
+                        class="checkout-choice-row"
+                        role="group"
+                        aria-label="Pickup option"
+                    >
+                        <button
+                            type="button"
+                            data-pickup-type="locker"
+                            class="checkout-choice is-active"
+                            aria-pressed="true"
+                        >Poștomat / locker</button>
+                        <button
+                            type="button"
+                            data-pickup-type="branch"
+                            class="checkout-choice"
+                            aria-pressed="false"
+                        >Branch</button>
+                    </div>
+                    <input
+                        id="novaPostPickupTypeValue"
+                        type="hidden"
+                        value="locker"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="novaBuyerPickupNumber">Nova Post locker / branch number</label>
+                    <input
+                        id="novaBuyerPickupNumber"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="40"
+                        placeholder="e.g. 123"
+                        required
+                    >
+                </div>
+
+                <p class="checkout-note">
+                    This creates an order request for the seller. The seller still needs to confirm shipment and the available Nova Post payment method for the chosen pickup option.
+                </p>
+
+                <button
+                    id="novaPostCheckoutSubmit"
+                    class="primary-button full-width"
+                    type="submit"
+                >Place order</button>
+            </form>
+        </div>
+
+        <div id="novaPostCheckoutSuccessStep" class="checkout-success" hidden>
+            <div class="checkout-success-icon" aria-hidden="true">✓</div>
+            <p class="eyebrow">ORDER PLACED</p>
+            <h2>Order request sent!</h2>
+            <p>
+                Your order is now <strong>pending seller confirmation</strong>.
+                The seller will arrange Nova Post delivery and confirm the payment method supported for your selected pickup point.
+            </p>
+
+            <div class="checkout-success-actions">
+                <a
+                    id="novaPostTelegramLink"
+                    class="primary-button"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >Notify seller on Telegram</a>
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    data-close-nova-post
+                >Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="languageModal" class="language-modal" hidden role="dialog" aria-modal="true" aria-labelledby="languageModalTitle">
     <div class="language-modal-card">
         <p class="eyebrow">A doua șansă</p>
