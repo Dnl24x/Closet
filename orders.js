@@ -4,7 +4,7 @@
     const formStep = document.getElementById("novaPostCheckoutFormStep");
     const successStep = document.getElementById("novaPostCheckoutSuccessStep");
     const closeButtons = document.querySelectorAll("[data-close-nova-post]");
-    const successTelegram = document.getElementById("novaPostTelegramLink");
+    const successMessages = document.getElementById("novaPostMessagesLink");
     const message = document.getElementById("novaPostCheckoutMessage");
     const submitButton = document.getElementById("novaPostCheckoutSubmit");
 
@@ -220,23 +220,16 @@
             if (formStep) formStep.hidden = true;
             if (successStep) successStep.hidden = false;
 
-            const sellerName =
-                activeSeller.display_name ||
-                activeSeller.username ||
-                "the seller";
-
-            const text =
-                `Hi ${sellerName}! I just placed an A doua șansă order for "${activeListing.title || "your item"}" with Nova Post. Please confirm the delivery details. Order: ${data?.id || "pending"}`;
-
-            const shareUrl =
-                "https://t.me/share/url?url=" +
-                encodeURIComponent(window.location.href) +
-                "&text=" +
-                encodeURIComponent(text);
-
-            if (successTelegram) {
-                successTelegram.href = shareUrl;
+            if (successMessages) {
+                successMessages.onclick = () => {
+                    close();
+                    void window.ClosetMessages?.openConversationWithSeller(
+                        activeSeller.id,
+                        activeListing.id
+                    );
+                };
             }
+
         } catch (error) {
             console.error("A doua șansă Nova Post order error:", error);
             showMessage(
