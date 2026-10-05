@@ -51,8 +51,21 @@ function pageTitle(html: string) {
 }
 
 function firstHeading(html: string) {
-    const match = html.match(/<h1\b[^>]*>([\s\S]*?)<\\/h1>/i);
+    const match = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
     return match?.[1] ? stripTags(match[1]) : "";
+}
+
+function firstParagraph(html: string) {
+    const matches = html.match(/<p\b[^>]*>([\s\S]*?)<\/p>/gi) || [];
+
+    for (const value of matches) {
+        const text = stripTags(value);
+        if (text.length >= 20) {
+            return text;
+        }
+    }
+
+    return "";
 }
 
 function meta(html: string, name: string) {
@@ -61,7 +74,8 @@ function meta(html: string, name: string) {
 
     for (const tag of tags) {
         const attrs = getTagAttributes(tag);
-        const key = String(attrs.property || attrs.name || "").toLowerCase();
+        const key =
+            String(attrs.property || attrs.name || "").toLowerCase();
 
         if (key === wanted && attrs.content) {
             return attrs.content;
@@ -76,21 +90,23 @@ function firstImage(html: string, pageUrl: URL) {
 
     for (const tag of tags) {
         const attrs = getTagAttributes(tag);
-        const candidate =
-            attrs.src ||
-            attrs["data-src"] ||
-            attrs["data-lazy-src"] ||
-            "";
 
-        if (!candidate) continue;
+        const candidates = [
+            attrs.src,
+            attrs["data-src"],
+            attrs["data-lazy-src"],
+            attrs["data-original"]
+        ].filter(Boolean);
 
-        const absolute = absoluteUrl(candidate, pageUrl);
+        for (const candidate of candidates) {
+            const absolute = absoluteUrl(candidate, pageUrl);
 
-        if (
-            absolute &&
-            /i\.simpalsmedia\\.com\\/999\.md\\//i.test(absolute)
-        ) {
-            return absolute;
+            if (
+                absolute &&
+                /i\.simpalsmedia\.com\/999\.md\//i.test(absolute)
+            ) {
+                return absolute;
+            }
         }
     }
 
@@ -263,7 +279,11 @@ Deno.serve(async request => {
         const response = await fetch(sourceUrl.href, {
             headers: {
                 "Accept": "text/html,application/xhtml+xml",
-                "User-Agent": "Mozilla/5.0 (compatible; A doua sansa importer/1.0)"
+                "Accept-Language": "ro-RO,ro;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache",
+                "Referer": "https://999.md/",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/138.0.0.0 Safari/537.36"
             },
             signal: controller.signal,
             redirect: "follow"
@@ -293,7 +313,7 @@ Deno.serve(async request => {
         const description =
             meta(html, "og:description") ||
             meta(html, "description") ||
-            "";
+            firstParagraph(html);
 
         const imageMeta =
             meta(html, "og:image") ||
