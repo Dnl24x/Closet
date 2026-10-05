@@ -107,11 +107,11 @@ function detectPrice(html: string) {
             return { value: second, currency: "EUR" };
         }
 
-        if (first !== null && /MDL|LEI|L/i.test(match[2] || "")) {
+        if (first !== null && /MDL|LEI/i.test(match[2] || "")) {
             return { value: first, currency: "MDL" };
         }
 
-        if (second !== null && /MDL|LEI|L/i.test(match[1] || "")) {
+        if (second !== null && /MDL|LEI/i.test(match[1] || "")) {
             return { value: second, currency: "MDL" };
         }
     }
