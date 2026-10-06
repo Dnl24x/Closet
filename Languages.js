@@ -1327,9 +1327,14 @@
         document.documentElement.lang = lang;
         document.title = "A doua șansă — Moldova Marketplace";
         translateElement(document.body);
-        document.querySelectorAll(".logo, .site-footer strong").forEach(el => {
+        document.querySelectorAll(".site-footer strong").forEach(el => {
             el.textContent = brand();
         });
+
+        const logoText = document.querySelector(".site-logo-text");
+        if (logoText) {
+            logoText.textContent = brand();
+        }
         window.dispatchEvent(new CustomEvent("closet:language-changed", { detail: { language: lang } }));
     }
 
