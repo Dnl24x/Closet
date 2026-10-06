@@ -1250,13 +1250,19 @@
     Object.assign(translations.ro, {
         "Save changes to apply these settings.": "Salvează modificările pentru a aplica aceste setări.",
         "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "O modalitate simplă de a păstra lucrurile utile în circulație. Găsește ceva în apropiere, oferă lucrurilor nefolosite o casă nouă și câștigă niște bani.",
-        "Find something worth keeping.": "Găsește ceva care merită păstrat."
+        "Find something worth keeping.": "Găsește ceva care merită păstrat.",
+        "Share": "Distribuie",
+        "Listing link copied to clipboard.": "Linkul anunțului a fost copiat.",
+        "Could not share this listing. Please try again.": "Anunțul nu a putut fi distribuit. Încearcă din nou."
     });
 
     Object.assign(translations.ru, {
         "Save changes to apply these settings.": "Сохрани изменения, чтобы применить эти настройки.",
         "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "Простой способ дать полезным вещам новую жизнь. Найди что-нибудь рядом, передай ненужные вещи новому владельцу и заработай немного денег.",
-        "Find something worth keeping.": "Найди то, что стоит сохранить."
+        "Find something worth keeping.": "Найди то, что стоит сохранить.",
+        "Share": "Поделиться",
+        "Listing link copied to clipboard.": "Ссылка на объявление скопирована.",
+        "Could not share this listing. Please try again.": "Не удалось поделиться объявлением. Попробуйте снова."
     });
 
     function getLanguage() {
