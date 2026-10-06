@@ -415,7 +415,11 @@
                         <div id="imagePreviewGrid" class="image-preview-grid" aria-live="polite"></div>
                     </div>
 
-                    <button type="submit" id="publishListingButton" class="primary-button full-width">Publish listing</button>
+                    <div class="listing-form-actions">
+                        <button type="submit" id="publishListingButton" class="primary-button">Publish listing</button>
+                        <button type="button" id="saveListingDraftButton" class="secondary-button">Save as draft</button>
+                        <button type="button" id="cancelListingButton" class="text-button" hidden>Cancel</button>
+                    </div>
 
                 </form>
             </div>
@@ -1863,7 +1867,7 @@
 <script src="profile.js"></script>
 <script src="messages.js?v=messages-safe-12"></script>
 
-<script src="app.js?v=market-settings-6"></script>
+<script src="app.js?v=listing-drafts-1"></script>
 <script src="listing-importer.js?v=999-import-3"></script>
 <script src="orders.js?v=novapost-6"></script>
 <script src="offers.js?v=offers-4"></script>
