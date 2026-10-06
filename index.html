@@ -11,8 +11,8 @@
     content="A doua șansă is a Moldova-focused marketplace for buying and selling almost anything locally."
 >
 
-<link rel="stylesheet" href="style.css?v=header-layout-3">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="style.css?v=feed-layout-4">
+<link rel="icon" type="image/png" href="images/logo.png">
 
 
 </head>
@@ -31,7 +31,6 @@
         type="button"
         aria-label="Go to A doua șansă home"
     >
-        <img src="images/logo.png" alt="" class="site-logo-image">
         <span class="site-logo-text">A doua șansă</span>
     </button>
 
@@ -83,14 +82,6 @@
             <input id="headerSearchInput" type="search" placeholder="Search the marketplace..." autocomplete="off">
             <button type="submit" class="header-search-button">Search</button>
         </form>
-    <div class="header-category-wrap">
-        <button type="button" id="headerCategoryButton" class="header-category-button" aria-expanded="false">
-            <span class="header-category-eyebrow" data-i18n="EXPLORE">EXPLORE</span>
-            <span data-i18n="Categories.">Categories.</span>
-            <span class="header-category-chevron" aria-hidden="true">⌄</span>
-        </button>
-        <div id="headerCategoryMenu" class="header-category-menu" hidden></div>
-    </div>
     </div>
 
     <div class="header-actions">
@@ -114,6 +105,12 @@
     </div>
 
 </header>
+
+<nav class="marketplace-category-bar" aria-label="Marketplace categories">
+    <div class="marketplace-category-scroll" id="homeCategoryStrip">
+        <div class="listing-loading">Loading categories...</div>
+    </div>
+</nav>
 
 <div id="offlineBanner" class="offline-banner" hidden role="status" aria-live="polite">
     <span class="offline-banner-dot" aria-hidden="true"></span>
@@ -159,19 +156,6 @@
 
     <section id="homeView" class="app-view" data-view-section="home">
 
-        <section class="home-category-section">
-            <div class="section-heading compact-heading">
-                <div>
-                    <p class="eyebrow" data-i18n="EXPLORE">EXPLORE</p>
-                    <h2 data-i18n="Categories.">Categories.</h2>
-                </div>
-                <button type="button" class="text-button" data-view="browse" data-i18n="View all →">View all →</button>
-            </div>
-            <div id="homeCategoryStrip" class="home-category-strip" aria-label="Marketplace categories">
-                <div class="listing-loading">Loading categories...</div>
-            </div>
-        </section>
-
         <section class="home-introduction marketplace-introduction">
             <h1 data-i18n="Give your items a second life. Save the planet. Earn.">Give your items a second life.<br>Save the planet. Earn.</h1>
             <p>
@@ -181,7 +165,7 @@
         </section>
 
         <section class="home-recently-viewed" id="recentlyViewedSection" hidden>
-            <div class="section-heading">
+            <div class="recently-viewed-heading">
                 <div>
                     <p class="eyebrow" data-i18n="RECENTLY VIEWED">RECENTLY VIEWED</p>
                     <h2 data-i18n="Pick up where you left off.">Pick up where you left off.</h2>
@@ -1879,7 +1863,7 @@
 
 <script src="supabase.js"></script>
 
-<script src="Languages.js?v=header-layout-3"></script>
+<script src="Languages.js?v=feed-layout-4"></script>
 
 <script src="navigation.js"></script>
 
@@ -1895,7 +1879,7 @@
 <script src="profile.js"></script>
 <script src="messages.js?v=messages-safe-12"></script>
 
-<script src="app.js?v=header-layout-3"></script>
+<script src="app.js?v=feed-layout-4"></script>
 <script src="listing-importer.js?v=999-import-4"></script>
 <script src="orders.js?v=novapost-6"></script>
 <script src="offers.js?v=offers-4"></script>
