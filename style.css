@@ -6076,3 +6076,34 @@ body.reduce-motion *::after{
         padding:0 10px;
     }
 }
+
+
+/* Listing form actions */
+.listing-form-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin-top:6px;
+}
+.listing-form-actions .primary-button{
+    flex:1 1 220px;
+}
+.listing-form-actions .secondary-button{
+    flex:0 1 auto;
+}
+.text-button{
+    border:0;
+    background:transparent;
+    color:var(--muted-text);
+    padding:10px 12px;
+    cursor:pointer;
+    font:inherit;
+}
+.text-button:hover{color:var(--text)}
+@media(max-width:600px){
+    .listing-form-actions{display:grid;grid-template-columns:1fr;}
+    .listing-form-actions .primary-button,
+    .listing-form-actions .secondary-button,
+    .listing-form-actions .text-button{width:100%;}
+}
