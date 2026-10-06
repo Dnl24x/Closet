@@ -1970,6 +1970,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 state.selectedImages.push({ id: crypto.randomUUID(), file, url: URL.createObjectURL(file) });
             });
             renderImagePreviews();
+            markListingFormDirty();
             elements.itemImages.value = "";
         };
         elements.itemImages.addEventListener("change", event => addFiles(event.target.files));
@@ -2009,12 +2010,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const removed = state.selectedImages.splice(index, 1)[0];
                 if (removed?.url && !removed.existing) URL.revokeObjectURL(removed.url);
                 renderImagePreviews();
+                markListingFormDirty();
             });
 
             card.querySelector(".make-main-button")?.addEventListener("click", () => {
                 const [selected] = state.selectedImages.splice(index, 1);
                 state.selectedImages.unshift(selected);
                 renderImagePreviews();
+                markListingFormDirty();
             });
 
             card.addEventListener("dragstart", event => {
@@ -2034,6 +2037,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const [moved] = state.selectedImages.splice(from, 1);
                 state.selectedImages.splice(to, 0, moved);
                 renderImagePreviews();
+                markListingFormDirty();
             });
 
             elements.imagePreviewGrid.appendChild(card);
