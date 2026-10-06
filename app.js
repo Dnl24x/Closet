@@ -2451,9 +2451,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             ClosetNavigation.show("browse");
         });
         window.addEventListener("closet:navigate", event => {
-            const isHome = event.detail?.view === "home";
-            if (elements.homeHeaderSearch) elements.homeHeaderSearch.hidden = !isHome;
-            if (!isHome && elements.headerCategoryMenu) {
+            if (elements.homeHeaderSearch) {
+                elements.homeHeaderSearch.hidden = false;
+            }
+            if (elements.headerCategoryMenu && event.detail?.view !== "home") {
                 elements.headerCategoryMenu.hidden = true;
                 elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
             }
