@@ -2361,7 +2361,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
                     if (elements.browseSearch) elements.browseSearch.value = "";
                     ClosetNavigation.show("browse");
-                    void loadBrowseListings();
                 });
             });
         } catch (error) {
