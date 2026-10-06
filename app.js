@@ -16,7 +16,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         listingBackView: "browse",
         publicProfileUserId: null,
         publicProfileBackView: "browse",
-        editReturnView: "browse"
+        editReturnView: "browse",
+        listingFormMode: "new",
+        listingFormSnapshot: null,
+        listingFormDirty: false
     };
 
     const elements = {
@@ -68,6 +71,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         publishListingButton:
             document.getElementById("publishListingButton"),
+        saveListingDraftButton:
+            document.getElementById("saveListingDraftButton"),
+        cancelListingButton:
+            document.getElementById("cancelListingButton"),
 
         listingDetailsContent:
             document.getElementById("listingDetailsContent"),
@@ -1768,10 +1775,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const editedId = state.editingListingId;
         if (editedId) {
+            clearListingDraft(editedId);
             state.listingBackView = state.editReturnView || state.listingBackView || "browse";
             state.editReturnView = "browse";
         }
         state.editingListingId = null;
+        state.listingFormMode = "new";
+        state.listingFormDirty = false;
+        state.listingFormSnapshot = null;
 
         state.selectedImages.forEach(
             item => item.url && URL.revokeObjectURL(item.url)
@@ -1876,8 +1887,93 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         renderImagePreviews();
 
+        state.listingFormMode = "edit";
+        state.listingFormSnapshot = getListingFormSnapshot();
+        state.listingFormDirty = false;
         if (elements.publishListingButton) elements.publishListingButton.textContent = "Save changes";
+        if (elements.saveListingDraftButton) elements.saveListingDraftButton.textContent = "Save as draft";
+        if (elements.cancelListingButton) elements.cancelListingButton.hidden = false;
         clearFormMessage(document.getElementById("listingFormMessage"));
+        ClosetNavigation.show("sell");
+    }
+
+    const LISTING_DRAFT_PREFIX = "a-doua-sansa-listing-draft-";
+
+    function getListingDraftKey(listingId = "new") {
+        const userId = ClosetAuth.getUser()?.id || "guest";
+        return LISTING_DRAFT_PREFIX + userId + "-" + (listingId || "new");
+    }
+
+    function getListingFormSnapshot() {
+        return {
+            title: document.getElementById("itemName")?.value || "",
+            price: document.getElementById("itemPrice")?.value || "",
+            categoryId: document.getElementById("itemCategory")?.value || "",
+            subcategoryId: document.getElementById("itemSubcategory")?.value || "",
+            condition: document.getElementById("itemCondition")?.value || "",
+            location: document.getElementById("itemLocation")?.value || "",
+            description: document.getElementById("itemDescription")?.value || "",
+            images: state.selectedImages.map(image => ({ id:image.id, imageId:image.imageId || image.id, existing:Boolean(image.existing), url:(image.existing || image.imported) ? image.url : null }))
+        };
+    }
+
+    function markListingFormDirty() { state.listingFormDirty = true; }
+    function clearListingDraft(listingId = "new") { try { localStorage.removeItem(getListingDraftKey(listingId)); } catch {} }
+
+    function saveListingDraft() {
+        const listingId = state.editingListingId || "new";
+        try {
+            localStorage.setItem(getListingDraftKey(listingId), JSON.stringify({ savedAt:Date.now(), mode:state.listingFormMode, ...getListingFormSnapshot() }));
+            state.listingFormDirty = false;
+            showStatus("Draft saved. You can come back and finish it later.", "success");
+            return true;
+        } catch (error) {
+            console.error("CLOSET draft save error:", error);
+            showStatus("We couldn't save the draft on this device.", "error");
+            return false;
+        }
+    }
+
+    function resetListingForm({ clearDraft = false } = {}) {
+        const draftId = state.editingListingId || "new";
+        if (clearDraft) clearListingDraft(draftId);
+        state.selectedImages.forEach(item => { if (item?.url && !item.existing && !item.imported) URL.revokeObjectURL(item.url); });
+        state.selectedImages = [];
+        state.editingListingId = null;
+        state.currentListingId = null;
+        state.listingFormMode = "new";
+        state.listingFormSnapshot = null;
+        state.listingFormDirty = false;
+        elements.listingForm?.reset();
+        resetCategoryPickers();
+        renderImagePreviews();
+        if (elements.publishListingButton) elements.publishListingButton.textContent = "Publish listing";
+        if (elements.saveListingDraftButton) elements.saveListingDraftButton.textContent = "Save as draft";
+        if (elements.cancelListingButton) elements.cancelListingButton.hidden = true;
+        clearFormMessage(document.getElementById("listingFormMessage"));
+    }
+
+    function hasListingChanges() {
+        if (state.listingFormDirty) return true;
+        return JSON.stringify(getListingFormSnapshot()) !== JSON.stringify(state.listingFormSnapshot);
+    }
+
+    function leaveListingForm(nextView = "home") {
+        if (!hasListingChanges()) { ClosetNavigation.show(nextView); return true; }
+        const choice = window.confirm(state.editingListingId ? "You have unsaved changes. Press OK to save a draft and leave, or Cancel to stay here." : "You have an unfinished listing. Press OK to save it as a draft and leave, or Cancel to stay here.");
+        if (!choice) return false;
+        if (!saveListingDraft()) return false;
+        ClosetNavigation.show(nextView);
+        return true;
+    }
+
+    function startNewListing() {
+        if (hasListingChanges()) {
+            const choice = window.confirm("Start a new listing? Your current changes will be saved as a draft first.");
+            if (!choice) return;
+            if (!saveListingDraft()) return;
+        }
+        resetListingForm();
         ClosetNavigation.show("sell");
     }
 
@@ -2158,7 +2254,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "click",
             () => {
                 if (ClosetAuth.isSignedIn()) {
-                    ClosetNavigation.show("sell");
+                    startNewListing();
                 } else {
                     window.location.href =
                         "login.html";
@@ -2299,15 +2395,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function setupForms() {
-        elements.listingForm?.addEventListener(
-            "submit",
-            publishListing
-        );
-
-        elements.profileForm?.addEventListener(
-            "submit",
-            saveProfile
-        );
+        elements.listingForm?.addEventListener("submit", publishListing);
+        elements.saveListingDraftButton?.addEventListener("click", saveListingDraft);
+        elements.cancelListingButton?.addEventListener("click", () => {
+            const id = state.editingListingId;
+            const backView = state.editReturnView || "browse";
+            resetListingForm({ clearDraft: true });
+            if (id) { showStatus("Changes discarded. The published listing was not changed.", "success"); void openListing(id, { preserveBack: true }); }
+            else ClosetNavigation.show("home");
+        });
+        elements.listingForm?.querySelectorAll("input, textarea, select").forEach(input => {
+            input.addEventListener("input", markListingFormDirty);
+            input.addEventListener("change", markListingFormDirty);
+        });
+        elements.profileForm?.addEventListener("submit", saveProfile);
+        document.querySelector('[data-view="home"]')?.addEventListener("click", event => {
+            if (ClosetNavigation.getCurrentView() === "sell") { event.preventDefault(); leaveListingForm("home"); }
+        });
     }
 
     function setupProfileAvatarEditor() {
