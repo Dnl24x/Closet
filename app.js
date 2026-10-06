@@ -51,6 +51,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         headerCategoryMenu: document.getElementById("headerCategoryMenu"),
         browseCategoryMenu: document.getElementById("browseCategoryMenu"),
         homeCategoryStrip: document.getElementById("homeCategoryStrip"),
+        recentlyViewedSection: document.getElementById("recentlyViewedSection"),
+        recentlyViewedGrid: document.getElementById("recentlyViewedGrid"),
 
         browseSearch: document.getElementById("browseSearch"),
         browseFilterButton: document.getElementById("browseFilterButton"),
@@ -426,6 +428,47 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         return "";
+    }
+
+    function getRecentlyViewedKey() {
+        const user = ClosetAuth.getUser();
+        return user ? `closet-recently-viewed-${user.id}` : "closet-recently-viewed-guest";
+    }
+
+    function getRecentlyViewedIds() {
+        try {
+            const value = JSON.parse(localStorage.getItem(getRecentlyViewedKey()) || "[]");
+            return Array.isArray(value) ? value.filter(Boolean) : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function rememberRecentlyViewed(id) {
+        if (!id) return;
+        const ids = getRecentlyViewedIds().filter(item => item !== id);
+        ids.unshift(id);
+        try {
+            localStorage.setItem(getRecentlyViewedKey(), JSON.stringify(ids.slice(0, 8)));
+        } catch {}
+    }
+
+    async function loadRecentlyViewed() {
+        if (!elements.recentlyViewedSection || !elements.recentlyViewedGrid) return;
+        const ids = getRecentlyViewedIds();
+        if (!ids.length) {
+            elements.recentlyViewedSection.hidden = true;
+            return;
+        }
+        const results = await Promise.all(ids.slice(0, 6).map(id => ClosetListings.getListing(id)));
+        const listings = results.filter(result => result.success && result.listing && result.listing.status === "active").map(result => result.listing);
+        if (!listings.length) {
+            elements.recentlyViewedSection.hidden = true;
+            return;
+        }
+        renderListings(elements.recentlyViewedGrid, listings, "", "");
+        elements.recentlyViewedSection.hidden = false;
+        renderVisibleListingHearts();
     }
 
     function getSavedKey() {
@@ -815,6 +858,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         state.currentListingId = id;
+        rememberRecentlyViewed(id);
         ClosetNavigation.show("listing");
 
         elements.listingDetailsContent.innerHTML = `
@@ -2522,7 +2566,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     event.detail?.view;
 
                 if (view === "home") {
-                    await loadHomeListings();
+                    await Promise.all([loadHomeListings(), loadRecentlyViewed()]);
                 }
 
                 if (view === "browse") {
@@ -2958,7 +3002,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const homeDataPromise = Promise.all([
             loadHomeListings(),
-            loadHomeCategories()
+            loadHomeCategories(),
+            loadRecentlyViewed()
         ]);
 
         const session = await authPromise;
