@@ -254,7 +254,7 @@
 
             const friendlyFunctionError =
                 isFunctionFetchError(error)
-                    ? "The 999.md import service could not be reached. Please refresh and try again. If it keeps happening, the fetch-999-meta Edge Function needs to be redeployed in Supabase."
+                    ? "The 999.md import service could not be reached. Please refresh and try again."
                     : "";
 
             showMessage(
