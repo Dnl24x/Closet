@@ -6764,3 +6764,262 @@ body.reduce-motion *::after{
     }
 }
 
+
+
+/* =========================================================
+   FINAL HEADER RESPONSIVE PASS
+   ========================================================= */
+
+.site-header{
+    min-height:68px;
+    padding:12px 24px;
+    gap:14px;
+}
+
+.logo{
+    flex:0 0 auto;
+    font-size:20px;
+    font-weight:800;
+    letter-spacing:-0.8px;
+}
+
+.main-navigation{
+    flex:0 0 auto;
+    gap:2px;
+}
+
+.nav-link{
+    min-height:38px;
+    padding:0 11px;
+    font-size:13px;
+}
+
+.home-header-search{
+    flex:1 1 420px;
+    min-width:220px;
+    max-width:680px;
+    margin:0 auto;
+}
+
+.header-search-form{
+    height:44px;
+    min-height:44px;
+}
+
+.header-search-form input{
+    font-size:14px;
+}
+
+.header-search-button{
+    padding:0 16px;
+    font-size:13px;
+}
+
+.header-actions{
+    flex:0 0 auto;
+    gap:8px;
+    margin-left:auto;
+}
+
+.header-profile-button,
+.header-sell-button{
+    min-height:38px;
+    padding:0 13px;
+    font-size:12px;
+}
+
+.header-button-icon{
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+.header-button-icon svg{
+    width:19px;
+    height:19px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.marketplace-category-bar{
+    position:relative;
+    z-index:900;
+}
+
+.marketplace-category-scroll{
+    min-height:46px;
+    padding:7px 0;
+}
+
+.marketplace-category-scroll .category-filter{
+    min-height:32px;
+    padding:0 13px;
+    font-size:11.5px;
+}
+
+/* Keep Recently Viewed visibly compact on every screen. */
+#recentlyViewedGrid .listing-card{
+    flex-basis:205px;
+}
+
+/* Dense latest-feed grid. */
+#homeListingsGrid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+#homeListingsGrid .listing-image,
+#homeListingsGrid .listing-card .listing-image{
+    aspect-ratio:1 / 1;
+}
+
+@media (min-width:768px){
+    #homeListingsGrid{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+}
+@media (min-width:1180px){
+    #homeListingsGrid{
+        grid-template-columns:repeat(5,minmax(0,1fr));
+    }
+}
+
+@media (max-width:720px){
+    .site-header{
+        min-height:56px;
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        align-items:center;
+        gap:8px;
+        padding:8px 10px;
+    }
+
+    .logo{
+        min-width:0;
+        font-size:17px;
+        white-space:nowrap;
+    }
+
+    .main-navigation{
+        display:none !important;
+    }
+
+    .home-header-search{
+        order:initial;
+        width:auto;
+        min-width:0;
+        max-width:none;
+        margin:0;
+    }
+
+    .header-search-form{
+        width:100%;
+        height:40px;
+        min-height:40px;
+        border-radius:11px;
+    }
+
+    .header-search-form input{
+        min-width:0;
+        padding:0 11px;
+        font-size:13px;
+    }
+
+    .header-search-button{
+        display:none;
+    }
+
+    .header-actions{
+        margin-left:0;
+        gap:5px;
+    }
+
+    .header-profile-button,
+    .header-sell-button{
+        width:40px;
+        min-width:40px;
+        min-height:40px;
+        padding:0;
+        border-radius:11px;
+        font-size:0;
+    }
+
+    .header-button-label{
+        display:none;
+    }
+
+    .header-button-icon{
+        display:inline-flex;
+    }
+
+    .marketplace-category-scroll{
+        width:calc(100% - 18px);
+        min-height:44px;
+        gap:7px;
+        padding:6px 0;
+    }
+
+    .marketplace-category-scroll .category-filter{
+        min-height:32px;
+        padding:0 14px;
+        font-size:11px;
+        border-radius:999px;
+        white-space:nowrap;
+    }
+
+    #homeListingsGrid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:12px;
+    }
+
+    #recentlyViewedGrid{
+        gap:9px;
+        padding-bottom:5px;
+    }
+
+    #recentlyViewedGrid .listing-card{
+        flex-basis:160px;
+    }
+}
+
+@media (max-width:420px){
+    .site-header{
+        grid-template-columns:auto minmax(0,1fr) auto;
+        gap:5px;
+        padding:7px 8px;
+    }
+
+    .logo{
+        font-size:15px;
+    }
+
+    .header-profile-button,
+    .header-sell-button{
+        width:36px;
+        min-width:36px;
+        min-height:36px;
+    }
+
+    .header-button-icon svg{
+        width:17px;
+        height:17px;
+    }
+
+    .header-search-form{
+        height:38px;
+        min-height:38px;
+    }
+
+    .marketplace-category-scroll{
+        width:calc(100% - 14px);
+        min-height:42px;
+        gap:6px;
+    }
+
+    #homeListingsGrid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+    }
+}
