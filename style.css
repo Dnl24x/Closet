@@ -6107,3 +6107,37 @@ body.reduce-motion *::after{
     .listing-form-actions .secondary-button,
     .listing-form-actions .text-button{width:100%;}
 }
+
+.settings-pending-notice{
+    margin:14px 23px 0;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface-soft);
+    color:var(--text-soft);
+    font-size:12px;
+    line-height:1.45;
+}
+.settings-actions{
+    display:flex;
+    justify-content:flex-end;
+    padding:14px 23px 18px;
+}
+.settings-actions .primary-button{
+    min-width:150px;
+}
+#cancelImportButton{
+    flex:0 0 auto;
+    white-space:nowrap;
+}
+@media(max-width:720px){
+    .settings-pending-notice{
+        margin:12px 15px 0;
+    }
+    .settings-actions{
+        padding:12px 15px 16px;
+    }
+    .settings-actions .primary-button{
+        width:100%;
+    }
+}
