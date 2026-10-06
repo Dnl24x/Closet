@@ -126,6 +126,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         settingsLanguage:
             document.getElementById("settingsLanguage"),
 
+        settingsTheme:
+            document.getElementById("settingsTheme"),
+
+        settingsMessageDensity:
+            document.getElementById("settingsMessageDensity"),
+
+        settingsReduceMotion:
+            document.getElementById("settingsReduceMotion"),
+
+        logoutButton:
+            document.getElementById("logoutButton"),
+
         publicProfileBackButton:
             document.getElementById("publicProfileBackButton"),
         publicProfileAvatar:
@@ -2442,6 +2454,115 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    function applyThemePreference(value) {
+        const preference = ["system", "light", "dark"].includes(value)
+            ? value
+            : "system";
+
+        const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        document.body.classList.toggle(
+            "theme-dark",
+            preference === "dark" || (preference === "system" && prefersDark)
+        );
+
+        localStorage.setItem("closet-theme", preference);
+
+        if (elements.settingsTheme) {
+            elements.settingsTheme.value = preference;
+        }
+    }
+
+    function applyMessageDensity(value) {
+        const density = value === "compact" ? "compact" : "comfortable";
+
+        document.body.classList.toggle(
+            "messages-compact",
+            density === "compact"
+        );
+
+        localStorage.setItem("closet-message-density", density);
+
+        if (elements.settingsMessageDensity) {
+            elements.settingsMessageDensity.value = density;
+        }
+    }
+
+    function applyReducedMotion(enabled) {
+        const isEnabled = Boolean(enabled);
+
+        document.body.classList.toggle("reduce-motion", isEnabled);
+        localStorage.setItem(
+            "closet-reduce-motion",
+            isEnabled ? "1" : "0"
+        );
+
+        if (elements.settingsReduceMotion) {
+            elements.settingsReduceMotion.checked = isEnabled;
+        }
+    }
+
+    function setupSettingsPreferences() {
+        const savedTheme = localStorage.getItem("closet-theme") || "system";
+        const savedDensity =
+            localStorage.getItem("closet-message-density") || "comfortable";
+        const savedReducedMotion =
+            localStorage.getItem("closet-reduce-motion") === "1";
+
+        applyThemePreference(savedTheme);
+        applyMessageDensity(savedDensity);
+        applyReducedMotion(savedReducedMotion);
+
+        elements.settingsTheme?.addEventListener("change", event => {
+            applyThemePreference(event.target.value);
+        });
+
+        elements.settingsMessageDensity?.addEventListener("change", event => {
+            applyMessageDensity(event.target.value);
+        });
+
+        elements.settingsReduceMotion?.addEventListener("change", event => {
+            applyReducedMotion(event.target.checked);
+        });
+
+        const mediaQuery =
+            window.matchMedia?.("(prefers-color-scheme: dark)");
+
+        mediaQuery?.addEventListener?.("change", () => {
+            if ((localStorage.getItem("closet-theme") || "system") === "system") {
+                applyThemePreference("system");
+            }
+        });
+    }
+
+    function setupSettingsLogout() {
+        elements.logoutButton?.addEventListener("click", async () => {
+            if (!ClosetAuth.isSignedIn()) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            elements.logoutButton.disabled = true;
+            elements.logoutButton.textContent = "Signing out…";
+
+            const result = await ClosetAuth.signOut();
+
+            if (!result.success) {
+                elements.logoutButton.disabled = false;
+                elements.logoutButton.textContent = "Sign out";
+                showStatus(
+                    result.message || "We couldn't sign you out. Please try again.",
+                    "error"
+                );
+                return;
+            }
+
+            window.location.href = "index.html";
+        });
+    }
+
     function setupAuthStateListener() {
         window.addEventListener(
             "closet:auth",
@@ -2512,6 +2633,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupNavigationEvents();
         setupAuthStateListener();
         setupLanguageSettings();
+        setupSettingsPreferences();
+        setupSettingsLogout();
         setupEmailVerificationSuccess();
         if (typeof ClosetMessages !== "undefined") ClosetMessages.initialize();
 
