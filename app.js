@@ -990,6 +990,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                             data-detail-save-listing-id="${escapeHTML(listing.id)}"
                             aria-label="${saved ? "Remove from saved" : "Save listing"}"
                         >${saved ? "♥" : "♡"}</button>
+                        <button
+                            type="button"
+                            class="secondary-button listing-share-button"
+                            data-detail-share-listing
+                            data-i18n="Share"
+                        >Share</button>
                         ${
                             ownListing
                                 ? `<button type="button" class="secondary-button" data-detail-edit-listing-id="${escapeHTML(listing.id)}">Edit</button>`
@@ -1030,6 +1036,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         const saveButton = elements.listingDetailsContent.querySelector("[data-detail-save-listing-id]");
         const messageSellerButton =
             elements.listingDetailsContent.querySelector("[data-detail-message-seller]");
+        const shareButton =
+            elements.listingDetailsContent.querySelector("[data-detail-share-listing]");
+
+        shareButton?.addEventListener("click", async event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const shareUrl = new URL(window.location.href);
+            shareUrl.search = "";
+            shareUrl.hash = `listing-${listing.id}`;
+
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: listing.title || "A doua șansă listing",
+                        text: "Check out this listing on A doua șansă.",
+                        url: shareUrl.toString()
+                    });
+                    return;
+                }
+
+                await navigator.clipboard.writeText(shareUrl.toString());
+                showStatus("Listing link copied to clipboard.", "success");
+            } catch (error) {
+                if (error?.name !== "AbortError") {
+                    showStatus("Could not share this listing. Please try again.", "error");
+                }
+            }
+        });
 
         messageSellerButton?.addEventListener("click", event => {
             event.preventDefault();
