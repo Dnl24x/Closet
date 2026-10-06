@@ -6543,3 +6543,224 @@ body.reduce-motion *::after{
         padding:7px;
     }
 }
+
+
+/* =========================================================
+   CLEAN MARKETPLACE FEED LAYOUT
+   ========================================================= */
+
+/* Brand is text-only in the navbar. */
+.site-logo-image,
+.header-category-wrap{
+    display:none !important;
+}
+.site-logo-text{
+    display:inline-block;
+    white-space:nowrap;
+}
+
+/* One category navigation row directly under the main navbar. */
+.marketplace-category-bar{
+    width:100%;
+    border-bottom:1px solid var(--border);
+    background:var(--surface);
+    position:relative;
+    z-index:900;
+}
+.marketplace-category-scroll{
+    width:min(calc(100% - 28px),var(--content-width));
+    min-height:46px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    overflow-x:auto;
+    padding:6px 0;
+    scrollbar-width:none;
+}
+.marketplace-category-scroll::-webkit-scrollbar{
+    display:none;
+}
+.marketplace-category-scroll .category-filter{
+    flex:0 0 auto;
+    min-height:32px;
+    padding:0 12px;
+    border:1px solid var(--border);
+    border-radius:999px;
+    background:var(--surface-soft);
+    color:var(--text-soft);
+    font-size:11px;
+    font-weight:750;
+    white-space:nowrap;
+    cursor:pointer;
+}
+.marketplace-category-scroll .category-filter:hover{
+    border-color:var(--border-strong);
+    color:var(--text);
+}
+.marketplace-category-scroll .category-filter.active{
+    background:var(--text);
+    border-color:var(--text);
+    color:var(--surface);
+}
+
+/* Compact Recently Viewed strip: max four cards, horizontal only. */
+.home-recently-viewed{
+    margin:22px 0 34px;
+    padding:16px 0 0;
+    border-top:1px solid var(--border);
+}
+.recently-viewed-heading{
+    margin-bottom:12px;
+}
+.recently-viewed-heading .eyebrow{
+    margin-bottom:4px;
+}
+.recently-viewed-heading h2{
+    margin:0;
+    font-size:19px;
+    letter-spacing:-.6px;
+}
+#recentlyViewedGrid{
+    display:flex;
+    align-items:stretch;
+    gap:12px;
+    overflow-x:auto;
+    padding:2px 2px 8px;
+    scrollbar-width:thin;
+}
+#recentlyViewedGrid .listing-card{
+    flex:0 0 210px;
+    scroll-snap-align:start;
+}
+#recentlyViewedGrid .listing-card-management{
+    display:none;
+}
+#recentlyViewedGrid .listing-card-body{
+    padding:11px 12px 12px;
+}
+#recentlyViewedGrid .listing-card-title{
+    font-size:13px;
+}
+#recentlyViewedGrid .listing-card-meta{
+    margin-top:5px;
+    font-size:10px;
+}
+#recentlyViewedGrid .listing-card-price{
+    margin-top:8px;
+    font-size:14px;
+}
+
+/* Dense homepage feed: 2 mobile → 4 desktop → 5 large desktop. */
+#homeListingsGrid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+#homeListingsGrid .listing-empty,
+#homeListingsGrid .listing-loading{
+    grid-column:1 / -1;
+}
+#homeListingsGrid .listing-card{
+    min-width:0;
+    border-radius:14px;
+}
+#homeListingsGrid .listing-image,
+.listing-card .listing-image{
+    aspect-ratio:1 / 1;
+    width:100%;
+    object-fit:cover;
+}
+#homeListingsGrid .listing-card-body{
+    padding:12px;
+}
+#homeListingsGrid .listing-card-title{
+    font-size:14px;
+}
+#homeListingsGrid .listing-card-meta{
+    margin-top:6px;
+    font-size:11px;
+}
+#homeListingsGrid .listing-card-price{
+    margin-top:9px;
+    font-size:15px;
+}
+
+@media (min-width:768px){
+    #homeListingsGrid{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+    }
+}
+@media (min-width:1200px){
+    #homeListingsGrid{
+        grid-template-columns:repeat(5,minmax(0,1fr));
+    }
+}
+
+@media (max-width:560px){
+    .marketplace-category-scroll{
+        width:calc(100% - 18px);
+        min-height:42px;
+        padding:5px 0;
+    }
+    .marketplace-category-scroll .category-filter{
+        min-height:30px;
+        padding:0 10px;
+        font-size:10.5px;
+    }
+    .home-recently-viewed{
+        margin:18px 0 26px;
+        padding-top:13px;
+    }
+    .recently-viewed-heading h2{
+        font-size:17px;
+    }
+    #recentlyViewedGrid{
+        gap:9px;
+    }
+    #recentlyViewedGrid .listing-card{
+        flex-basis:158px;
+        border-radius:12px;
+    }
+    #recentlyViewedGrid .listing-card-body{
+        padding:9px;
+    }
+    #recentlyViewedGrid .listing-card-title{
+        font-size:12px;
+    }
+    #recentlyViewedGrid .listing-card-meta{
+        font-size:9px;
+    }
+    #recentlyViewedGrid .listing-card-price{
+        font-size:13px;
+    }
+    #homeListingsGrid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:12px;
+    }
+    #homeListingsGrid .listing-card{
+        border-radius:12px;
+    }
+    #homeListingsGrid .listing-card-body{
+        padding:9px;
+    }
+    #homeListingsGrid .listing-card-title{
+        font-size:12px;
+    }
+    #homeListingsGrid .listing-card-meta{
+        font-size:9px;
+    }
+    #homeListingsGrid .listing-card-price{
+        font-size:13px;
+        margin-top:7px;
+    }
+}
+
+@media (max-width:380px){
+    #homeListingsGrid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:9px;
+    }
+}
+
