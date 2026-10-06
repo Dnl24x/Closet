@@ -4520,12 +4520,59 @@ body.verification-modal-open {
 @media (max-width: 520px) {
     .listing-owner-status-actions {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+    }
+
+    .listing-card-status-actions {
+        grid-template-columns: 1fr;
     }
 
     .status-action-button {
-        padding: 0 8px;
+        width: 100%;
+        min-width: 0;
+        padding: 0 12px;
         font-size: 12px;
+    }
+}
+
+/* Keep listing cards readable on very narrow phones.
+   Two narrow columns make titles, prices and seller/category text feel cramped. */
+@media (max-width: 430px) {
+    .listing-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .listing-card {
+        border-radius: 16px;
+    }
+
+    .listing-card-body {
+        padding: 14px;
+    }
+
+    .listing-card-title {
+        font-size: 15px;
+    }
+
+    .listing-card-meta {
+        display: flex;
+        gap: 12px;
+        margin-top: 7px;
+    }
+
+    .listing-card-meta span {
+        display: block;
+    }
+
+    .listing-card-price {
+        margin-top: 11px;
+        font-size: 16px;
+    }
+
+    .listing-card-actions {
+        top: 9px;
+        right: 9px;
     }
 }
 
