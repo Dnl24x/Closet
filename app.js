@@ -1765,6 +1765,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     subcategoryName,
                     condition,
                     location,
+                    attributes,
                     images: state.selectedImages
                 });
             }
