@@ -659,8 +659,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!unique.length) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <h3>\${escapeHTML(emptyTitle)}</h3>
-                    <p>\${escapeHTML(emptyText)}</p>
+                    <h3>${escapeHTML(emptyTitle)}</h3>
+                    <p>${escapeHTML(emptyText)}</p>
                 </div>`;
             return;
         }
