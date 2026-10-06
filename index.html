@@ -11,7 +11,7 @@
     content="A doua șansă is a Moldova-focused marketplace for buying and selling almost anything locally."
 >
 
-<link rel="stylesheet" href="style.css?v=listing-drafts-1">
+<link rel="stylesheet" href="style.css?v=listing-drafts-2">
 
 
 </head>
@@ -310,6 +310,7 @@
                             required
                         >
                         <button id="listingImportButton" class="secondary-button" type="submit">Fetch &amp; Auto-Fill</button>
+                        <button id="cancelImportButton" class="text-button" type="button" data-i18n="Cancel">Cancel</button>
                     </div>
 
                     <label class="listing-import-consent">
@@ -1045,6 +1046,16 @@
                         <input id="settingsReduceMotion" type="checkbox">
                         <span class="settings-toggle-track" aria-hidden="true"></span>
                     </label>
+                <div id="settingsPendingNotice" class="settings-pending-notice" hidden data-i18n="Save changes to apply these settings.">
+                    Save changes to apply these settings.
+                </div>
+
+                <div class="settings-actions">
+                    <button id="saveSettingsButton" type="button" class="primary-button" data-i18n="Save changes">
+                        Save changes
+                    </button>
+                </div>
+
                 </div>
 
                 <div class="settings-section-label">ACCOUNT</div>
@@ -1852,7 +1863,7 @@
 
 <script src="supabase.js"></script>
 
-<script src="i18n.js?v=ru-ro-3"></script>
+<script src="i18n.js?v=ru-ro-4"></script>
 
 <script src="navigation.js"></script>
 
@@ -1867,8 +1878,8 @@
 <script src="profile.js"></script>
 <script src="messages.js?v=messages-safe-12"></script>
 
-<script src="app.js?v=listing-drafts-1"></script>
-<script src="listing-importer.js?v=999-import-3"></script>
+<script src="app.js?v=listing-drafts-2"></script>
+<script src="listing-importer.js?v=999-import-4"></script>
 <script src="orders.js?v=novapost-6"></script>
 <script src="offers.js?v=offers-4"></script>
 
