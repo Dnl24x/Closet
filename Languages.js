@@ -1241,7 +1241,10 @@
     });
 
     Object.assign(translations.en, {
-        "Save changes to apply these settings.": "Save changes to apply these settings."
+        "Save changes to apply these settings.": "Save changes to apply these settings.",
+        "Share": "Share",
+        "Listing link copied to clipboard.": "Listing link copied to clipboard.",
+        "Could not share this listing. Please try again.": "Could not share this listing. Please try again."
     });
 
     Object.assign(translations.ro, {
