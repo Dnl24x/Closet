@@ -6192,3 +6192,40 @@ body.reduce-motion *::after{
     .header-profile-button, .header-sell-button { min-height: 34px; padding-left: 10px; padding-right: 10px; font-size: 11px; }
     .nav-link { min-height: 34px; padding-left: 9px; padding-right: 9px; font-size: 12px; }
 }
+
+
+/* Final compact header + responsive messaging polish */
+.site-header{min-height:58px;padding:0 max(12px,calc((100% - var(--content-width))/2));gap:9px}
+.logo{font-size:18px;gap:7px}
+.site-logo-image{width:32px;height:32px;flex-basis:32px;border-radius:50%;clip-path:circle(50%)}
+.main-navigation{gap:0}
+.nav-link{min-height:34px;padding:0 9px;font-size:12px}
+.header-actions{gap:6px}
+.header-profile-button,.header-sell-button{min-height:34px;padding:0 10px;font-size:11px}
+.home-header-search{gap:6px;flex:1;max-width:560px}
+.header-search-form{min-height:36px}
+.header-category-button{min-height:36px}
+.messages-shell{width:100%;height:min(760px,calc(100vh - 150px));min-height:0;border-radius:16px}
+.message-thread-header{min-height:58px;padding:9px 14px}
+.message-list{padding:14px 18px}
+.message-composer{padding:9px 14px}
+@media(max-width:900px){
+ .site-header{flex-wrap:wrap;min-height:0;padding:8px 12px}
+ .logo{order:1}
+ .header-actions{order:2;margin-left:auto}
+ .main-navigation{order:3;width:auto}
+ .home-header-search{order:4;width:100%;max-width:none}
+ .home-header-search[hidden]{display:none}
+ .messages-shell{height:calc(100vh - 128px);min-height:0;border-radius:12px}
+}
+@media(max-width:560px){
+ .site-header{padding:7px 9px;gap:5px}
+ .logo{font-size:16px}
+ .site-logo-image{width:28px;height:28px;flex-basis:28px}
+ .nav-link{padding:0 6px;font-size:11px}
+ .header-profile-button,.header-sell-button{padding:0 7px;font-size:10px}
+ .messages-shell{height:calc(100dvh - 110px);min-height:0;margin:0;border-radius:10px}
+ .message-thread-header{min-height:52px;padding:7px 9px}
+ .message-list{padding:10px 9px}
+ .message-bubble{max-width:84%;padding:9px 11px}
+}
