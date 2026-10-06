@@ -142,36 +142,41 @@ h3 {
     position: sticky;
     top: 0;
     z-index: 1000;
-
     width: 100%;
-    min-height: var(--header-height);
-
+    min-height: 64px;
     display: flex;
     align-items: center;
-
-    padding: 0 max(20px, calc((100% - var(--content-width)) / 2));
-
+    gap: 14px;
+    padding: 0 max(16px, calc((100% - var(--content-width)) / 2));
     background: rgba(247, 245, 240, 0.94);
     border-bottom: 1px solid var(--border);
-
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
 }
 
 .logo {
     flex-shrink: 0;
-
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
     padding: 0;
-
     border: 0;
     background: transparent;
-
     color: var(--text);
-
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 850;
     line-height: 1;
-    letter-spacing: -1.8px;
+    letter-spacing: -1.2px;
+}
+
+.site-logo-image {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-small);
 }
 
 .logo:hover {
@@ -181,15 +186,13 @@ h3 {
 .main-navigation {
     display: flex;
     align-items: center;
-    gap: 3px;
-
-    margin-left: 38px;
+    gap: 2px;
+    margin-left: 0;
 }
 
 .nav-link {
-    min-height: 40px;
-
-    padding: 0 14px;
+    min-height: 36px;
+    padding: 0 11px;
 
     border: 0;
     border-radius: 11px;
@@ -225,9 +228,8 @@ h3 {
 
 .header-profile-button,
 .header-sell-button {
-    min-height: 42px;
-
-    padding: 0 16px;
+    min-height: 36px;
+    padding: 0 13px;
 
     border-radius: var(--radius-pill);
 
@@ -2153,8 +2155,8 @@ label:focus-visible {
 
 @media (max-width: 800px) {
     .site-header {
-        position: relative;
-
+        position: sticky;
+        top: 0;
         flex-wrap: wrap;
 
         padding-top: 15px;
@@ -2252,7 +2254,14 @@ label:focus-visible {
     }
 
     .logo {
-        font-size: 23px;
+        font-size: 18px;
+        gap: 7px;
+    }
+
+    .site-logo-image {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
     }
 
     .header-actions {
@@ -6165,4 +6174,21 @@ body.reduce-motion *::after{
 @media(max-width:600px){
     .category-attributes-grid{grid-template-columns:1fr;}
     .category-attributes-section{padding:14px;}
+}
+
+
+/* Compact, tidy sticky marketplace header */
+@media (max-width: 1050px) {
+    .home-header-search { max-width: 520px; gap: 6px; }
+    .header-search-form, .header-category-button { height: 40px; min-height: 40px; }
+}
+@media (max-width: 800px) {
+    .site-header { gap: 8px; padding-top: 9px; padding-bottom: 9px; }
+    .main-navigation { padding-top: 6px; gap: 2px; }
+    .home-header-search { order: 4; width: 100%; max-width: none; margin: 2px 0 0; }
+}
+@media (max-width: 560px) {
+    .site-header { padding-right: 10px; padding-left: 10px; }
+    .header-profile-button, .header-sell-button { min-height: 34px; padding-left: 10px; padding-right: 10px; font-size: 11px; }
+    .nav-link { min-height: 34px; padding-left: 9px; padding-right: 9px; font-size: 12px; }
 }
