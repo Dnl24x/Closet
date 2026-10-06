@@ -6229,3 +6229,317 @@ body.reduce-motion *::after{
  .message-list{padding:10px 9px}
  .message-bubble{max-width:84%;padding:9px 11px}
 }
+
+
+/* =========================================================
+   DEFINITIVE HEADER + MESSAGES LAYOUT
+   Keep these rules last so older responsive blocks cannot
+   override the final marketplace layout.
+   ========================================================= */
+
+.site-header{
+    min-height:58px;
+    height:auto;
+    padding:7px max(12px,calc((100% - var(--content-width))/2));
+    gap:8px;
+    flex-wrap:nowrap;
+}
+
+.logo{
+    flex:0 0 auto;
+    min-width:max-content;
+    font-size:17px;
+    gap:7px;
+}
+
+.site-logo-image{
+    width:32px;
+    height:32px;
+    flex:0 0 32px;
+    display:block;
+    object-fit:cover;
+    border-radius:50%;
+    clip-path:circle(50%);
+}
+
+.site-logo-text{
+    display:inline-block;
+    white-space:nowrap;
+}
+
+.main-navigation{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:1px;
+    margin:0;
+    padding:0;
+}
+
+.nav-link{
+    min-height:34px;
+    padding:0 8px;
+    font-size:12px;
+}
+
+.header-category-wrap{
+    position:relative;
+    flex:0 0 auto;
+    order:initial;
+}
+
+.header-category-button{
+    min-height:34px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:0 10px;
+    white-space:nowrap;
+    border-radius:10px;
+    font-size:12px;
+}
+
+.header-category-eyebrow{
+    color:var(--text-soft);
+    font-size:9px;
+    font-weight:850;
+    letter-spacing:.12em;
+}
+
+.header-category-chevron{
+    color:var(--text-soft);
+    line-height:1;
+}
+
+.header-category-menu{
+    top:calc(100% + 7px);
+    left:0;
+    right:auto;
+    width:min(300px,calc(100vw - 20px));
+    max-height:min(430px,70vh);
+}
+
+.home-header-search{
+    flex:1 1 360px;
+    min-width:220px;
+    max-width:none;
+    margin:0;
+    gap:6px;
+}
+
+.header-search-form{
+    min-width:0;
+    height:36px;
+}
+
+.header-search-form input{
+    font-size:13px;
+}
+
+.header-search-button{
+    padding:0 13px;
+    font-size:12px;
+}
+
+.header-category-wrap + .home-header-search .header-category-wrap{
+    display:none;
+}
+
+.header-actions{
+    flex:0 0 auto;
+    gap:6px;
+    margin-left:auto;
+}
+
+.header-profile-button,
+.header-sell-button{
+    min-height:34px;
+    padding:0 10px;
+    font-size:11px;
+    white-space:nowrap;
+}
+
+
+/* Messages: use the screen width and height instead of a small
+   card constrained like the rest of the app. */
+#messagesView{
+    width:min(calc(100% - 48px),1500px);
+    max-width:1500px;
+    padding-top:28px;
+    padding-bottom:34px;
+}
+
+#messagesView .messages-header{
+    max-width:none;
+    margin-bottom:16px;
+}
+
+#messagesView .messages-header h1{
+    font-size:clamp(40px,4.8vw,62px);
+}
+
+#messagesView .messages-header>div>p:last-child{
+    margin-top:10px;
+}
+
+#messagesView .messages-shell{
+    width:100%;
+    height:min(820px,calc(100dvh - 175px));
+    min-height:620px;
+    border-radius:18px;
+}
+
+#messagesView .conversation-list-panel{
+    width:340px;
+}
+
+#messagesView .message-thread-header{
+    min-height:64px;
+    padding:12px 18px;
+}
+
+#messagesView .message-list{
+    padding:18px 22px;
+}
+
+#messagesView .message-bubble{
+    max-width:min(72%,720px);
+    padding:12px 15px;
+    border-radius:17px;
+}
+
+#messagesView .message-composer{
+    padding:10px 16px;
+}
+
+
+/* Tablet / mobile: compact top bar, but let messages own the
+   usable viewport instead of leaving a giant empty lower area. */
+@media (max-width:900px){
+    .site-header{
+        flex-wrap:wrap;
+        align-items:center;
+        padding:7px 12px;
+    }
+
+    .logo{order:1}
+    .header-actions{order:2;margin-left:auto}
+    .main-navigation{order:3}
+    .header-category-wrap{order:3}
+    .home-header-search{
+        order:4;
+        flex:1 0 100%;
+        width:100%;
+        min-width:0;
+        max-width:none;
+    }
+
+    #messagesView{
+        width:calc(100% - 24px);
+        padding-top:18px;
+        padding-bottom:20px;
+    }
+
+    #messagesView .messages-header{
+        margin-bottom:10px;
+    }
+
+    #messagesView .messages-header h1{
+        font-size:clamp(30px,7vw,42px);
+        letter-spacing:-2px;
+    }
+
+    #messagesView .messages-header>div>p:last-child{
+        margin-top:7px;
+        font-size:13px;
+    }
+
+    #messagesView .messages-shell{
+        height:calc(100dvh - 150px);
+        min-height:0;
+        border-radius:14px;
+    }
+
+    #messagesView .conversation-list-panel{
+        width:auto;
+    }
+}
+
+@media (max-width:560px){
+    .site-header{
+        padding:6px 8px;
+        gap:4px;
+    }
+
+    .logo{font-size:15px}
+    .site-logo-image{
+        width:28px;
+        height:28px;
+        flex-basis:28px;
+    }
+
+    .nav-link{
+        min-height:32px;
+        padding:0 6px;
+        font-size:10.5px;
+    }
+
+    .header-category-button{
+        min-height:32px;
+        padding:0 7px;
+        gap:4px;
+        font-size:10.5px;
+    }
+
+    .header-category-eyebrow{font-size:8px}
+
+    .header-profile-button,
+    .header-sell-button{
+        min-height:32px;
+        padding:0 7px;
+        font-size:10px;
+    }
+
+    .home-header-search{
+        flex-basis:100%;
+    }
+
+    #messagesView{
+        width:calc(100% - 12px);
+        padding-top:12px;
+        padding-bottom:12px;
+    }
+
+    #messagesView .messages-header{
+        margin-bottom:7px;
+    }
+
+    #messagesView .messages-header h1{
+        font-size:28px;
+        letter-spacing:-1.4px;
+    }
+
+    #messagesView .messages-header>div>p:last-child{
+        display:none;
+    }
+
+    #messagesView .messages-shell{
+        height:calc(100dvh - 118px);
+        min-height:0;
+        margin:0;
+        border-radius:12px;
+        box-shadow:none;
+    }
+
+    #messagesView .message-thread-header{
+        padding:8px 9px;
+    }
+
+    #messagesView .message-list{
+        padding:10px 8px;
+    }
+
+    #messagesView .message-composer{
+        padding:7px;
+    }
+}
