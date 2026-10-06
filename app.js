@@ -1711,6 +1711,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const condition = document.getElementById("itemCondition")?.value || "";
         const location = document.getElementById("itemLocation")?.value.trim() || "";
         const description = document.getElementById("itemDescription")?.value.trim() || "";
+        const attributes = typeof ClosetCategoryAttributes !== "undefined"
+            ? ClosetCategoryAttributes.getValues()
+            : {};
 
         const safety = runListingSafetyCheck({ title, description, location });
         if (!safety.allowed) {
@@ -1747,6 +1750,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         category_id: subcategoryId || categoryId,
                         condition,
                         location,
+                        attributes,
                         images: state.editingListingId ? state.selectedImages : undefined
                     }
                 );
@@ -1978,7 +1982,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             String(snapshot.condition || "").trim() ||
             String(snapshot.location || "").trim() ||
             String(snapshot.description || "").trim() ||
-            (Array.isArray(snapshot.images) && snapshot.images.length)
+            (Array.isArray(snapshot.images) && snapshot.images.length) ||
+            (snapshot.attributes && Object.keys(snapshot.attributes).length)
         );
     }
 
@@ -2056,6 +2061,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         state.selectedCategory = draft.categoryId || null;
         state.selectedSubcategory = draft.subcategoryId || null;
 
+        if (typeof ClosetCategoryPicker !== "undefined" && draft.categoryId) {
+            ClosetCategoryPicker.selectByIds(draft.categoryId, draft.subcategoryId || "");
+        }
+        if (typeof ClosetCategoryAttributes !== "undefined") {
+            ClosetCategoryAttributes.refresh(draft.attributes || {});
+        }
+
         const savedImages = Array.isArray(draft.images) ? draft.images.filter(image => image?.url) : [];
         if (savedImages.length) {
             const currentByUrl = new Map(state.selectedImages.map(image => [image.url, image]));
@@ -2075,6 +2087,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (subcategoryField) subcategoryField.hidden = true;
         state.selectedCategory = null;
         state.selectedSubcategory = null;
+        if (typeof ClosetCategoryAttributes !== "undefined") {
+            ClosetCategoryAttributes.clear();
+        }
     }
 
     async function detectImportedCategory(data) {
