@@ -7259,3 +7259,60 @@ body.reduce-motion *::after{
         gap:7px;
     }
 }
+
+
+/* MOBILE STABILITY FIX — keep desktop untouched */
+@media (max-width:720px){
+    html, body { width:100%; max-width:100%; overflow-x:hidden; }
+    #app { width:100%; max-width:100%; min-width:0; }
+    .app-view {
+        width:calc(100% - 20px) !important;
+        max-width:none !important;
+        min-width:0 !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
+    }
+
+    .listing-grid {
+        width:100%;
+        min-width:0;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    }
+    .listing-card,
+    .listing-card-button,
+    .listing-card-body { min-width:0; max-width:100%; }
+    .listing-card-title,
+    .listing-card-meta,
+    .listing-card-price {
+        min-width:0;
+        max-width:100%;
+        overflow-wrap:anywhere;
+        word-break:break-word;
+    }
+
+    .header-profile-button,
+    .header-sell-button {
+        width:auto !important;
+        min-width:0 !important;
+        height:38px;
+        min-height:38px;
+        padding:0 10px !important;
+        font-size:12px !important;
+        white-space:nowrap;
+    }
+    .header-button-label { display:inline !important; }
+    .header-button-icon { display:none !important; }
+}
+
+@media (max-width:420px){
+    .app-view { width:calc(100% - 16px) !important; }
+    .listing-grid { gap:8px; }
+    .listing-card-body { padding:9px !important; }
+    .header-profile-button,
+    .header-sell-button {
+        height:36px;
+        min-height:36px;
+        padding:0 8px !important;
+        font-size:11px !important;
+    }
+}
