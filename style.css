@@ -4751,7 +4751,13 @@ body.verification-modal-open {
     .messages-header{margin-bottom:18px}
     .messages-header h1{font-size:clamp(34px,10vw,48px);letter-spacing:-2px}
     .messages-header>div>p:last-child{font-size:14px;margin-top:9px}
-    .messages-shell{display:block;height:calc(100dvh - 190px);min-height:500px;border-radius:18px;box-shadow:none}
+    .messages-shell{
+        display:block;
+        height:calc(100dvh - 140px);
+        min-height:560px;
+        border-radius:18px;
+        box-shadow:none;
+    }
     .conversation-list-panel{height:100%;border-right:0;border-bottom:0}
     .conversation-list-header{padding:14px 14px 12px}
     .conversation-list{max-height:none;overflow-y:auto}
@@ -4759,10 +4765,29 @@ body.verification-modal-open {
     .conversation-avatar{width:44px;height:44px}
     .conversation-copy strong{font-size:14px}.conversation-copy span{font-size:11px}
     .conversation-item time{font-size:9px}
-    .message-thread-panel{height:100%}
+    .message-thread-panel{height:100%;min-height:0}
     .message-thread-empty{min-height:100%;padding:28px 18px}
-    .message-thread-header{min-height:60px;padding:9px 10px}
-    .message-list{height:auto;flex:1;padding:14px 10px}
+    .message-thread-header{
+        min-height:0;
+        max-height:190px;
+        overflow-y:auto;
+        overflow-x:hidden;
+        align-items:flex-start;
+        padding:10px;
+        background:var(--surface);
+        position:relative;
+        z-index:2;
+    }
+    .message-thread-header #messageThreadHeaderContent{
+        min-width:0;
+    }
+    .message-list{
+        height:auto;
+        min-height:0;
+        flex:1 1 auto;
+        padding:16px 10px;
+        overflow-y:auto;
+    }
     .message-bubble{max-width:86%;padding:10px 11px;margin-bottom:9px}
     .message-bubble p{font-size:14px;line-height:1.4}
     .message-composer{grid-template-columns:minmax(0,1fr) auto;gap:7px;padding:8px}
@@ -4774,7 +4799,7 @@ body.verification-modal-open {
     .status-action-button{min-height:42px;padding:0 6px;font-size:11px}
 }
 @media(max-width:420px){
-    .messages-shell{height:calc(100dvh - 176px);min-height:470px}
+    .messages-shell{height:calc(100dvh - 128px);min-height:560px}
     .conversation-item{min-height:68px;padding:11px 10px;grid-template-columns:40px minmax(0,1fr) auto}
     .conversation-avatar{width:40px;height:40px}
     .conversation-copy strong{font-size:13px}
@@ -5533,6 +5558,11 @@ body.offer-modal-open {
    ========================================================= */
 
 @media (max-width: 600px) {
+    .listing-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
     html,
     body {
         width: 100%;
@@ -5563,6 +5593,7 @@ body.offer-modal-open {
     .listing-card {
         min-width: 0;
         width: 100%;
+        max-width: none;
     }
 
     .listing-card-button {
