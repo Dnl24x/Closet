@@ -402,6 +402,20 @@ const ClosetCategoryPicker = (() => {
         }
     }
 
+    function selectByIds(categoryId, subcategoryId = "") {
+        const category = allCategories.find(item => item.id === categoryId);
+        if (!category) return false;
+
+        selectCategory(category);
+
+        if (subcategoryId) {
+            const subcategory = allCategories.find(item => item.id === subcategoryId && item.parent_id === category.id);
+            if (subcategory) selectSubcategory(subcategory);
+        }
+
+        return true;
+    }
+
     function getSelection() {
         return {
             category: selectedCategory,
@@ -411,7 +425,8 @@ const ClosetCategoryPicker = (() => {
 
     return {
         initialize,
-        getSelection
+        getSelection,
+        selectByIds
     };
 })();
 
