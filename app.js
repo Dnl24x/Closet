@@ -1887,6 +1887,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         renderImagePreviews();
 
+        const savedDraft = loadSavedListingDraft(listing.id);
+        if (savedDraft) {
+            state._categoryCache = allCategories;
+            applyListingDraft(savedDraft);
+            showStatus("Draft changes restored for this listing.", "success");
+        }
+
         state.listingFormMode = "edit";
         state.listingFormSnapshot = getListingFormSnapshot();
         state.listingFormDirty = false;
@@ -1944,6 +1951,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         state.listingFormMode = "new";
         state.listingFormSnapshot = null;
         state.listingFormDirty = false;
+        state._categoryCache = null;
         elements.listingForm?.reset();
         resetCategoryPickers();
         renderImagePreviews();
@@ -1988,6 +1996,49 @@ document.addEventListener("DOMContentLoaded", async () => {
             return { allowed: false, message: "This listing contains content that CLOSET does not allow. Please only list ordinary items that can be legally sold on the marketplace." };
         }
         return { allowed: true };
+    }
+
+    function loadSavedListingDraft(listingId) {
+        try {
+            const raw = localStorage.getItem(getListingDraftKey(listingId));
+            if (!raw) return null;
+            const draft = JSON.parse(raw);
+            if (!draft || typeof draft !== "object") return null;
+            return draft;
+        } catch { return null; }
+    }
+
+    function applyListingDraft(draft) {
+        if (!draft) return false;
+        const setValue = (id, value) => { const el = document.getElementById(id); if (el) el.value = value ?? ""; };
+        setValue("itemName", draft.title);
+        setValue("itemPrice", draft.price);
+        setValue("itemCondition", draft.condition);
+        setValue("itemLocation", draft.location);
+        setValue("itemDescription", draft.description);
+        setValue("itemCategory", draft.categoryId);
+        setValue("itemSubcategory", draft.subcategoryId);
+
+        const all = state._categoryCache || [];
+        const category = all.find(item => item.id === draft.categoryId);
+        const subcategory = all.find(item => item.id === draft.subcategoryId);
+        const categoryValue = document.getElementById("categoryPickerValue");
+        const subcategoryValue = document.getElementById("subcategoryPickerValue");
+        const subcategoryField = document.getElementById("subcategoryField");
+        if (categoryValue) categoryValue.textContent = category?.name || "Choose a category";
+        if (subcategoryValue) subcategoryValue.textContent = subcategory?.name || "Choose a subcategory";
+        if (subcategoryField) subcategoryField.hidden = !subcategory;
+        state.selectedCategory = draft.categoryId || null;
+        state.selectedSubcategory = draft.subcategoryId || null;
+
+        const savedImages = Array.isArray(draft.images) ? draft.images.filter(image => image?.url) : [];
+        if (savedImages.length) {
+            const currentByUrl = new Map(state.selectedImages.map(image => [image.url, image]));
+            const importedOrExisting = savedImages.map(image => currentByUrl.get(image.url) || ({ id:image.id || crypto.randomUUID(), imageId:image.imageId || image.id, existing:Boolean(image.existing), imported:Boolean(image.imported), file:null, url:image.url }));
+            state.selectedImages = importedOrExisting;
+            renderImagePreviews();
+        }
+        return true;
     }
 
     function resetCategoryPickers() {
