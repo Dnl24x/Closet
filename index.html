@@ -11,7 +11,7 @@
     content="A doua șansă is a Moldova-focused marketplace for buying and selling almost anything locally."
 >
 
-<link rel="stylesheet" href="style.css?v=category-attributes-1">
+<link rel="stylesheet" href="style.css?v=marketplace-features-1">
 
 
 </head>
@@ -153,14 +153,6 @@
 
     <section id="homeView" class="app-view" data-view-section="home">
 
-        <section class="home-introduction marketplace-introduction">
-            <h1 data-i18n="Give your items a second life. Save the planet. Earn.">Give your items a second life.<br>Save the planet. Earn.</h1>
-            <p>
-                <span data-i18n="A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.">A simpler way to keep useful things moving. Find something nearby,
-                give unused items a new home, and make a little money while you're at it.</span>
-            </p>
-        </section>
-
         <section class="home-category-section">
             <div class="section-heading compact-heading">
                 <div>
@@ -172,6 +164,24 @@
             <div id="homeCategoryStrip" class="home-category-strip" aria-label="Marketplace categories">
                 <div class="listing-loading">Loading categories...</div>
             </div>
+        </section>
+
+        <section class="home-introduction marketplace-introduction">
+            <h1 data-i18n="Give your items a second life. Save the planet. Earn.">Give your items a second life.<br>Save the planet. Earn.</h1>
+            <p>
+                <span data-i18n="A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.">A simpler way to keep useful things moving. Find something nearby,
+                give unused items a new home, and make a little money while you're at it.</span>
+            </p>
+        </section>
+
+        <section class="home-recently-viewed" id="recentlyViewedSection" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow" data-i18n="RECENTLY VIEWED">RECENTLY VIEWED</p>
+                    <h2 data-i18n="Pick up where you left off.">Pick up where you left off.</h2>
+                </div>
+            </div>
+            <div id="recentlyViewedGrid" class="listing-grid"></div>
         </section>
 
         <section class="home-latest">
@@ -1879,7 +1889,7 @@
 <script src="profile.js"></script>
 <script src="messages.js?v=messages-safe-12"></script>
 
-<script src="app.js?v=category-attributes-1"></script>
+<script src="app.js?v=marketplace-features-1"></script>
 <script src="listing-importer.js?v=999-import-4"></script>
 <script src="orders.js?v=novapost-6"></script>
 <script src="offers.js?v=offers-4"></script>
