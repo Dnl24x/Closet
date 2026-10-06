@@ -995,12 +995,14 @@
 
             <div class="settings-card">
 
+                <div class="settings-section-label">PREFERENCES</div>
+
                 <div class="settings-item language-setting">
-                    <div>
+                    <div class="settings-item-copy">
                         <strong>Language</strong>
-                        <span>Choose the language used across the website.</span>
+                        <span>Choose the language used across A doua șansă.</span>
                     </div>
-                    <select id="settingsLanguage" class="filter-select" aria-label="Language">
+                    <select id="settingsLanguage" class="settings-select" aria-label="Language">
                         <option value="en">English</option>
                         <option value="ro">Română</option>
                         <option value="ru">Русский</option>
@@ -1008,65 +1010,93 @@
                 </div>
 
                 <div class="settings-item">
-
-                    <div>
-
-                        <strong>
-                            Account email
-                        </strong>
-
-                        <span id="settingsEmail">
-                            Loading...
-                        </span>
-
+                    <div class="settings-item-copy">
+                        <strong>Appearance</strong>
+                        <span>Choose how A doua șansă looks on this device.</span>
                     </div>
-
+                    <select id="settingsTheme" class="settings-select" aria-label="Appearance">
+                        <option value="system">System</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
                 </div>
-
 
                 <div class="settings-item">
-
-                    <div>
-
-                        <strong>
-                            Buying Protection
-                        </strong>
-
-                        <span>
-                            A future A doua șansă feature.
-                            We'll announce when it becomes
-                            available.
-                        </span>
-
+                    <div class="settings-item-copy">
+                        <strong>Message layout</strong>
+                        <span>Use a comfortable or more compact conversation layout.</span>
                     </div>
-
-                    <span class="coming-soon-badge">
-                        Coming soon
-                    </span>
-
+                    <select id="settingsMessageDensity" class="settings-select" aria-label="Message layout">
+                        <option value="comfortable">Comfortable</option>
+                        <option value="compact">Compact</option>
+                    </select>
                 </div>
 
+                <div class="settings-item">
+                    <div class="settings-item-copy">
+                        <strong>Reduced motion</strong>
+                        <span>Reduce animations and scrolling effects across the site.</span>
+                    </div>
+                    <label class="settings-toggle">
+                        <input id="settingsReduceMotion" type="checkbox">
+                        <span class="settings-toggle-track" aria-hidden="true"></span>
+                    </label>
+                </div>
+
+                <div class="settings-section-label">ACCOUNT</div>
+
+                <div class="settings-item">
+                    <div class="settings-item-copy">
+                        <strong>Account email</strong>
+                        <span id="settingsEmail">Loading...</span>
+                    </div>
+                    <span class="settings-static-badge">Verified account</span>
+                </div>
+
+                <div class="settings-section-label">COMING SOON</div>
+
+                <div class="settings-item settings-coming-soon">
+                    <div class="settings-item-copy">
+                        <strong>Notifications</strong>
+                        <span>Get alerts for new messages, offers and order updates.</span>
+                    </div>
+                    <span class="coming-soon-badge">Coming soon</span>
+                </div>
+
+                <div class="settings-item settings-coming-soon">
+                    <div class="settings-item-copy">
+                        <strong>Buying Protection</strong>
+                        <span>Extra protection for eligible purchases and transactions.</span>
+                    </div>
+                    <span class="coming-soon-badge">Coming soon</span>
+                </div>
+
+                <div class="settings-item settings-coming-soon">
+                    <div class="settings-item-copy">
+                        <strong>Delivery options</strong>
+                        <span>Delivery and pickup tools for buyers and sellers.</span>
+                    </div>
+                    <span class="coming-soon-badge">Coming soon</span>
+                </div>
+
+                <div class="settings-item settings-coming-soon">
+                    <div class="settings-item-copy">
+                        <strong>Seller ratings</strong>
+                        <span>More detailed seller reputation and trust features.</span>
+                    </div>
+                    <span class="coming-soon-badge">Coming soon</span>
+                </div>
+
+                <div class="settings-section-label">SESSION</div>
 
                 <div class="settings-item danger-zone">
 
-                    <div>
-
-                        <strong>
-                            Sign out
-                        </strong>
-
-                        <span>
-                            Sign out of this A doua șansă account
-                            on this device.
-                        </span>
-
+                    <div class="settings-item-copy">
+                        <strong>Sign out</strong>
+                        <span>Sign out of this A doua șansă account on this device.</span>
                     </div>
 
-                    <button
-                        id="logoutButton"
-                        type="button"
-                        class="danger-button"
-                    >
+                    <button id="logoutButton" type="button" class="danger-button">
                         Sign out
                     </button>
 
