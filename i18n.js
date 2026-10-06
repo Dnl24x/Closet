@@ -563,6 +563,42 @@
     Object.assign(translations.ru, extraTranslations.ru);
 
     Object.assign(translations.en, {
+        "Give your items a second life. Save the planet. Earn.": "Give your items a second life. Save the planet. Earn.",
+        "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.",
+        "Find something": "Find something",
+        "worth keeping.": "worth keeping.",
+        "Search local listings from people across Moldova.": "Search local listings from people across Moldova.",
+        "Categories.": "Categories.",
+        "View all →": "View all →",
+        "EXPLORE": "EXPLORE",
+        "EXPLORE A doua șansă": "EXPLORE A doua șansă"
+    });
+
+    Object.assign(translations.ro, {
+        "Give your items a second life. Save the planet. Earn.": "Dă-le lucrurilor tale o a doua viață. Protejează planeta. Câștigă.",
+        "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "O modalitate simplă de a păstra lucrurile utile în circulație. Găsește ceva în apropiere, oferă lucrurilor nefolosite o casă nouă și câștigă niște bani.",
+        "Find something": "Găsește ceva",
+        "worth keeping.": "care merită păstrat.",
+        "Search local listings from people across Moldova.": "Caută anunțuri locale de la oameni din toată Moldova.",
+        "Categories.": "Categorii.",
+        "View all →": "Vezi toate →",
+        "EXPLORE": "EXPLOREAZĂ",
+        "EXPLORE A doua șansă": "EXPLOREAZĂ A doua șansă"
+    });
+
+    Object.assign(translations.ru, {
+        "Give your items a second life. Save the planet. Earn.": "Дай своим вещам вторую жизнь. Береги планету. Зарабатывай.",
+        "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "Простой способ дать полезным вещам новую жизнь. Найди что-нибудь рядом, передай ненужные вещи новому владельцу и заработай немного денег.",
+        "Find something": "Найди что-нибудь",
+        "worth keeping.": "что стоит сохранить.",
+        "Search local listings from people across Moldova.": "Ищи объявления от людей со всей Молдовы.",
+        "Categories.": "Категории.",
+        "View all →": "Посмотреть все →",
+        "EXPLORE": "ОБЗОР",
+        "EXPLORE A doua șansă": "ОБЗОР A doua șansă"
+    });
+
+    Object.assign(translations.en, {
         "Use initials": "Use initials",
         "Avatar background": "Avatar background",
         "Used behind your initial when no photo is shown.": "Used behind your initial when no photo is shown.",
