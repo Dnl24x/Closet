@@ -1856,6 +1856,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         setValue("itemLocation", listing.location);
         setValue("itemDescription", listing.description);
 
+        const existingAttributes =
+            listing.attributes && typeof listing.attributes === "object"
+                ? listing.attributes
+                : {};
+
         const allCategories = await ClosetCategories.getCategories();
         const selectedCategory = allCategories.find(item => item.id === listing.category_id);
         const parentCategory = selectedCategory?.parent_id
@@ -1879,6 +1884,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (subcategoryField) subcategoryField.hidden = true;
             if (subcategoryValue) subcategoryValue.textContent = "Choose a subcategory";
             if (subcategoryInput) subcategoryInput.value = "";
+        }
+
+        if (typeof ClosetCategoryAttributes !== "undefined") {
+            ClosetCategoryAttributes.render(parentCategory || selectedCategory, existingAttributes);
         }
 
         state.selectedImages.forEach(item => {
