@@ -2533,20 +2533,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             input.addEventListener("input", markListingFormDirty);
             input.addEventListener("change", markListingFormDirty);
         });
-        elements.cancelListingButton?.addEventListener("click", () => {
-            const hasChanges = hasListingChanges();
-            if (hasChanges) {
-                const confirmed = window.confirm(
-                    state.editingListingId
-                        ? "Discard your changes? The published listing will stay unchanged."
-                        : "Cancel this listing? Your current changes will be discarded."
-                );
-                if (!confirmed) return;
-            }
-            resetListingForm({ clearDraft: true });
-            ClosetNavigation.show("home");
-        });
-
         elements.profileForm?.addEventListener("submit", saveProfile);
         document.querySelector('[data-view="home"]')?.addEventListener("click", event => {
             if (ClosetNavigation.getCurrentView() === "sell") { event.preventDefault(); leaveListingForm("home"); }
