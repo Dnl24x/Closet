@@ -1926,6 +1926,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             condition: document.getElementById("itemCondition")?.value || "",
             location: document.getElementById("itemLocation")?.value || "",
             description: document.getElementById("itemDescription")?.value || "",
+            attributes: typeof ClosetCategoryAttributes !== "undefined" ? ClosetCategoryAttributes.getValues() : {},
             images: state.selectedImages.map(image => ({ id:image.id, imageId:image.imageId || image.id, existing:Boolean(image.existing), url:(image.existing || image.imported) ? image.url : null }))
         };
     }
@@ -2895,6 +2896,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupHomeHeaderSearch();
         setupListingClicks();
         setupListingDetailActions();
+        window.addEventListener("closet:category-selected", event => {
+            if (typeof ClosetCategoryAttributes !== "undefined") {
+                ClosetCategoryAttributes.render(event.detail?.category || null, {});
+            }
+            markListingFormDirty();
+        });
+
+        window.addEventListener("closet:subcategory-selected", () => {
+            markListingFormDirty();
+        });
+
+        document.addEventListener("closet:listing-attribute-changed", () => {
+            markListingFormDirty();
+        });
+
+
         setupBrowseControls();
         setupForms();
         setupProfileActions();
