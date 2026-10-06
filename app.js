@@ -2350,7 +2350,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const allCategories = [{ id: "", name: "All" }, ...categories];
 
             elements.homeCategoryStrip.innerHTML = allCategories.map(category => `
-                <button type="button" class="category-filter\${!state.selectedCategory && !category.id ? " active" : ""}" data-category="\${escapeHTML(category.id)}">\${escapeHTML(category.name)}</button>
+                <button type="button" class="category-filter${!state.selectedCategory && !category.id ? " active" : ""}" data-category="${escapeHTML(category.id)}">${escapeHTML(category.name)}</button>
             `).join("");
 
             elements.homeCategoryStrip.querySelectorAll(".category-filter").forEach(button => {
