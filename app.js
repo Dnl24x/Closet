@@ -2076,8 +2076,56 @@ document.addEventListener("DOMContentLoaded", async () => {
         state.selectedSubcategory = null;
     }
 
+    async function detectImportedCategory(data) {
+        try {
+            if (typeof ClosetCategories === "undefined" || typeof ClosetCategoryPicker === "undefined") return;
+            const categories = await ClosetCategories.getCategories();
+            const topLevel = categories.filter(category => category.parent_id === null);
+            const text = [data?.title || "", data?.description || ""].join(" ").toLowerCase();
+            const keywordGroups = {
+                clothing: ["clothing","fashion","shirt","t-shirt","tshirt","jeans","dress","jacket","coat","shoes","sneakers","hoodie","pants","одеж","обув","джинс","rochie","cămaș","haine","pantofi"],
+                electronics: ["electronics","phone","smartphone","iphone","android","samsung","xiaomi","laptop","computer","tablet","monitor","keyboard","mouse","headphones","телефон","смартфон","ноутбук","компьютер","планшет","наушник","telefon","calculator","tabletă","căști"],
+                vehicles: ["car","vehicle","auto","bmw","mercedes","audi","toyota","volkswagen","машин","авто","автомобил","mașină","automobil"],
+                home: ["home","garden","kitchen","appliance","fridge","refrigerator","washing machine","microwave","сад","дом","кухн","холодильник","стиральн","casă","grădin","bucătărie","frigider"],
+                furniture: ["furniture","sofa","couch","table","chair","wardrobe","bed","диван","стол","стул","кровать","мебел","canapea","masă","scaun","pat"],
+                kids: ["baby","kid","kids","child","children","stroller","toy","детск","ребён","игруш","коляс","copil","copii","bebeluș","cărucior","jucărie"],
+                games: ["game","gaming","playstation","xbox","nintendo","console","игр","консол","joc","consolă"],
+                sports: ["sport","football","soccer","basketball","tennis","fitness","gym","велосипед","спорт","фитнес","fotbal","baschet","tenis"],
+                books: ["book","books","textbook","education","school","учебник","книг","образован","școală","carte","cărți","educație"],
+                tools: ["tool","tools","drill","saw","equipment","инструмент","оборудован","sculă","unelte","echipament"],
+                beauty: ["beauty","cosmetic","cosmetics","makeup","perfume","skincare","космет","парфюм","красот","cosmetice","machiaj","parfum"],
+                pets: ["pet","pets","dog","cat","animal","puppy","kitten","собак","кошк","животн","câine","pisică","animale"],
+                jewelry: ["jewelry","jewellery","ring","necklace","bracelet","watch","ювелир","кольцо","ожерель","браслет","bijuter","inel","colier","brățară"],
+                bikes: ["bike","bicycle","scooter","велосипед","самокат","biciclet","trotinet"],
+                cameras: ["camera","photography","dslr","mirrorless","lens","фотоаппарат","камера","объектив","fotografie","aparat foto","obiectiv"],
+                music: ["music","guitar","piano","keyboard","drum","microphone","instrument","музык","гитар","пиан","барабан","микрофон","instrument","chitară","pian"]
+            };
+            let best = null;
+            for (const category of topLevel) {
+                const haystack = (String(category.name || "") + " " + String(category.slug || "")).toLowerCase();
+                let score = 0;
+                if (haystack && text.includes(haystack)) score += 12;
+                const groupKey = Object.keys(keywordGroups).find(key =>
+                    haystack.includes(key) ||
+                    (key === "home" && /home|garden|дом|casă|grădin/.test(haystack)) ||
+                    (key === "bikes" && /bike|bicycle|scooter|велосип|biciclet|trotinet/.test(haystack)) ||
+                    (key === "cameras" && /camera|photograph|фото|fotograf/.test(haystack))
+                );
+                const keywords = groupKey ? keywordGroups[groupKey] : [];
+                keywords.forEach(keyword => { if (text.includes(keyword)) score += keyword.length >= 6 ? 3 : 2; });
+                if (score > 0 && (!best || score > best.score)) best = { category, score };
+            }
+            if (best && best.score >= 3) {
+                ClosetCategoryPicker.selectByIds(best.category.id);
+                markListingFormDirty();
+            }
+        } catch (error) {
+            console.warn("A doua șansă imported category detection skipped:", error);
+        }
+    }
+
     function setup999ImporterBridge() {
-        window.addEventListener("closet:999-imported", event => {
+        window.addEventListener("closet:999-imported", async event => {
             const data = event.detail || {};
 
             if (state.editingListingId) {
@@ -2122,6 +2170,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     renderImagePreviews();
                 }
             }
+
+            await detectImportedCategory(data);
 
             const locationInput = document.getElementById("itemLocation");
             if (locationInput && !locationInput.value.trim()) {
