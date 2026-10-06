@@ -5479,3 +5479,217 @@ body.offer-modal-open {
         min-height: 48px;
     }
 }
+
+
+/* =========================================================
+   MOBILE LISTING SAFETY / ANTI-SQUISH OVERRIDES
+   ========================================================= */
+
+@media (max-width: 600px) {
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .app-view {
+        width: min(100% - 24px, var(--content-width));
+        padding-top: 42px;
+        padding-bottom: 80px;
+    }
+
+    .page-header {
+        margin-bottom: 28px;
+    }
+
+    .page-header h1,
+    .about-page h1,
+    .sell-introduction h1,
+    .settings-introduction h1,
+    .account-card h1 {
+        font-size: clamp(38px, 12vw, 56px);
+        letter-spacing: -2.8px;
+    }
+
+    /* Never let listing cards squeeze their contents horizontally. */
+    .listing-card {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .listing-card-button {
+        min-width: 0;
+    }
+
+    .listing-image,
+    .listing-detail-image {
+        width: 100%;
+        min-width: 0;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+    }
+
+    .listing-card-body {
+        min-width: 0;
+        padding: 12px;
+    }
+
+    .listing-card-title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        min-height: 2.5em;
+        overflow: hidden;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        text-overflow: clip;
+        line-height: 1.25;
+    }
+
+    .listing-card-meta {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        min-width: 0;
+    }
+
+    .listing-card-meta span {
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .listing-card-price {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .listing-card-management {
+        min-width: 0;
+    }
+
+    .listing-card-status-actions {
+        min-width: 0;
+    }
+
+    /* Imported-listing preview must remain readable on small screens. */
+    .listing-importer {
+        min-width: 0;
+        overflow: hidden;
+        padding: 15px;
+    }
+
+    .listing-importer-header,
+    .listing-importer-header h2,
+    .listing-importer-header p {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .listing-import-row {
+        min-width: 0;
+    }
+
+    .listing-import-row input[type="url"] {
+        min-width: 0;
+        max-width: 100%;
+        font-size: 16px;
+    }
+
+    .listing-import-preview {
+        min-width: 0;
+        grid-template-columns: 72px minmax(0, 1fr);
+        align-items: center;
+    }
+
+    .listing-import-preview img {
+        width: 72px;
+        height: 72px;
+        min-width: 72px;
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+
+    .listing-import-preview-copy {
+        min-width: 0;
+    }
+
+    .listing-import-preview-copy strong,
+    .listing-import-preview-copy span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    /* Detail pages: stack actions instead of squeezing them into one row. */
+    .listing-detail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .listing-detail-actions .listing-buy-button,
+    .listing-detail-actions .listing-offer-button {
+        flex: 1 1 calc(50% - 4px);
+        min-width: 0;
+    }
+
+    .listing-detail-actions .listing-message-icon-button,
+    .listing-detail-actions .listing-save-button {
+        flex: 0 0 48px;
+    }
+
+    /* Long imported titles/descriptions/prices must never force page width. */
+    .listing-detail-content,
+    .listing-detail-content * {
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .listing-detail-title {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .listing-detail-description {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
+@media (max-width: 380px) {
+    .app-view {
+        width: min(100% - 18px, var(--content-width));
+    }
+
+    .listing-grid {
+        gap: 8px;
+    }
+
+    .listing-card-body {
+        padding: 10px;
+    }
+
+    .listing-card-price {
+        font-size: 15px;
+    }
+
+    .listing-detail-actions .listing-buy-button,
+    .listing-detail-actions .listing-offer-button {
+        flex-basis: 100%;
+    }
+
+    .listing-detail-actions .listing-message-icon-button,
+    .listing-detail-actions .listing-save-button {
+        flex: 1 1 48px;
+    }
+}
