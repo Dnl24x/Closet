@@ -1204,6 +1204,22 @@
         "© 2026 A doua șansă · Moldova": "© 2026 A doua șansă · Молдова"
     });
 
+    Object.assign(translations.en, {
+        "Save changes to apply these settings.": "Save changes to apply these settings."
+    });
+
+    Object.assign(translations.ro, {
+        "Save changes to apply these settings.": "Salvează modificările pentru a aplica aceste setări.",
+        "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "O modalitate simplă de a păstra lucrurile utile în circulație. Găsește ceva în apropiere, oferă lucrurilor nefolosite o casă nouă și câștigă niște bani.",
+        "Find something worth keeping.": "Găsește ceva care merită păstrat."
+    });
+
+    Object.assign(translations.ru, {
+        "Save changes to apply these settings.": "Сохрани изменения, чтобы применить эти настройки.",
+        "A simpler way to keep useful things moving. Find something nearby, give unused items a new home, and make a little money while you're at it.": "Простой способ дать полезным вещам новую жизнь. Найди что-нибудь рядом, передай ненужные вещи новому владельцу и заработай немного денег.",
+        "Find something worth keeping.": "Найди то, что стоит сохранить."
+    });
+
     function getLanguage() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return SUPPORTED.includes(saved) ? saved : "en";
