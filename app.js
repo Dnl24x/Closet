@@ -142,6 +142,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         settingsReduceMotion:
             document.getElementById("settingsReduceMotion"),
 
+        settingsPendingNotice:
+            document.getElementById("settingsPendingNotice"),
+
+        saveSettingsButton:
+            document.getElementById("saveSettingsButton"),
+
         logoutButton:
             document.getElementById("logoutButton"),
 
@@ -1957,13 +1963,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderImagePreviews();
         if (elements.publishListingButton) elements.publishListingButton.textContent = "Publish listing";
         if (elements.saveListingDraftButton) elements.saveListingDraftButton.textContent = "Save as draft";
-        if (elements.cancelListingButton) elements.cancelListingButton.hidden = true;
+        if (elements.cancelListingButton) elements.cancelListingButton.hidden = false;
         clearFormMessage(document.getElementById("listingFormMessage"));
+    }
+
+    function hasMeaningfulListingContent(snapshot = getListingFormSnapshot()) {
+        if (!snapshot) return false;
+        return Boolean(
+            String(snapshot.title || "").trim() ||
+            String(snapshot.price || "").trim() ||
+            String(snapshot.categoryId || "").trim() ||
+            String(snapshot.subcategoryId || "").trim() ||
+            String(snapshot.condition || "").trim() ||
+            String(snapshot.location || "").trim() ||
+            String(snapshot.description || "").trim() ||
+            (Array.isArray(snapshot.images) && snapshot.images.length)
+        );
     }
 
     function hasListingChanges() {
         if (state.listingFormDirty) return true;
-        return JSON.stringify(getListingFormSnapshot()) !== JSON.stringify(state.listingFormSnapshot);
+        const current = getListingFormSnapshot();
+        if (!state.listingFormSnapshot) {
+            return hasMeaningfulListingContent(current);
+        }
+        return JSON.stringify(current) !== JSON.stringify(state.listingFormSnapshot);
     }
 
     function leaveListingForm(nextView = "home") {
@@ -2459,6 +2483,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             input.addEventListener("input", markListingFormDirty);
             input.addEventListener("change", markListingFormDirty);
         });
+        elements.cancelListingButton?.addEventListener("click", () => {
+            const hasChanges = hasListingChanges();
+            if (hasChanges) {
+                const confirmed = window.confirm(
+                    state.editingListingId
+                        ? "Discard your changes? The published listing will stay unchanged."
+                        : "Cancel this listing? Your current changes will be discarded."
+                );
+                if (!confirmed) return;
+            }
+            resetListingForm({ clearDraft: true });
+            ClosetNavigation.show("home");
+        });
+
         elements.profileForm?.addEventListener("submit", saveProfile);
         document.querySelector('[data-view="home"]')?.addEventListener("click", event => {
             if (ClosetNavigation.getCurrentView() === "sell") { event.preventDefault(); leaveListingForm("home"); }
@@ -2602,7 +2640,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         elements.settingsLanguage.value = ClosetI18n.getLanguage();
 
         elements.settingsLanguage.addEventListener("change", () => {
-            ClosetI18n.setLanguage(elements.settingsLanguage.value);
+            markSettingsDirty();
         });
 
         window.addEventListener("closet:language-changed", event => {
@@ -2611,6 +2649,40 @@ document.addEventListener("DOMContentLoaded", async () => {
                 elements.settingsLanguage.value = language;
             }
         });
+    }
+
+    function markSettingsDirty() {
+        if (elements.settingsPendingNotice) {
+            elements.settingsPendingNotice.hidden = false;
+        }
+        if (elements.saveSettingsButton) {
+            elements.saveSettingsButton.disabled = false;
+        }
+    }
+
+    function clearSettingsDirty() {
+        if (elements.settingsPendingNotice) {
+            elements.settingsPendingNotice.hidden = true;
+        }
+    }
+
+    async function saveSettingsPreferences() {
+        const language = elements.settingsLanguage?.value || ClosetI18n.getLanguage();
+        const theme = elements.settingsTheme?.value || "system";
+        const density = elements.settingsMessageDensity?.value || "comfortable";
+        const reducedMotion = Boolean(elements.settingsReduceMotion?.checked);
+
+        applyThemePreference(theme);
+        applyMessageDensity(density);
+        applyReducedMotion(reducedMotion);
+        clearSettingsDirty();
+
+        if (language !== ClosetI18n.getLanguage()) {
+            await ClosetI18n.setLanguage(language);
+            return;
+        }
+
+        ClosetI18n.apply();
     }
 
     function applyThemePreference(value) {
@@ -2674,17 +2746,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         applyMessageDensity(savedDensity);
         applyReducedMotion(savedReducedMotion);
 
-        elements.settingsTheme?.addEventListener("change", event => {
-            applyThemePreference(event.target.value);
+        elements.settingsTheme?.addEventListener("change", () => {
+            markSettingsDirty();
         });
 
-        elements.settingsMessageDensity?.addEventListener("change", event => {
-            applyMessageDensity(event.target.value);
+        elements.settingsMessageDensity?.addEventListener("change", () => {
+            markSettingsDirty();
         });
 
-        elements.settingsReduceMotion?.addEventListener("change", event => {
-            applyReducedMotion(event.target.checked);
+        elements.settingsReduceMotion?.addEventListener("change", () => {
+            markSettingsDirty();
         });
+
+        elements.saveSettingsButton?.addEventListener("click", saveSettingsPreferences);
+
+        clearSettingsDirty();
 
         const mediaQuery =
             window.matchMedia?.("(prefers-color-scheme: dark)");
