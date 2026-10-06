@@ -47,8 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         homeHeaderSearch: document.getElementById("homeHeaderSearch"),
         headerSearchForm: document.getElementById("headerSearchForm"),
         headerSearchInput: document.getElementById("headerSearchInput"),
-        headerCategoryButton: document.getElementById("headerCategoryButton"),
-        headerCategoryMenu: document.getElementById("headerCategoryMenu"),
         browseCategoryMenu: document.getElementById("browseCategoryMenu"),
         homeCategoryStrip: document.getElementById("homeCategoryStrip"),
         recentlyViewedSection: document.getElementById("recentlyViewedSection"),
@@ -455,22 +453,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function loadRecentlyViewed() {
         if (!elements.recentlyViewedSection || !elements.recentlyViewedGrid) return;
-        const ids = getRecentlyViewedIds();
+
+        const ids = [...new Set(getRecentlyViewedIds())].slice(0, 4);
         if (!ids.length) {
             elements.recentlyViewedSection.hidden = true;
             return;
         }
-        const results = await Promise.all(ids.slice(0, 6).map(id => ClosetListings.getListing(id)));
-        const listings = results.filter(result => result.success && result.listing && result.listing.status === "active").map(result => result.listing);
+
+        const results = await Promise.all(ids.map(id => ClosetListings.getListing(id)));
+        const listings = uniqueListings(
+            results.filter(result => result.success && result.listing && result.listing.status === "active").map(result => result.listing)
+        ).slice(0, 4);
+
         if (!listings.length) {
             elements.recentlyViewedSection.hidden = true;
             return;
         }
+
         renderListings(elements.recentlyViewedGrid, listings, "", "");
         elements.recentlyViewedSection.hidden = false;
         renderVisibleListingHearts();
     }
-
     function getSavedKey() {
         const user = ClosetAuth.getUser();
         return user ? `closet-saved-listings-${user.id}` : "closet-saved-listings-guest";
@@ -639,90 +642,59 @@ document.addEventListener("DOMContentLoaded", async () => {
         return card;
     }
 
-    function renderListings(
-        container,
-        listings,
-        emptyTitle,
-        emptyText
-    ) {
-        if (!container) {
-            return;
-        }
-
-        container.innerHTML = "";
-
-        if (!listings.length) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <h3>
-                        ${escapeHTML(emptyTitle)}
-                    </h3>
-
-                    <p>
-                        ${escapeHTML(emptyText)}
-                    </p>
-                </div>
-            `;
-
-            return;
-        }
-
-        listings.forEach((listing) => {
-            container.appendChild(
-                createListingCard(listing)
-            );
+    function uniqueListings(listings, excludedIds = new Set()) {
+        const seen = new Set();
+        return (Array.isArray(listings) ? listings : []).filter(listing => {
+            const id = listing?.id;
+            if (!id || excludedIds.has(id) || seen.has(id)) return false;
+            seen.add(id);
+            return true;
         });
     }
 
+    function renderListings(container, listings, emptyTitle, emptyText) {
+        if (!container) return;
+        const unique = uniqueListings(listings);
+        container.innerHTML = "";
+        if (!unique.length) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <h3>\${escapeHTML(emptyTitle)}</h3>
+                    <p>\${escapeHTML(emptyText)}</p>
+                </div>`;
+            return;
+        }
+        unique.forEach(listing => container.appendChild(createListingCard(listing)));
+    }
     async function loadHomeListings() {
         if (!elements.homeListingsGrid) return;
 
-        const result = await ClosetListings.getHomeListings({ limit: 8 });
+        const recentlyViewedIds = new Set(getRecentlyViewedIds());
+        const result = await ClosetListings.getHomeListings({ limit: 12 });
 
         if (!result.success) {
-            renderListings(
-                elements.homeListingsGrid,
-                [],
-                "Listings are unavailable",
-                result.message
-            );
+            renderListings(elements.homeListingsGrid, [], "Listings are unavailable", result.message);
             return;
         }
 
-        // Render immediately. Category labels are enrichment, not a
-        // prerequisite for showing the marketplace.
+        const latestListings = uniqueListings(result.listings, recentlyViewedIds).slice(0, 8);
+
         renderListings(
             elements.homeListingsGrid,
-            result.listings,
+            latestListings,
             "Nothing is listed yet",
             "Be the first person to give an item a new home."
         );
 
-        // Enrich cards in the background from the shared category cache.
-        // A slow categories request can no longer block Latest Items.
-        ClosetCategories.getCategories()
-            .then(categories => {
-                const categoryMap = new Map(
-                    categories.map(category => [category.id, category])
-                );
-
-                result.listings.forEach(listing => {
-                    const category = categoryMap.get(listing.category_id);
-                    if (category) listing.category = category;
-                });
-
-                renderListings(
-                    elements.homeListingsGrid,
-                    result.listings,
-                    "Nothing is listed yet",
-                    "Be the first person to give an item a new home."
-                );
-            })
-            .catch(() => {
-                // Keep the already-rendered listings visible.
+        ClosetCategories.getCategories().then(categories => {
+            const categoryMap = new Map(categories.map(category => [category.id, category]));
+            latestListings.forEach(listing => {
+                const category = categoryMap.get(listing.category_id);
+                if (category) listing.category = category;
             });
+            renderListings(elements.homeListingsGrid, latestListings, "Nothing is listed yet", "Be the first person to give an item a new home.");
+        }).catch(() => {});
     }
-
     async function loadBrowseListings() {
         if (!elements.browseListingsGrid) {
             return;
@@ -2372,24 +2344,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function loadHomeCategories() {
         if (!elements.homeCategoryStrip) return;
+
         try {
             const categories = await ClosetCategories.getTopLevelCategories();
-            elements.homeCategoryStrip.innerHTML = categories.map(category => `
-                <button type="button" class="category-filter" data-category="${escapeHTML(category.id)}">${escapeHTML(category.name)}</button>
+            const allCategories = [{ id: "", name: "All" }, ...categories];
+
+            elements.homeCategoryStrip.innerHTML = allCategories.map(category => `
+                <button type="button" class="category-filter\${!state.selectedCategory && !category.id ? " active" : ""}" data-category="\${escapeHTML(category.id)}">\${escapeHTML(category.name)}</button>
             `).join("");
+
             elements.homeCategoryStrip.querySelectorAll(".category-filter").forEach(button => {
                 button.addEventListener("click", () => {
                     state.selectedCategory = button.dataset.category || null;
+                    elements.homeCategoryStrip.querySelectorAll(".category-filter").forEach(item => {
+                        item.classList.toggle("active", item === button);
+                    });
                     if (elements.browseSearch) elements.browseSearch.value = "";
                     ClosetNavigation.show("browse");
+                    void loadBrowseListings();
                 });
             });
         } catch (error) {
-            console.error("CLOSET home categories error:", error);
+            console.error("CLOSET category bar error:", error);
             elements.homeCategoryStrip.innerHTML = '<div class="listing-empty"><p>Categories are temporarily unavailable.</p></div>';
         }
     }
-
     async function openBrowseCategoryMenu() {
         const menu = elements.browseCategoryMenu;
         if (!menu) return;
@@ -2419,45 +2398,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    async function openCategoryMenu() {
-        const menu = elements.headerCategoryMenu;
-        if (!menu) return;
-        if (!menu.hidden) {
-            menu.hidden = true;
-            elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
-            return;
-        }
-        const categories = await ClosetCategories.getTopLevelCategories();
-        menu.innerHTML = categories.map(category => `
-            <button type="button" class="header-category-option" data-category-id="${escapeHTML(category.id)}">${escapeHTML(category.name)}</button>`).join("");
-        menu.hidden = false;
-        elements.headerCategoryButton?.setAttribute("aria-expanded", "true");
-        menu.querySelectorAll("[data-category-id]").forEach(button => {
-            button.addEventListener("click", () => {
-                state.selectedCategory = button.dataset.categoryId || null;
-                menu.hidden = true;
-                elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
-                ClosetNavigation.show("browse");
-            });
-        });
-    }
-
     function setupHomeHeaderSearch() {
-        elements.headerCategoryButton?.addEventListener("click", openCategoryMenu);
         elements.headerSearchForm?.addEventListener("submit", event => {
             event.preventDefault();
             if (elements.browseSearch) elements.browseSearch.value = elements.headerSearchInput?.value.trim() || "";
             state.selectedCategory = null;
+            elements.homeCategoryStrip?.querySelectorAll(".category-filter").forEach(button => {
+                button.classList.toggle("active", !button.dataset.category);
+            });
             ClosetNavigation.show("browse");
         });
-        window.addEventListener("closet:navigate", event => {
-            if (elements.homeHeaderSearch) {
-                elements.homeHeaderSearch.hidden = false;
-            }
-            if (elements.headerCategoryMenu && event.detail?.view !== "home") {
-                elements.headerCategoryMenu.hidden = true;
-                elements.headerCategoryButton?.setAttribute("aria-expanded", "false");
-            }
+
+        window.addEventListener("closet:navigate", () => {
+            if (elements.homeHeaderSearch) elements.homeHeaderSearch.hidden = false;
         });
     }
 
