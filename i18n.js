@@ -1168,6 +1168,42 @@
         "Email": "Электронная почта"
     });
 
+    Object.assign(translations.en, {
+        "Cancel": "Cancel", "PURCHASE": "PURCHASE", "Item": "Item", "Offer": "Offer", "Listing": "Listing",
+        "Only the seller can send a counter offer.": "Only the seller can send a counter offer.",
+        "This listing has an invalid asking price.": "This listing has an invalid asking price.",
+        "The offer must be above 0 MDL and no more than the asking price.": "The offer must be above 0 MDL and no more than the asking price.",
+        "Offers must be between 1% and 80% below the asking price.": "Offers must be between 1% and 80% below the asking price.",
+        "Your counter offer cannot be above the asking price.": "Your counter offer cannot be above the asking price.",
+        "Sending counter offer…": "Sending counter offer…", "Sending offer…": "Sending offer…", "Fetching…": "Fetching…",
+        "Please wait…": "Please wait…"
+    });
+    Object.assign(translations.ro, {
+        "Cancel": "Anulează", "PURCHASE": "CUMPĂRARE", "Item": "Articol", "Offer": "Ofertă", "Listing": "Anunț",
+        "Only the seller can send a counter offer.": "Doar vânzătorul poate trimite o contraofertă.",
+        "This listing has an invalid asking price.": "Acest anunț are un preț solicitat invalid.",
+        "The offer must be above 0 MDL and no more than the asking price.": "Oferta trebuie să fie mai mare de 0 MDL și să nu depășească prețul solicitat.",
+        "Offers must be between 1% and 80% below the asking price.": "Ofertele trebuie să fie cu 1% până la 80% sub prețul solicitat.",
+        "Your counter offer cannot be above the asking price.": "Contraoferta ta nu poate depăși prețul solicitat.",
+        "Sending counter offer…": "Se trimite contraoferta…", "Sending offer…": "Se trimite oferta…", "Fetching…": "Se preia…",
+        "Please wait…": "Așteaptă…",
+        "You can now continue your experience. Your email has been verified successfully. You can now start selling.": "Poți continua. Adresa ta de email a fost verificată cu succes. Acum poți începe să vinzi.",
+        "WElCOME BACK": "BINE AI REVENIT"
+    });
+    Object.assign(translations.ru, {
+        "Cancel": "Отмена", "PURCHASE": "ПОКУПКА", "Item": "Товар", "Offer": "Предложение", "Listing": "Объявление",
+        "Only the seller can send a counter offer.": "Только продавец может отправить встречное предложение.",
+        "This listing has an invalid asking price.": "В этом объявлении указана недействительная цена.",
+        "The offer must be above 0 MDL and no more than the asking price.": "Предложение должно быть выше 0 MDL и не превышать указанную цену.",
+        "Offers must be between 1% and 80% below the asking price.": "Предложения должны быть на 1–80% ниже указанной цены.",
+        "Your counter offer cannot be above the asking price.": "Ваше встречное предложение не может превышать указанную цену.",
+        "Sending counter offer…": "Отправка встречного предложения…", "Sending offer…": "Отправка предложения…", "Fetching…": "Загрузка…",
+        "Please wait…": "Пожалуйста, подождите…",
+        "You can now continue your experience. Your email has been verified successfully. You can now start selling.": "Можно продолжить. Ваша электронная почта успешно подтверждена. Теперь вы можете начать продавать.",
+        "WElCOME BACK": "С ВОЗВРАЩЕНИЕМ",
+        "© 2026 A doua șansă · Moldova": "© 2026 A doua șansă · Молдова"
+    });
+
     function getLanguage() {
         const saved = localStorage.getItem(STORAGE_KEY);
         return SUPPORTED.includes(saved) ? saved : "en";
