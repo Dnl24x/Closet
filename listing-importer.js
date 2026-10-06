@@ -2,6 +2,7 @@
     const form = document.getElementById("listingImportForm");
     const urlInput = document.getElementById("listingImportUrl");
     const button = document.getElementById("listingImportButton");
+    const cancelButton = document.getElementById("cancelImportButton");
     const consent = document.getElementById("listingImportConsent");
     const message = document.getElementById("listingImportMessage");
     const preview = document.getElementById("listingImportPreview");
@@ -154,6 +155,22 @@
 
         preview.hidden = false;
     }
+
+    function resetImporter() {
+        if (urlInput) urlInput.value = "";
+        if (consent) consent.checked = false;
+        clearMessage();
+        if (preview) {
+            preview.replaceChildren();
+            preview.hidden = true;
+        }
+        setLoading(false);
+    }
+
+    cancelButton?.addEventListener("click", () => {
+        resetImporter();
+        window.dispatchEvent(new CustomEvent("closet:999-import-cancelled"));
+    });
 
     form.addEventListener("submit", async event => {
         event.preventDefault();
